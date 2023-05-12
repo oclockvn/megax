@@ -7,9 +7,9 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
     <!--<SpaRoot>ClientApp\</SpaRoot>-->
-    <SpaRoot>NextApp\</SpaRoot>
+    <SpaRoot>nextapp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
-    <SpaProxyServerUrl>https://localhost:44439</SpaProxyServerUrl>
+    <SpaProxyServerUrl>http://localhost:3000</SpaProxyServerUrl>
     <!--<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>-->
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
