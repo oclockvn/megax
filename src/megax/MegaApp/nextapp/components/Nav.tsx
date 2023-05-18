@@ -1,6 +1,7 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import Button from "@mui/material/Button";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function Nav() {
@@ -15,12 +16,12 @@ export default function Nav() {
           <>
             <span>Hi {session.data?.user?.name}</span>
 
-            <button onClick={() => signOut()}>Logout</button>
+            <Button variant="contained" onClick={() => signOut()}>
+              Logout
+            </Button>
           </>
         ) : (
-          <>
-            <Link href="/auth/login">Login</Link>
-          </>
+          <></>
         )}
       </nav>
     </>

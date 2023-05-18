@@ -1,16 +1,16 @@
-import Nav from "@/components/Nav";
-import "./globals.css";
-import { Inter } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
+import { Inter } from "next/font/google";
+
+import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "MegaApp",
+  title: "MegaApp - Sign In",
   description: "A Mega App for A Company",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -18,10 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <Nav />
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
