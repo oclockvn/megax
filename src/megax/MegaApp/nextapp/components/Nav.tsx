@@ -14,6 +14,8 @@ export default function Nav() {
         {isAuthenticated ? (
           <>
             <span>Hi {session.data?.user?.name}</span>
+
+            <button onClick={() => signOut()}>Logout</button>
           </>
         ) : (
           <>
