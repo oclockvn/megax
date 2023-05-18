@@ -1,9 +1,9 @@
-import { Inter } from "next/font/google";
-import AuthProvider from "@/components/AuthProvider";
+// import { Inter } from "next/font/google";
+// import AuthProvider from "@/components/AuthProvider";
 
 import "../globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "MegaApp - Welcome to Portal",
@@ -16,13 +16,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          <h1>Welcome</h1>
-          {children}
-        </AuthProvider>
-      </body>
-    </html>
+    <main>
+      <h1>Welcome</h1>
+      {children}
+    </main>
   );
 }
