@@ -1,9 +1,9 @@
 export const metadata = {
-  title: "MegaApp - Sign In",
+  title: "MegaApp",
   description: "A Super App for A Company",
 };
 
-export default function AuthLayout({
+export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;

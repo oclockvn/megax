@@ -8,6 +8,7 @@ import {
   MenuItem,
   Menu,
   Button,
+  // Skeleton,
 } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -18,6 +19,7 @@ import { useRouter } from "next/navigation";
 export default function Nav() {
   const session = useSession();
   const isAuthenticated = session.status === "authenticated";
+  // const isLoading = session.status === "loading";
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
@@ -84,6 +86,9 @@ export default function Nav() {
               </div>
             ) : (
               <>
+                {/* {isLoading && (
+                  <Skeleton variant="circular" width={24} height={24} />
+                )} */}
                 <div>
                   <Button>
                     <Link href="/about">About</Link>

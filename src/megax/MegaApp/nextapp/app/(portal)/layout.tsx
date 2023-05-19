@@ -1,9 +1,9 @@
 export const metadata = {
   title: "MegaApp - Welcome to Portal",
-  description: "A Mega App for A Company",
+  description: "A Super App for A Company",
 };
 
-export default async function RootLayout({
+export default function PortalLayout({
   children,
 }: {
   children: React.ReactNode;
