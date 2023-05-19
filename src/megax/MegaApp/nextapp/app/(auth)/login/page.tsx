@@ -20,8 +20,8 @@ export default function SignInPage() {
       className="flex items-center justify-center"
       style={{ minHeight: "calc(100vh - 50px)" }}
     >
-      <div className="border rounded-lg shadow p-8 bg-blue-100">
-        <Typography component="div" variant="h4">
+      <div className="border rounded-lg shadow p-8 bg-white">
+        <Typography component="div" variant="h4" color={"#000"}>
           Sign In to MegaX
         </Typography>
 

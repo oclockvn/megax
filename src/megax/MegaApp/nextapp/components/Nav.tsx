@@ -7,6 +7,7 @@ import {
   Typography,
   MenuItem,
   Menu,
+  Button,
 } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -32,12 +33,20 @@ export default function Nav() {
     }
   };
 
+  const toolbarBg = isAuthenticated ? "" : "bg-white";
+  const logoColor = isAuthenticated ? "text-white" : "text-blue-500";
+
   return (
     <>
       <nav>
         <AppBar position="static">
-          <Toolbar variant="dense">
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Toolbar variant="dense" color="white" className={toolbarBg}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1 }}
+              className={logoColor}
+            >
               <Link href={"/"}>MegaX</Link>
             </Typography>
             {isAuthenticated ? (
@@ -74,7 +83,16 @@ export default function Nav() {
                 </Menu>
               </div>
             ) : (
-              <></>
+              <>
+                <div>
+                  <Button>
+                    <Link href="/about">About</Link>
+                  </Button>
+                  <Button>
+                    <Link href="/login">Login</Link>
+                  </Button>
+                </div>
+              </>
             )}
           </Toolbar>
         </AppBar>
