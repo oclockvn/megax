@@ -1,0 +1,4 @@
+.fullBg {
+  box-shadow: 0 0 0 100vmax rgb(219, 234, 254);
+  clip-path: inset(0 -100vmax);
+}
