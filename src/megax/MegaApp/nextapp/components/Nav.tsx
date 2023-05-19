@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { AccountCircle } from "@mui/icons-material";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
