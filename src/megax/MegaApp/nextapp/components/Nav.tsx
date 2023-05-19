@@ -41,7 +41,7 @@ export default function Nav() {
   return (
     <>
       <nav>
-        <AppBar position="static">
+        <AppBar position="static" elevation={isAuthenticated ? 4 : 0}>
           <Toolbar variant="dense" color="white" className={toolbarBg}>
             <Typography
               variant="h6"

@@ -28,7 +28,7 @@ export default function SignInPage() {
         <div className="mt-4">
           <Button
             variant="contained"
-            className="!bg-blue-500"
+            className="!bg-blue-500 w-full"
             onClick={() => signIn(provider)}
           >
             <GoogleIcon className="mr-4" />
