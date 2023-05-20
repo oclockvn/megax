@@ -1,12 +1,20 @@
 using MegaApp.Controllers;
+using MegaApp.Core;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbConnection");
 
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddSingleton<SessionManager>();
+builder.Services
+    .AddCoreServices(dbOption =>
+    {
+        dbOption.UseSqlServer(connectionString);
+    })
+    .AddSingleton<SessionManager>();
 
 var app = builder.Build();
 
