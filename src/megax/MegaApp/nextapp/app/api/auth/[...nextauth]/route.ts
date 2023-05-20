@@ -17,6 +17,31 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  callbacks: {
+    // async signIn({ user, account, profile, email, credentials }) {
+    //   console.log("> signin", { user, account, profile, email, credentials });
+    //   return true;
+    // },
+    // async redirect({ url, baseUrl }) {
+    //   return baseUrl
+    // },
+    async session({ session, user, token }) {
+      console.log("> session", { session, user, token });
+
+      return {
+        ...session,
+        accessToken: token.accessToken,
+      };
+    },
+    async jwt({ token, user, account, profile, isNewUser }) {
+      console.log("> jwt", { token, user, account, profile, isNewUser });
+      if (account) {
+        // add token to session
+        token.accessToken = account.access_token;
+      }
+      return token;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

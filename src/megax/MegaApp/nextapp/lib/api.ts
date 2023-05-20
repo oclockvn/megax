@@ -1,9 +1,10 @@
 import axios from "axios";
 import { handleResponse } from "@/lib/response.intercepter";
-import { isProd } from "./config";
+import { getSession } from "next-auth/react";
+import { authUrl } from "./config";
 
 const client = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: authUrl,
   withCredentials: true,
   headers: {
     "Content-type": "application/json",
@@ -11,12 +12,15 @@ const client = axios.create({
   },
 });
 
-if (!isProd) {
-  client.interceptors.request.use(request => {
-    console.log("Starting Request", JSON.stringify(request, null, 2));
-    return request;
-  });
-}
+client.interceptors.request.use(async request => {
+  const session = await getSession();
+  const token = session ? (session as any)["accessToken"] : null; // we inject token to session in jwt callback
+
+  if (token) {
+    request.headers.Authorization = `Bearer ${token}`;
+  }
+  return request;
+});
 
 client.interceptors.response.use(originalResponse => {
   handleResponse(originalResponse.data);
