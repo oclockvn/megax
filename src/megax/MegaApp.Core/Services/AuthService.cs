@@ -10,6 +10,8 @@ namespace MegaApp.Core.Services
         Task<AdapterUser> GetUserAsync(Guid id);
         Task<AdapterUser> GetUserByEmailAsync(string email);
         Task<AdapterUser> GetUserByAccountAsync(string provider, string providerAccountId);
+
+        Task<AdapterUser> CreateUserAsync(BaseAdapterUser user);
         Task<AdapterUser> UpdateUserAsync(AdapterUser user);
         Task DeleteUserAsync(Guid id);
 
@@ -31,11 +33,11 @@ namespace MegaApp.Core.Services
             this.dbContextFactory = dbContextFactory;
         }
 
-        private ApplicationDbContext initDb() => dbContextFactory.CreateDbContext();
+        private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
 
         public async Task<AdapterSession> CreateSessionAsync(AdapterSession session)
         {
-            using var db = initDb();
+            using var db = UseDb();
             var entry = db.Sessions.Add(new()
             {
                 Expires = session.Expires,
@@ -51,13 +53,13 @@ namespace MegaApp.Core.Services
 
         public async Task DeleteSessionAsync(string sessionToken)
         {
-            using var db = initDb();
+            using var db = UseDb();
             await db.Sessions.Where(s => s.SessionToken == sessionToken).ExecuteDeleteAsync();
         }
 
         public async Task DeleteUserAsync(Guid id)
         {
-            using var db = initDb();
+            using var db = UseDb();
             var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id) ?? throw new Exception($"No user found by id {id}");
             user.IsDisabled = true;
 
@@ -66,7 +68,7 @@ namespace MegaApp.Core.Services
 
         public async Task<SessionAndUser> GetSessionAndUserAsync(string sessionToken)
         {
-            using var db = initDb();
+            using var db = UseDb();
             var user = await db.Sessions
                 .AsNoTracking()
                 .Where(s => s.SessionToken == sessionToken)
@@ -82,7 +84,7 @@ namespace MegaApp.Core.Services
 
         public async Task<AdapterSession> UpdateSessionAsync(AdapterSession session)
         {
-            using var db = initDb();
+            using var db = UseDb();
             var entity = await db.Sessions.FirstOrDefaultAsync(s => s.SessionToken == session.SessionToken) ?? throw new Exception($"No session found by token {session.SessionToken}");
 
             entity.Expires = session.Expires;
@@ -93,7 +95,7 @@ namespace MegaApp.Core.Services
 
         public async Task<AdapterUser> GetUserAsync(Guid id)
         {
-            using var db = initDb();
+            using var db = UseDb();
             return await db.Users.Where(u => u.Id == id)
                 .Select(u => MapFromUser(u))
                 .FirstOrDefaultAsync();
@@ -101,7 +103,7 @@ namespace MegaApp.Core.Services
 
         public async Task<AdapterUser> GetUserByAccountAsync(string provider, string providerAccountId)
         {
-            using var db = initDb();
+            using var db = UseDb();
             return await db.Accounts.Where(a => a.Provider == provider && a.ProviderAccountId == providerAccountId)
                 .Select(a => MapFromUser(a.User))
                 .FirstOrDefaultAsync();
@@ -109,7 +111,7 @@ namespace MegaApp.Core.Services
 
         public async Task<AdapterUser> GetUserByEmailAsync(string email)
         {
-            using var db = initDb();
+            using var db = UseDb();
             return await db.Users.Where(u => u.Email == email)
                 .Select(u => MapFromUser(u))
                 .FirstOrDefaultAsync();
@@ -117,15 +119,33 @@ namespace MegaApp.Core.Services
 
         public async Task<AdapterAccount> LinkAccountAsync(AdapterAccount account)
         {
-            using var db = initDb();
-            var userExist = await db.Users.AnyAsync(u => u.Id == Guid.Parse(account.UserId));
+            using var db = UseDb();
+            var uid = Guid.Parse(account.UserId);
+            var userExist = await db.Users.AnyAsync(u => u.Id == uid);
             if (!userExist)
                 throw new Exception($"No user exist by id {account.UserId}");
 
-            var entity = await db.Accounts.FirstOrDefaultAsync(a => a.Provider == account.Provider && a.ProviderAccountId == account.ProviderAccountId)
-                ?? throw new Exception($"No account found by provider {account.Provider} and id {account.ProviderAccountId}");
+            var entity = await db.Accounts.FirstOrDefaultAsync(a => a.Provider == account.Provider && a.ProviderAccountId == account.ProviderAccountId);
+            if (entity == null)
+            {
+                entity = new Account
+                {
+                    AccessToken = account.AccessToken,
+                    ExpiresAt = account.ExpiresAt,
+                    Id = Guid.NewGuid(),
+                    IdToken = Guid.NewGuid().ToString(),
+                    Provider = account.Provider,
+                    ProviderAccountId = account.ProviderAccountId,
+                    //RefreshToken = "",
+                    Scope = account.Scope,
+                    //SessionState = "",
+                    Type = account.Type,
+                };
 
-            entity.UserId = Guid.Parse(account.UserId);
+                db.Accounts.Add(entity);
+            }
+
+            entity.UserId = uid;
             await db.SaveChangesAsync();
 
             return new()
@@ -137,9 +157,25 @@ namespace MegaApp.Core.Services
             };
         }
 
+        public async Task<AdapterUser> CreateUserAsync(BaseAdapterUser user)
+        {
+            using var db = UseDb();
+            var entry = db.Users.Add(new()
+            {
+                Email = user.Email,
+                EmailVerified = user.EmailVerified,
+                Id = Guid.NewGuid(),
+                Image = user.Image,
+                Name = user.Name,
+            });
+
+            await db.SaveChangesAsync();
+
+            return MapFromUser(entry.Entity);
+        }
         public async Task<AdapterUser> UpdateUserAsync(AdapterUser user)
         {
-            using var db = initDb();
+            using var db = UseDb();
             var entity = await db.Users.FirstOrDefaultAsync(u => u.Id == Guid.Parse(user.Id)) ?? throw new Exception($"No user found by id {user.Id}");
 
             // todo: update more user props later

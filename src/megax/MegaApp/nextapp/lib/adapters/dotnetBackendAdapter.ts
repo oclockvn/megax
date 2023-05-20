@@ -17,11 +17,13 @@ export default function DotnetBackendAdapter(): Adapter {
       const resp = await client.post<AdapterUser>("/be/auth/createUser", user);
       return resp.data;
     },
+
     async getUser(id: string) {
       console.log("getUser", id);
       const resp = await client.get<AdapterUser>("/be/auth/getUser/" + id);
       return resp.data;
     },
+
     async getUserByEmail(email: string) {
       console.log("getUserByEmail", email);
       const resp = await client.get<AdapterUser>(
@@ -29,6 +31,7 @@ export default function DotnetBackendAdapter(): Adapter {
       );
       return resp.data;
     },
+
     async getUserByAccount({ providerAccountId, provider }) {
       console.log("getUserByAccount", providerAccountId, provider);
       const resp = await client.get<AdapterUser>(
@@ -36,23 +39,31 @@ export default function DotnetBackendAdapter(): Adapter {
       );
       return resp.data;
     },
+
     async updateUser(user: Partial<AdapterUser> & Pick<AdapterUser, "id">) {
       console.log("updateUser", user);
       await delay(100);
       return user as AdapterUser;
     },
-    //     async deleteUser(userId: string): Promise<void> {
-    //       // no need
-    //       return new Promise(() => {})
-    //     },
+
+    async deleteUser(userId: string) {
+      console.log("deleteUser", userId);
+      await client.post("/be/auth/deleteUser/" + userId);
+    },
+
     async linkAccount(account: AdapterAccount) {
       console.log("linkAccount", account);
-      // no need
-      // return new Promise(() => {});
+      const res = await client.post<AdapterAccount>(
+        "/be/auth/linkAccount",
+        account
+      );
+      return res.data;
     },
+
     //     async unlinkAccount({ providerAccountId, provider }) {
     // return new Promise(() => {})
     //     },
+
     async createSession({
       sessionToken,
       userId,
@@ -71,6 +82,7 @@ export default function DotnetBackendAdapter(): Adapter {
 
       return resp.data;
     },
+
     async getSessionAndUser(sessionToken) {
       console.log("getSessionAndUser", sessionToken);
       const resp = await client.get<SessionAndUser>(
@@ -79,15 +91,20 @@ export default function DotnetBackendAdapter(): Adapter {
       return resp.data;
     },
 
-    async updateSession({ sessionToken }: { sessionToken: string }) {
-      console.log("updateSession", sessionToken);
-      await delay(200);
-      return { sessionToken } as AdapterSession;
+    async updateSession(
+      session: Partial<AdapterSession> & Pick<AdapterSession, "sessionToken">
+    ) {
+      console.log("updateSession", session);
+      const res = await client.post<AdapterSession>(
+        "/be/auth/updateSession",
+        session
+      );
+      return res.data;
     },
 
     async deleteSession(sessionToken: string) {
       console.log("deleteSession", sessionToken);
-      await delay(200);
+      await client.post(`/be/auth/deleteSession/${sessionToken}`);
     },
 
     // async createVerificationToken({ identifier, expires, token }) {
