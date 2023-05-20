@@ -1,3 +1,4 @@
+import DotnetBackendAdapter from "@/lib/adapters/dotnetBackendAdapter";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -10,6 +11,11 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/login",
+  },
+  adapter: DotnetBackendAdapter(),
+  // debug: true,
+  session: {
+    strategy: "jwt",
   },
 };
 

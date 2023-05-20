@@ -25,7 +25,8 @@ if (isProd) {
     //   destination: "/api/auth/:path*",
     // },
     {
-      source: "/api/:path((?!auth).*)", // skip auth path for authentication
+      // source: "/api/:path((?!auth/).*)", // skip auth path for authentication
+      source: "/be/:path*", // skip auth path for authentication
       destination: backendUrl + "/api/:path*",
     },
   ];
