@@ -9,7 +9,9 @@ import { Typography } from "@mui/material";
 
 export default function SignInPage() {
   const session = useSession();
-  if (session.status === "authenticated") {
+  const isAuthenticated = session.status === "authenticated";
+
+  if (isAuthenticated) {
     redirect("/");
   }
 

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+"use client";
 
 export default function Home() {
   return <h2>Dashboard</h2>;
