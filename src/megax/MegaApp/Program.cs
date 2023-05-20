@@ -14,7 +14,7 @@ builder.Services
     {
         dbOption.UseSqlServer(connectionString);
     })
-    .AddSingleton<SessionManager>();
+    ;
 
 var app = builder.Build();
 

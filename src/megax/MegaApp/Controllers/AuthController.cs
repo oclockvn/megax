@@ -1,185 +1,93 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.CodeAnalysis;
+﻿using MegaApp.Core.Dtos;
+using MegaApp.Core.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MegaApp.Controllers
 {
-    public class AdapterUser
-    {
-        public string Id { get; set; } = null;
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Image { get; set; }
-        public DateTime? EmailVerified { get; set; }
-    }
-
-    public class NewAdapterUser
-    {
-        //public string Id { get; set; } = null;
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Image { get; set; }
-        public DateTime? EmailVerified { get; set; }
-    }
-
-    public class AdapterSession
-    {
-        /** A randomly generated value that is used to get hold of the session. */
-        public string SessionToken { get; set; }
-        /** Used to connect the session to a particular user */
-        public string UserId { get; set; }
-        public DateTime expires { get; set; }
-    }
-
-    public class SessionManager
-    {
-        public List<AdapterUser> Users { get; set; } = new();
-        public List<AdapterSession> Sessions { get; set; } = new();
-
-        public AdapterUser GetFirst() => Users.FirstOrDefault();
-        public AdapterUser GetUser(string id) => Users.FirstOrDefault(u => u.Id == id);
-        public AdapterUser GetUserByEmail(string email) => Users.FirstOrDefault(u => u.Email == email);
-        public AdapterUser AddUser(AdapterUser user)
-        {
-            Users.Add(user);
-            return user;
-        }
-
-        public AdapterSession GetSession(string token) => Sessions.FirstOrDefault(s => s.SessionToken == token);
-        public void AddSession(AdapterSession session)
-        {
-            // AdapterSession
-            Sessions.Add(session);
-        }
-
-    }
-
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly SessionManager manager;
+        private readonly IAuthService authService;
 
-        public AuthController(SessionManager manager)
+        public AuthController(IAuthService authService)
         {
-            this.manager = manager;
+            this.authService = authService;
         }
 
-
-        // private static AdapterUser _user(string id) =>
-        // new()
-        // {
-        //     Id = id,// "08da00f3-f67b-47f2-87d9-1a5cf54dd986",// Guid.NewGuid().ToString(),
-        //     Email = "oclockvn.dev@gmail.com",
-        //     Name = "Quang Phan",
-        //     EmailVerified = DateTime.Now,
-        // };
-
-        // private static AdapterSession _session(string sessionToken, string userId)
-        // => new()
-        // {
-        //     expires = DateTime.Now.AddDays(30),
-        //     SessionToken = sessionToken,// Guid.NewGuid().ToString("N"),
-        //     UserId = userId,// "08da00f3-f67b-47f2-87d9-1a5cf54dd986",// Guid.NewGuid().ToString(),
-        // };
-
         [HttpPost("createUser")]
-        public async Task<IActionResult> CreateUser(NewAdapterUser user)
+        public async Task<IActionResult> CreateUser(BaseAdapterUser user)
         {
-            await Task.CompletedTask;
-            var addedUser = manager.AddUser(new AdapterUser
-            {
-                Id = Guid.NewGuid().ToString(),
-                Email = user.Email,
-                EmailVerified = null,
-                Image = user.Image,
-                Name = user.Name
-            });
-
+            var addedUser = await authService.CreateUserAsync(user);
             return Ok(addedUser);
         }
 
         [HttpGet("getUser/{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
-            await Task.CompletedTask;
-            return Ok(manager.GetUser(id));
+            var user = await authService.GetUserAsync(Guid.Parse(id));
+            return Ok(user);
         }
 
         [HttpGet("getUserByEmail/{email}")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
-            await Task.CompletedTask;
-            return Ok(manager.GetUserByEmail(email));
+            return Ok(await authService.GetUserByEmailAsync(email));
         }
 
         [HttpGet("getUserByAccount/{provider}/{providerAccountId}")]
-        public async Task<IActionResult> GetUserByAccount(string providerAccountId, string provider)
+        public async Task<IActionResult> GetUserByAccount(string provider, string providerAccountId)
         {
-            await Task.CompletedTask;
-            return Ok(manager.GetFirst());
+            return Ok(await authService.GetUserByAccountAsync(provider, providerAccountId));
         }
-
 
         [HttpPost("updateUser")]
         public async Task<IActionResult> UpdateUser(AdapterUser user)
         {
-            return Ok(manager.GetUser(user.Id));
+            var updated = await authService.UpdateUserAsync(user);
+            return Ok(updated);
         }
 
         [HttpDelete("deleteUser/{userId}")]
         public async Task<IActionResult> DeleteUser(string userId)
         {
-            await Task.CompletedTask;
-            return Ok(new { success = true });
+            await authService.DeleteUserAsync(Guid.Parse(userId));
+            return Ok(new { done = true });
         }
 
         [HttpPost("createSession")]
         public async Task<IActionResult> CreateSession(AdapterSession session)
         {
-            await Task.CompletedTask;
-            // var session = new AdapterSession
-            // {
-            //     expires = expires,
-            //     SessionToken = sessionToken,
-            //     UserId = userId,
-            // };
-            //var existingSession = manager.GetSession(session.UserId);
-            //if (existingSession != null)
-            //{
-            //    return Ok(existingSession);
-            //}
-
-            manager.AddSession(session);
-
-            return Ok(session);
+            var sessionResult = await authService.CreateSessionAsync(session);
+            return Ok(sessionResult);
         }
 
         [HttpGet("getSessionAndUser/{sessionToken}")]
         public async Task<IActionResult> GetSessionAndUser(string sessionToken)
         {
-            await Task.CompletedTask;
-            var session = manager.GetSession(sessionToken);
-            if (session == null)
-            {
-                return Ok();
-            }
-
-            var user = manager.GetUser(session.UserId);
-            return Ok(new { session, user });
+            var sessionAndUser = await authService.GetSessionAndUserAsync(sessionToken);
+            return Ok(sessionAndUser);
         }
 
         [HttpPost("updateSession/{sessionToken}")]
-        public async Task<IActionResult> UpdateSession(string sessionToken)
+        public async Task<IActionResult> UpdateSession(AdapterSession session)
         {
-            await Task.CompletedTask;
-            return Ok(manager.GetSession(sessionToken));
+            var sessionResult = await authService.UpdateSessionAsync(session);
+            return Ok(sessionResult);
         }
 
         [HttpDelete("deleteSession/{sessionToken}")]
         public async Task<IActionResult> DeleteSession(string sessionToken)
         {
-            await Task.CompletedTask;
-            return Ok(new { deleted = true });
+            await authService.DeleteSessionAsync(sessionToken);
+            return Ok(new { done = true });
+        }
+
+        [HttpPost("linkAccount")]
+        public async Task<IActionResult> LinkAccount(AdapterAccount account)
+        {
+            var res = await authService.LinkAccountAsync(account);
+            return Ok(res);
         }
     }
 }
