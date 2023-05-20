@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MegaApp.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230520095558_Init")]
+    [Migration("20230520105434_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -97,12 +97,12 @@ namespace MegaApp.Core.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("sysdatetimeoffset()");
 
                     b.Property<Guid?>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("sysdatetimeoffset()");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");

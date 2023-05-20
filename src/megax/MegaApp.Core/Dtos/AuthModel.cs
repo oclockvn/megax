@@ -1,4 +1,4 @@
-﻿using MegaApp.Core.Enums;
+﻿using System.Text.Json.Serialization;
 
 namespace MegaApp.Core.Dtos
 {
@@ -33,6 +33,19 @@ namespace MegaApp.Core.Dtos
         public string ProviderAccountId { get; set; }
         public string UserId { get; set; }
         public string Provider { get; set; }
-        public ProviderType Type { get; set; }
+        public string Type { get; set; }
+
+        [JsonPropertyName("id_token")]
+        public string IdToken { get; set; }
+
+        [JsonPropertyName("token_type")]
+        public string TokenType { get; set; }
+
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; }
+        public string Scope { get; set; }
+
+        [JsonPropertyName("expires_at")]
+        public long? ExpiresAt { get; set; }
     }
 }
