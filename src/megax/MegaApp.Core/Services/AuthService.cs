@@ -41,12 +41,12 @@ namespace MegaApp.Core.Services
                 Expires = session.Expires,
                 Id = Guid.NewGuid(),
                 SessionToken = session.SessionToken,
-                UserId = session.UserId,
+                UserId = Guid.Parse(session.UserId),
             });
 
             await db.SaveChangesAsync();
 
-            return mapFromSession(entry.Entity);
+            return MapFromSession(entry.Entity);
         }
 
         public async Task DeleteSessionAsync(string sessionToken)
@@ -72,8 +72,8 @@ namespace MegaApp.Core.Services
                 .Where(s => s.SessionToken == sessionToken)
                 .Select(s => new SessionAndUser
                 {
-                    Session = mapFromSession(s),
-                    User = mapFromUser(s.User)
+                    Session = MapFromSession(s),
+                    User = MapFromUser(s.User)
                 })
                 .FirstOrDefaultAsync();
 
@@ -88,14 +88,14 @@ namespace MegaApp.Core.Services
             entity.Expires = session.Expires;
 
             await db.SaveChangesAsync();
-            return mapFromSession(entity);
+            return MapFromSession(entity);
         }
 
         public async Task<AdapterUser> GetUserAsync(Guid id)
         {
             using var db = initDb();
             return await db.Users.Where(u => u.Id == id)
-                .Select(u => mapFromUser(u))
+                .Select(u => MapFromUser(u))
                 .FirstOrDefaultAsync();
         }
 
@@ -103,7 +103,7 @@ namespace MegaApp.Core.Services
         {
             using var db = initDb();
             return await db.Accounts.Where(a => a.Provider == provider && a.ProviderAccountId == providerAccountId)
-                .Select(a => mapFromUser(a.User))
+                .Select(a => MapFromUser(a.User))
                 .FirstOrDefaultAsync();
         }
 
@@ -111,7 +111,7 @@ namespace MegaApp.Core.Services
         {
             using var db = initDb();
             return await db.Users.Where(u => u.Email == email)
-                .Select(u => mapFromUser(u))
+                .Select(u => MapFromUser(u))
                 .FirstOrDefaultAsync();
         }
 
@@ -147,10 +147,10 @@ namespace MegaApp.Core.Services
 
             await db.SaveChangesAsync();
 
-            return mapFromUser(entity);
+            return MapFromUser(entity);
         }
 
-        private static AdapterUser mapFromUser(User u) => new()
+        private static AdapterUser MapFromUser(User u) => new()
         {
             Id = u.Id.ToString(),
             Email = u.Email,
@@ -159,11 +159,11 @@ namespace MegaApp.Core.Services
             Name = u.Name
         };
 
-        private static AdapterSession mapFromSession(Session s) => new()
+        private static AdapterSession MapFromSession(Session s) => new()
         {
             Expires = s.Expires ?? DateTime.Now.AddDays(30),
             SessionToken = s.SessionToken,
-            UserId = s.UserId
+            UserId = s.UserId.ToString()
         };
     }
 }
