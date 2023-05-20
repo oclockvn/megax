@@ -25,6 +25,7 @@ namespace MegaApp.Core.Db.Entities
     {
         public void Configure(EntityTypeBuilder<Account> builder)
         {
+            builder.HasKey(x => x.Id);
             builder.ToTable("Accounts", "auth");
         }
     }

@@ -30,6 +30,8 @@ namespace MegaApp.Core.Db.Entities
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.HasKey(x => x.Id);
+
             builder.HasMany(x => x.Accounts)
                 .WithOne(a => a.User)
                 .HasForeignKey(a => a.UserId);
@@ -38,7 +40,7 @@ namespace MegaApp.Core.Db.Entities
                 .WithOne(s => s.User)
                 .HasForeignKey(s => s.UserId);
 
-            builder.Property(x => x.CreatedBy)
+            builder.Property(x => x.CreatedAt)
                 .HasDefaultValueSql("sysdatetimeoffset()");
         }
     }

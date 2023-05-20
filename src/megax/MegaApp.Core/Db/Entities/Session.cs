@@ -9,7 +9,7 @@ namespace MegaApp.Core.Db.Entities
         public DateTime? Expires { get; set; }
         public string SessionToken { get; set; }
 
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public User User { get; set; }
     }
 
@@ -17,6 +17,7 @@ namespace MegaApp.Core.Db.Entities
     {
         public void Configure(EntityTypeBuilder<Session> builder)
         {
+            builder.HasKey(x => x.Id);
             builder.ToTable("Sessions", "auth");
         }
     }
