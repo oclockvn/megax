@@ -25,21 +25,24 @@ export const authOptions: NextAuthOptions = {
     // async redirect({ url, baseUrl }) {
     //   return baseUrl
     // },
+    async jwt({ token, user, account, profile, isNewUser }) {
+      console.log("> jwt", { token, user, account, profile, isNewUser });
+      if (account) {
+        // add token to session
+        token.accessToken = account.access_token;
+        token.idToken = account.id_token;
+      }
+      return token;
+    },
+
     async session({ session, user, token }) {
       console.log("> session", { session, user, token });
 
       return {
         ...session,
         accessToken: token.accessToken,
+        idToken: token.idToken,
       };
-    },
-    async jwt({ token, user, account, profile, isNewUser }) {
-      console.log("> jwt", { token, user, account, profile, isNewUser });
-      if (account) {
-        // add token to session
-        token.accessToken = account.access_token;
-      }
-      return token;
     },
   },
 };
