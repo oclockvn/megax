@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace MegaApp.Middlewares
 {
-    //public class ExceptionHandlingMiddleware
-    //{
-    //}
-
     public static class ExceptionHandlingExtension
     {
         public static IApplicationBuilder UseCustomExceptionHandler(this WebApplication app)
