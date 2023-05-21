@@ -12,16 +12,16 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
-  adapter: DotnetBackendAdapter(),
+  // adapter: DotnetBackendAdapter(), // no longer use custom adapter
   // debug: true,
-  session: {
-    strategy: "jwt",
-  },
+  // session: { // without custom adapter, session uses jwt strategy by default so no need to specify it again
+  //   strategy: "jwt",
+  // },
   callbacks: {
-    // async signIn({ user, account, profile, email, credentials }) {
-    //   console.log("> signin", { user, account, profile, email, credentials });
-    //   return true;
-    // },
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log("> signin", { user, account, profile, email, credentials });
+      return true;
+    },
     // async redirect({ url, baseUrl }) {
     //   return baseUrl
     // },
