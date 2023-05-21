@@ -1,5 +1,6 @@
 using MegaApp.Controllers;
 using MegaApp.Core;
+using MegaApp.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services
     })
     ;
 
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,6 +32,10 @@ if (!app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseCustomExceptionHandler();
 
 
 app.MapControllerRoute(
