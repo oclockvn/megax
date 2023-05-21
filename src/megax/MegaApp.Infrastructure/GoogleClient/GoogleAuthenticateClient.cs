@@ -1,25 +1,50 @@
 ﻿using Google.Apis.Auth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace MegaApp.Infrastructure.GoogleClient
 {
-    internal class GoogleAuthenticateClient
+    public class GoogleClientOption
     {
-        public async Task<bool> ValidateAsync(string idToken)
-        {
-            GoogleJsonWebSignature.ValidationSettings settings = new GoogleJsonWebSignature.ValidationSettings();
-            settings.Audience = new[]
-            {
-                ""
-            };
+        public string ClientId { get; set; }
+    }
 
-            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
-            payload.
+    public record GoogleClaim(string Name, string Email);
+
+    public interface IGoogleAuthenticateClient
+    {
+        Task<(bool valid, GoogleClaim claim)> ValidateAsync(string idToken);
+    }
+
+    internal class GoogleAuthenticateClient : IGoogleAuthenticateClient
+    {
+        private readonly GoogleClientOption googleClientOption;
+
+        public GoogleAuthenticateClient(IOptions<GoogleClientOption> options)
+        {
+            googleClientOption = options.Value;
         }
 
+        public async Task<(bool valid, GoogleClaim claim)> ValidateAsync(string idToken)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new[]
+                {
+                    googleClientOption.ClientId,
+                }
+            };
+
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+                var claim = payload == null ? null : new GoogleClaim(payload.Name, payload.Email);
+
+                return (claim != null, claim);
+            }
+            catch (InvalidJwtException)
+            {
+                return (false, null);
+            }
+        }
     }
 }

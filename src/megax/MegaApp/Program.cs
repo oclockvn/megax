@@ -1,5 +1,6 @@
 using MegaApp.Controllers;
 using MegaApp.Core;
+using MegaApp.Infrastructure;
 using MegaApp.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ builder.Services
     {
         dbOption.UseSqlServer(connectionString);
     })
+    .AddInfrastructureServices(builder.Configuration)
     ;
 
 builder.Services.AddJwtAuthentication(builder.Configuration);

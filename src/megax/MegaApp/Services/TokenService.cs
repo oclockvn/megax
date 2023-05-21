@@ -17,16 +17,15 @@ namespace MegaApp.Services
     //{
     //}
 
-    public interface ITokenGeneratorService
+    public interface ITokenService
     {
         //string GetToken(UserToken user, int expiryMinites = 0);
         string GetToken( int expiryMinites = 0);
     }
 
-    public class TokenGeneratorService : ITokenGeneratorService
+    public class TokenService : ITokenService
     {
         //private readonly TokenSetting _tokenSetting;
-
         //public TokenGeneratorService(IOptions<TokenSetting> tokenOptions)
         public TokenGeneratorService()
         {
@@ -63,6 +62,11 @@ namespace MegaApp.Services
                 );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public Task<bool> ValidateTokenAsync(string idToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MegaApp.Core\MegaApp.Core.csproj" />
+    <ProjectReference Include="..\MegaApp.Infrastructure\MegaApp.Infrastructure.csproj" />
   </ItemGroup>
 
   <!--<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
