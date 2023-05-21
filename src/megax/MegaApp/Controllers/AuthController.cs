@@ -26,7 +26,7 @@ namespace MegaApp.Controllers
             this.tokenService = tokenService;
         }
 
-        [HttpPost("validate")]
+        [HttpPost("validateGoogleToken")]
         public async Task<IActionResult> ValidateGoogleToken(GoogleToken googleAuth)
         {
             var (valid, claim) = await googleAuthenticateClient.ValidateAsync(googleAuth.IdToken);

@@ -1,4 +1,5 @@
-import DotnetBackendAdapter from "@/lib/adapters/dotnetBackendAdapter";
+import DotnetBackendAdapter from "@/lib/authLib/dotnetBackendAdapter";
+import { validateGoogleToken } from "@/lib/authLib/token.service";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -20,8 +21,16 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       console.log("> signin", { user, account, profile, email, credentials });
+      // validate token in the backend
+      if (account && account.id_token) {
+        const validationResult = await validateGoogleToken(account.id_token);
+        if (validationResult?.token) {
+          (user as any).jwtToken = validationResult.token; // assign custom token returned from backend
+        }
+      }
       return true;
     },
+
     // async redirect({ url, baseUrl }) {
     //   return baseUrl
     // },
@@ -32,6 +41,11 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = account.access_token;
         token.idToken = account.id_token;
       }
+
+      if (user) {
+        token.jwtToken = (user as any).jwtToken; // custom token from backend returned after signin
+      }
+
       return token;
     },
 
@@ -42,6 +56,7 @@ export const authOptions: NextAuthOptions = {
         ...session,
         accessToken: token.accessToken,
         idToken: token.idToken,
+        jwtToken: token.jwtToken,
       };
     },
   },

@@ -14,7 +14,7 @@ const client = axios.create({
 
 client.interceptors.request.use(async request => {
   const session = await getSession();
-  const token = session ? (session as any)["accessToken"] : null; // we inject token to session in jwt callback
+  const token = session ? (session as any)["jwtToken"] : null; // we inject token to session in jwt callback
 
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;
