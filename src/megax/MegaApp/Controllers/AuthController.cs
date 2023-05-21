@@ -1,36 +1,44 @@
-﻿using MegaApp.Core.Dtos;
-using MegaApp.Core.Services;
-using MegaApp.Infrastructure.GoogleClient;
+﻿using MegaApp.Infrastructure.GoogleClient;
+using MegaApp.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MegaApp.Controllers
 {
     public record GoogleToken(string IdToken);
+    public record TokenValidationResult(string Token);
 
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService authService;
+        // private readonly IAdapterService authService;
         private readonly IGoogleAuthenticateClient googleAuthenticateClient;
+        private readonly ITokenService tokenService;
 
-        public AuthController(IAuthService authService, IGoogleAuthenticateClient googleAuthenticateClient)
+        public AuthController(
+            // IAdapterService authService,
+            ITokenService tokenService,
+            IGoogleAuthenticateClient googleAuthenticateClient
+            )
         {
-            this.authService = authService;
+            // this.authService = authService;
             this.googleAuthenticateClient = googleAuthenticateClient;
+            this.tokenService = tokenService;
         }
 
         [HttpPost("validate")]
-        public async Task<IActionResult> ValidateGoogleToken(GoogleToken token)
+        public async Task<IActionResult> ValidateGoogleToken(GoogleToken googleAuth)
         {
-            var validationResult = await googleAuthenticateClient.ValidateAsync(token.IdToken);
-            if (!validationResult.valid)
+            var (valid, claim) = await googleAuthenticateClient.ValidateAsync(googleAuth.IdToken);
+            if (!valid)
             {
                 return Unauthorized();
             }
 
-            var addedUser = await authService.CreateUserAsync(user);
-            return Ok(addedUser);
+            var userId = 0; // undone: get user id
+
+            var token = tokenService.GenerateToken(new(userId, claim.Name, claim.Email));
+            return Ok(new TokenValidationResult(token));
         }
     }
 }

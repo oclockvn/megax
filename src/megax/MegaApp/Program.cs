@@ -1,3 +1,4 @@
+using MegaApp;
 using MegaApp.Controllers;
 using MegaApp.Core;
 using MegaApp.Infrastructure;
@@ -12,6 +13,8 @@ var connectionString = builder.Configuration.GetConnectionString("ApplicationDbC
 builder.Services.AddControllersWithViews();
 
 builder.Services
+    .AddAppSettings(builder.Configuration)
+    .AddAppServices()
     .AddCoreServices(dbOption =>
     {
         dbOption.UseSqlServer(connectionString);

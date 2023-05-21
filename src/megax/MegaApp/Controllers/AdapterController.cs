@@ -8,9 +8,9 @@ namespace MegaApp.Controllers
     [Route("api/[controller]")]
     public class AdapterController : ControllerBase
     {
-        private readonly IAuthService authService;
+        private readonly IAdapterService authService;
 
-        public AdapterController(IAuthService authService)
+        public AdapterController(IAdapterService authService)
         {
             this.authService = authService;
         }
