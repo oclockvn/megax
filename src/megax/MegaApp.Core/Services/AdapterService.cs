@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services
 {
-    public interface IAuthService
+    public interface IAdapterService
     {
         Task<AdapterUser> GetUserAsync(Guid id);
         Task<AdapterUser> GetUserByEmailAsync(string email);
@@ -24,11 +24,11 @@ namespace MegaApp.Core.Services
         Task<AdapterAccount> LinkAccountAsync(AdapterAccount account);
     }
 
-    internal class AuthService : IAuthService
+    internal class AdapterService : IAdapterService
     {
         private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
 
-        public AuthService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+        public AdapterService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
         {
             this.dbContextFactory = dbContextFactory;
         }

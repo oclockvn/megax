@@ -11,7 +11,7 @@ namespace MegaApp.Core
         {
             return services
                 .AddDbContextFactory<ApplicationDbContext>(contextOptionBuilder)
-                .AddScoped<IAuthService, AuthService>()
+                .AddScoped<IAdapterService, AdapterService>()
                 ;
         }
     }
