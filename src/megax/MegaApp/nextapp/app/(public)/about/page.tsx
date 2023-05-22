@@ -22,7 +22,7 @@ export default function AboutPage() {
         }
       >
         <div className="flex-1">
-          <Typography variant="h5" component="h5">
+          <Typography variant="h5" component="h5" className="mb-5">
             All in one app
           </Typography>
           <p>
@@ -38,7 +38,7 @@ export default function AboutPage() {
 
       <div className="flex items-center gap-8 min-h-[350px]">
         <div className="flex-1 order-2">
-          <Typography variant="h5" component="h5">
+          <Typography variant="h5" component="h5" className="mb-5">
             Devices Management made simple
           </Typography>
           <p>
@@ -62,8 +62,8 @@ export default function AboutPage() {
         className={`flex items-center gap-8 min-h-[350px] bg-blue-100 ${style.fullBg}`}
       >
         <div className="flex-1">
-          <Typography variant="h5" component={"h5"}>
-            Leave Request has never been that easy
+          <Typography variant="h5" component={"h5"} className="mb-5">
+            Leave Request never that easy
           </Typography>
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae

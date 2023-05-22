@@ -4,18 +4,21 @@
 
 ```bash
 cd src
+# new manifest
+dotnet new tool-manifest
+
 # restore dotnet tool, run once only
 dotnet tool restore
 
 # check database
-dotnet ef dbcontext info -s src/pos.web
+dotnet ef dbcontext info -s src/megax/MegaApp
 
 # apply migrations
-dotnet ef database update -s src/pos.web
+dotnet ef database update -s src/megax/MegaApp
 
 # add new migration
-dotnet ef migrations add Init -s src/pos.web/ -p src/pos.core/
+dotnet ef migrations add Init -s src/megax/MegaApp/ -p src/megax/MegaApp.Core/
 
 # generate a migration script
-dotnet ef migrations script -s src/pos.web/ -p src/pos.core/ -o src/pos.core/Migrations/sql/1-init.sql
+dotnet ef migrations script -s src/megax/MegaApp/ -p src/megax/MegaApp.Core/ -o src/megax/MegaApp.Core/Migrations/sql/1-init.sql
 ```

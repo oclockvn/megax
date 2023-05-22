@@ -5,15 +5,15 @@ const backendUrl = process.env.BACKEND_URL;
 
 const nextConfig = {
   swcMinify: true,
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/dashboard",
-        permanent: true,
-      },
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: "/",
+  //       destination: "/dashboard",
+  //       permanent: true,
+  //     },
+  //   ];
+  // },
 };
 
 if (isProd) {
@@ -25,7 +25,8 @@ if (isProd) {
     //   destination: "/api/auth/:path*",
     // },
     {
-      source: "/api/:path((?!auth).*)", // skip auth path for authentication
+      // source: "/api/:path((?!auth/).*)", // skip auth path for authentication
+      source: "/be/:path*", // skip auth path for authentication
       destination: backendUrl + "/api/:path*",
     },
   ];

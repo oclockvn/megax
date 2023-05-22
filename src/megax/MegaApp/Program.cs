@@ -1,8 +1,28 @@
+using MegaApp;
+using MegaApp.Controllers;
+using MegaApp.Core;
+using MegaApp.Infrastructure;
+using MegaApp.Middlewares;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbConnection");
 
+// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services
+    .AddAppSettings(builder.Configuration)
+    .AddAppServices()
+    .AddCoreServices(dbOption =>
+    {
+        dbOption.UseSqlServer(connectionString);
+    })
+    .AddInfrastructureServices(builder.Configuration)
+    ;
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
@@ -17,6 +37,10 @@ if (!app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseCustomExceptionHandler();
 
 
 app.MapControllerRoute(

@@ -9,6 +9,6 @@ export const config = {
      * - about (allow anonymous)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|login|about|favicon.ico).*)",
+    "/((?!api|be|login|about|favicon.ico).*)",
   ],
 };

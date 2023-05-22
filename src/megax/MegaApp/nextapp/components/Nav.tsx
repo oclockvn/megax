@@ -53,6 +53,7 @@ export default function Nav() {
             </Typography>
             {isAuthenticated ? (
               <div>
+                <span className="mr-1">Hi {session.data?.user?.name}</span>
                 <IconButton
                   size="large"
                   aria-label="account of current user"
