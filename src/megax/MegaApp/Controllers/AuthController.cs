@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace MegaApp.Controllers
 {
     public record GoogleToken(string IdToken);
-    public record TokenValidationResult(string Token);
+    public record TokenValidationResult(string Token, string RefreshToken);
+    public record TokenRefreshRequest(string RefreshToken);
 
     [ApiController]
     [Route("api/[controller]")]
@@ -36,9 +37,17 @@ namespace MegaApp.Controllers
             }
 
             var userId = 0; // undone: get user id
+            var refreshToken = "something-went-wrong"; // undone: gen refresh token
 
-            var token = tokenService.GenerateToken(new(userId, claim.Name, claim.Email));
-            return Ok(new TokenValidationResult(token));
+            var token = tokenService.GenerateToken(new(userId, claim.Name, claim.Email), 1);
+            return Ok(new TokenValidationResult(token, refreshToken));
+        }
+
+        [HttpPost("refreshToken")]
+        public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
+        {
+            var token = tokenService.GenerateToken(new(0, "Quang Phan", "oclockvn@gmail.com"));
+            return Ok(new TokenValidationResult(token, "refreshToken"));
         }
     }
 }

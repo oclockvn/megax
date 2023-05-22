@@ -1,4 +1,4 @@
-import DotnetBackendAdapter from "@/lib/authLib/dotnetBackendAdapter";
+// import DotnetBackendAdapter from "@/lib/authLib/dotnetBackendAdapter";
 import { validateGoogleToken } from "@/lib/authLib/token.service";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -26,37 +26,50 @@ export const authOptions: NextAuthOptions = {
         const validationResult = await validateGoogleToken(account.id_token);
         if (validationResult?.token) {
           (user as any).jwtToken = validationResult.token; // assign custom token returned from backend
+          (user as any).refreshToken = validationResult.refreshToken; // assign custom token returned from backend
         }
       }
       return true;
     },
 
-    // async redirect({ url, baseUrl }) {
-    //   return baseUrl
-    // },
-    async jwt({ token, user, account, profile, isNewUser }) {
-      console.log("> jwt", { token, user, account, profile, isNewUser });
+    async jwt({ token, user, account, profile, isNewUser, trigger, session }) {
+      console.log("> jwt", {
+        token,
+        user,
+        account,
+        profile,
+        isNewUser,
+        trigger,
+      });
       if (account) {
         // add token to session
-        token.accessToken = account.access_token;
+        // token.accessToken = account.access_token;
         token.idToken = account.id_token;
       }
 
       if (user) {
         token.jwtToken = (user as any).jwtToken; // custom token from backend returned after signin
+        token.refreshToken = (user as any).refreshToken;
+      }
+
+      // use refresh token to override expired token
+      if (trigger === "update" && session?.jwtToken) {
+        token.jwtToken = session.jwtToken;
+        token.refreshToken = session.refreshToken;
       }
 
       return token;
     },
 
-    async session({ session, user, token }) {
-      console.log("> session", { session, user, token });
+    async session({ session, user, token, trigger }) {
+      console.log("> session", { session, user, token, trigger });
 
       return {
         ...session,
-        accessToken: token.accessToken,
+        // accessToken: token.accessToken,
         idToken: token.idToken,
         jwtToken: token.jwtToken,
+        refreshToken: token.refreshToken,
       };
     },
   },
