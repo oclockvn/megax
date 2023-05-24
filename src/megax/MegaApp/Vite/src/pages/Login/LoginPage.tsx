@@ -4,7 +4,6 @@ import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
-// import Alert from "@mui/material/Alert";
 
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -25,7 +24,6 @@ export default function CustomizedSnackbars() {
     userName: "khangnguyen2019@gmail.com",
     passworld: "10091989",
   };
-  console.log("defaultValue: ", defaultValue);
 
   const handleClick = () => {
     setOpen(true);
@@ -53,7 +51,6 @@ export default function CustomizedSnackbars() {
       <div className="w-full pb-8">
         <form
           onSubmit={handleSubmit(values => {
-            console.log(values);
             values.username === defaultValue.userName &&
             values.password === defaultValue.passworld
               ? (setIsSuccess(true), setIsFailed(false))
@@ -64,7 +61,7 @@ export default function CustomizedSnackbars() {
           <div className=" mb-4">
             <TextField
               {...register("username", {
-                required: "Thi is required.",
+                required: "Username is required.",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                   message: "Username must be a valid email",
@@ -83,7 +80,7 @@ export default function CustomizedSnackbars() {
           <div className="mb-6">
             <TextField
               {...register("password", {
-                required: "Thi is required.",
+                required: "Password is required.",
                 minLength: {
                   value: 6,
                   message: "Password must greater than 6 characters",
@@ -124,7 +121,7 @@ export default function CustomizedSnackbars() {
                 open={open}
                 autoHideDuration={6000}
                 onClose={handleClose}
-                className="absolute top-[0] translate-x-[170%]"
+                className="absolute -top-[240px] translate-x-[170%]"
               >
                 <Alert
                   onClose={handleClose}
