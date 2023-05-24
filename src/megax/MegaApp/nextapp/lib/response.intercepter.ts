@@ -2,7 +2,7 @@ import dateLib from "./datetime";
 const isoFormat =
   /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/;
 
-export function handleResponse(body: any) {
+export function handleResponse(body: any): any {
   if (body == null || typeof body !== "object") {
     return body;
   }
@@ -12,9 +12,11 @@ export function handleResponse(body: any) {
     if (isIsoDateString(value)) {
       body[key] = dateLib.parseISO(value);
     } else if (typeof value === "object") {
-      handleResponse(value);
+      return handleResponse(value);
     }
   }
+
+  return body;
 }
 
 function isIsoDateString(value: any): boolean {

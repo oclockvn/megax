@@ -1,19 +1,34 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { getSession, signIn, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 import Button from "@mui/material/Button";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Typography } from "@mui/material";
+import storage from "@/lib/storage";
+import { useEffect } from "react";
+import { Router, useRouter } from "next/router";
 
 export default function SignInPage() {
-  const session = useSession();
-  const isAuthenticated = session.status === "authenticated";
+  const { data, status } = useSession();
+  const router = useRouter();
 
-  if (isAuthenticated) {
-    redirect("/");
-  }
+  // if (isAuthenticated) {
+  //   // storage.set("token", data.)
+  //   redirect("/");
+  // }
+
+  useEffect(() => {
+    const isAuthenticated = status === "authenticated";
+    if (isAuthenticated) {
+      const session = data as any;
+      storage.setToken(session.jwtToken);
+      storage.setRefreshToken(session.refreshToken);
+
+      router.push("/");
+    }
+  }, []);
 
   const provider = "google"; // currently we only support google
 

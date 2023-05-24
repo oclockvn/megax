@@ -1,4 +1,3 @@
-// import DotnetBackendAdapter from "@/lib/authLib/dotnetBackendAdapter";
 import { validateGoogleToken } from "@/lib/authLib/token.service";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -25,21 +24,23 @@ export const authOptions: NextAuthOptions = {
       if (account && account.id_token) {
         const validationResult = await validateGoogleToken(account.id_token);
         if (validationResult?.token) {
-          (user as any).jwtToken = validationResult.token; // assign custom token returned from backend
-          (user as any).refreshToken = validationResult.refreshToken; // assign custom token returned from backend
+          // assign custom token returned from backend
+          (user as any).jwtToken = validationResult.token;
+          (user as any).refreshToken = validationResult.refreshToken;
         }
       }
       return true;
     },
 
-    async jwt({ token, user, account, profile, isNewUser, trigger, session }) {
+    async jwt({ token, user, account }) {
+      // console.log("---jwt triggered");
       console.log("> jwt", {
         token,
         user,
         account,
-        profile,
-        isNewUser,
-        trigger,
+        // profile,
+        // isNewUser,
+        // trigger,
       });
       if (account) {
         // add token to session
@@ -48,15 +49,17 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (user) {
-        token.jwtToken = (user as any).jwtToken; // custom token from backend returned after signin
-        token.refreshToken = (user as any).refreshToken;
+        // custom token from backend returned after signin
+        const { jwtToken, refreshToken } = user as any;
+        token.jwtToken = jwtToken;
+        token.refreshToken = refreshToken;
       }
 
       // use refresh token to override expired token
-      if (trigger === "update" && session?.jwtToken) {
-        token.jwtToken = session.jwtToken;
-        token.refreshToken = session.refreshToken;
-      }
+      // if (trigger === "update" && session?.jwtToken) {
+      //   token.jwtToken = session.jwtToken;
+      //   token.refreshToken = session.refreshToken;
+      // }
 
       return token;
     },
@@ -68,8 +71,8 @@ export const authOptions: NextAuthOptions = {
         ...session,
         // accessToken: token.accessToken,
         idToken: token.idToken,
-        jwtToken: token.jwtToken,
-        refreshToken: token.refreshToken,
+        // jwtToken: token.jwtToken,
+        // refreshToken: token.refreshToken,
       };
     },
   },
