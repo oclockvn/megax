@@ -263,3 +263,4 @@ appsettings.Development.json
 
 LocalStorage/
 .vscode/
+.vscode
