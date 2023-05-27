@@ -40,6 +40,11 @@ export const authOptions: NextAuthOptions = {
         token.refreshToken = refreshToken;
       }
 
+      console.log({ token, user });
+      // if (!token.authToken) {
+      //   return null;
+      // }
+
       return token;
     },
 
@@ -49,6 +54,11 @@ export const authOptions: NextAuthOptions = {
         authToken: token.authToken,
         refreshToken: token.refreshToken,
       };
+    },
+  },
+  events: {
+    session({ session, token }) {
+      console.log("> event", { session, token });
     },
   },
 };
