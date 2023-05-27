@@ -1,24 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Db.Entities
 {
     public class User : ICreatedByEntity, IUpdatedByEntity
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
+
+        [MaxLength(100)]
+        [Required]
+        public string Username { get; set; }
+
+        [MaxLength(100)]
         public string Email { get; set; }
-        public string Name { get; set; }
-        public DateTime? EmailVerified { get; set; }
 
-        /// <summary>
-        /// profile image
-        /// </summary>
-        public string Image { get; set; }
+        [MaxLength(100)]
+        public string FullName { get; set; }
 
-        public bool IsDisabled { get; set; }
 
-        public List<Account> Accounts { get; set; } = new();
-        public List<Session> Sessions { get; set; } = new();
+        [MaxLength(200)]
+        public string PasswordHash { get; set; }
+
+        [MaxLength(250)]
+        public string RefreshToken { get; set; }
+        [MaxLength(250)]
+        public string AccessToken { get; set; }
+        public long? ExpiresAt { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
         public Guid? CreatedBy { get; set; }
@@ -30,18 +38,11 @@ namespace MegaApp.Core.Db.Entities
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.HasKey(x => x.Id);
-
-            builder.HasMany(x => x.Accounts)
-                .WithOne(a => a.User)
-                .HasForeignKey(a => a.UserId);
-
-            builder.HasMany(x => x.Sessions)
-                .WithOne(s => s.User)
-                .HasForeignKey(s => s.UserId);
-
             builder.Property(x => x.CreatedAt)
                 .HasDefaultValueSql("sysdatetimeoffset()");
+
+            builder.HasIndex(x => x.Username)
+                .IsUnique();
         }
     }
 }
