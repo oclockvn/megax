@@ -18,7 +18,7 @@ namespace MegaApp.Services
 
     public interface ITokenService
     {
-        string GenerateToken(TokenClaim claim, int expiryMinites = 60);
+        string GenerateToken(TokenClaim claim, int expiryMinites = 1140);
     }
 
     public class TokenService : ITokenService
@@ -30,7 +30,7 @@ namespace MegaApp.Services
             this.jwtOption = jwtOption.Value;
         }
 
-        public string GenerateToken(TokenClaim claim, int expiryMinites = 60)
+        public string GenerateToken(TokenClaim claim, int expiryMinites = 1140)
         {
             var claims = new List<Claim>
             {
@@ -51,6 +51,7 @@ namespace MegaApp.Services
                 audience: jwtOption.Audience,
                 claims: claims,
                 notBefore: DateTime.Now,
+                // expires: expiryMinites == 0 ? DateTime.Now.AddSeconds(10) : DateTime.Now.AddMinutes(expiryMinites),
                 expires: DateTime.Now.AddMinutes(expiryMinites),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
