@@ -1,10 +1,8 @@
 import axios from "axios";
-import { handleResponse } from "@/lib/response.intercepter";
-// import { getSession, useSession } from "next-auth/react";
+// import { handleResponse } from "@/lib/response.intercepter";
 import { authUrl } from "./config";
-import { refreshToken } from "./authLib/token.service";
-import storage from "@/lib/storage";
 import { getSession } from "next-auth/react";
+import dateLib from "./datetime";
 
 const client = axios.create({
   baseURL: authUrl,
@@ -16,10 +14,8 @@ const client = axios.create({
 });
 
 client.interceptors.request.use(async request => {
-  // console.log('quick check session -> trigger jwt');
-  // const session = await getSession();
-  // const token = session ? (session as any)["jwtToken"] : null; // we inject token to session in jwt callback
-  const token = storage.getToken();
+  const session = await getSession();
+  const token = session ? (session as any)["authToken"] : null; // we inject token to session in jwt callback
 
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;
@@ -29,7 +25,10 @@ client.interceptors.request.use(async request => {
 
 client.interceptors.response.use(
   originalResponse => handleResponse(originalResponse),
-  async err => {
+  // async err => handleRefreshToken(err)
+);
+
+function handleRefreshToken(err: any) {
     const originalConfig = err.config;
     console.log("> axios intercepter", {
       status: err.response.status,
@@ -51,36 +50,48 @@ client.interceptors.response.use(
     if (err.response.status === 401 && !originalConfig._retry) {
       originalConfig._retry = true;
 
-      try {
-        // const rs = await refreshToken();
-        // const { accessToken } = rs.data;
-        // const session = useSession();
-        // const sessionData = session as any;
-        const refreshTokenValue = storage.getRefreshToken();
-        console.log('trying to refresh token', { refreshTokenValue });
-        if (refreshTokenValue) {
-          const tokenResult = await refreshToken(refreshTokenValue);
-          // set to session
-          // session
-          // session.update({
-          //   jwtToken: token.token,
-          //   refreshToken: token.refreshToken,
-          // }); // accessToken will be availabed in jwt callback in next auth
-          if (tokenResult && tokenResult.token) {
-            storage.setToken(tokenResult.token);
-            storage.setRefreshToken(tokenResult.refreshToken);
+      // try {
+      //   const refreshTokenValue = storage.getRefreshToken();
+      //   if (refreshTokenValue) {
+      //     const tokenResult = await refreshToken(refreshTokenValue);
+      //     if (tokenResult && tokenResult.token) {
+      //       storage.setToken(tokenResult.token);
+      //       storage.setRefreshToken(tokenResult.refreshToken);
 
-            return client(originalConfig);
-          }
-        }
-      } catch (_error) {
-        // exception when refresh token
-        return Promise.reject(_error);
-      }
+      //       return client(originalConfig);
+      //     }
+      //   }
+      // } catch (_error) {
+      //   // exception when refresh token
+      //   return Promise.reject(_error);
+      // }
     }
 
     return Promise.reject(err);
+}
+
+const isoFormat =
+  /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/;
+
+export function handleResponse(body: any): any {
+  if (body == null || typeof body !== "object") {
+    return body;
   }
-);
+
+  for (const key of Object.keys(body)) {
+    const value = body[key];
+    if (isIsoDateString(value)) {
+      body[key] = dateLib.parseISO(value);
+    } else if (typeof value === "object") {
+      return handleResponse(value);
+    }
+  }
+
+  return body;
+}
+
+function isIsoDateString(value: any): boolean {
+  return value && typeof value === "string" && isoFormat.test(value);
+}
 
 export default client;

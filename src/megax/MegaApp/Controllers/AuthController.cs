@@ -58,8 +58,8 @@ namespace MegaApp.Controllers
             return Ok(signInResult);
         }
 
-        [HttpPost("oauth-signin")]
-        public async Task<IActionResult> OAuthSignIn(GoogleToken googleAuth)
+        [HttpPost("google-signin")]
+        public async Task<IActionResult> GoogleSignIn(GoogleToken googleAuth)
         {
             var (valid, claims) = await googleAuthenticateClient.ValidateAsync(googleAuth.IdToken);
             if (!valid)

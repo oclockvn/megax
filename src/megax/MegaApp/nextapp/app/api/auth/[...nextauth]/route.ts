@@ -1,4 +1,4 @@
-import { validateGoogleToken } from "@/lib/authLib/token.service";
+import { googleSignIn } from "@/lib/apis/signin.api";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -18,61 +18,36 @@ export const authOptions: NextAuthOptions = {
   //   strategy: "jwt",
   // },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log("> signin", { user, account, profile, email, credentials });
+    async signIn({ user, account }) {
       // validate token in the backend
       if (account && account.id_token) {
-        const validationResult = await validateGoogleToken(account.id_token);
-        if (validationResult?.token) {
+        const validationResult = await googleSignIn(account.id_token);
+        if (validationResult.isSuccess) {
           // assign custom token returned from backend
-          (user as any).jwtToken = validationResult.token;
-          (user as any).refreshToken = validationResult.refreshToken;
+          const { token, refreshToken } = validationResult.data;
+          (user as any).authToken = token;
+          (user as any).refreshToken = refreshToken;
         }
       }
       return true;
     },
 
-    async jwt({ token, user, account }) {
-      // console.log("---jwt triggered");
-      console.log("> jwt", {
-        token,
-        user,
-        account,
-        // profile,
-        // isNewUser,
-        // trigger,
-      });
-      if (account) {
-        // add token to session
-        // token.accessToken = account.access_token;
-        token.idToken = account.id_token;
-      }
-
+    async jwt({ token, user }) {
       if (user) {
         // custom token from backend returned after signin
-        const { jwtToken, refreshToken } = user as any;
-        token.jwtToken = jwtToken;
+        const { authToken, refreshToken } = user as any;
+        token.authToken = authToken;
         token.refreshToken = refreshToken;
       }
-
-      // use refresh token to override expired token
-      // if (trigger === "update" && session?.jwtToken) {
-      //   token.jwtToken = session.jwtToken;
-      //   token.refreshToken = session.refreshToken;
-      // }
 
       return token;
     },
 
-    async session({ session, user, token, trigger }) {
-      console.log("> session", { session, user, token, trigger });
-
+    async session({ session, token }) {
       return {
         ...session,
-        // accessToken: token.accessToken,
-        idToken: token.idToken,
-        // jwtToken: token.jwtToken,
-        // refreshToken: token.refreshToken,
+        authToken: token.authToken,
+        refreshToken: token.refreshToken,
       };
     },
   },
