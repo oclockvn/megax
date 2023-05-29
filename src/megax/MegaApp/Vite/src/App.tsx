@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 import "./App.css";
-import HomePage from "./pages/Home";
+import HomeTemplate from "./pages";
+import HomePage from "./pages/Home/Home";
 import LoginPage from "./pages/Login/LoginPage";
 
 function App() {
@@ -9,8 +10,12 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomeTemplate Component={HomePage} />} />
+
+          <Route
+            path="/login"
+            element={<HomeTemplate Component={LoginPage} />}
+          />
         </Routes>
       </BrowserRouter>
     </>
