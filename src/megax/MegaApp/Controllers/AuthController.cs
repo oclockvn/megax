@@ -3,14 +3,14 @@ using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
 using MegaApp.Infrastructure.GoogleClient;
 using MegaApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MegaApp.Controllers
 {
     public record GoogleToken(string IdToken);
     public record TokenRefreshRequest(string RefreshToken);
-    public record SignInResponse(string Token, string RefreshToken);
-    public record TokenResponse(string Token, string RefreshToken);
+    public record SignInResponse(string Token, DateTime ExpiryTime, string RefreshToken);
 
     [ApiController]
     [Route("api/[controller]")]
@@ -35,6 +35,7 @@ namespace MegaApp.Controllers
         }
 
         [HttpPost("cre-signin")]
+        [AllowAnonymous]
         public async Task<IActionResult> UserSignIn(UserModel.UserLogin req)
         {
             if (!ModelState.IsValid)
@@ -52,13 +53,14 @@ namespace MegaApp.Controllers
             }
 
             var user = await userService.GetUserAsync(req.Username);
-            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
-            signInResult = signInResult with { Data = new SignInResponse(token, string.Empty) };
+            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email), 10);
+            signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, string.Empty) };
 
             return Ok(signInResult);
         }
 
         [HttpPost("google-signin")]
+        [AllowAnonymous]
         public async Task<IActionResult> GoogleSignIn(GoogleToken googleAuth)
         {
             var (valid, claims) = await googleAuthenticateClient.ValidateAsync(googleAuth.IdToken);
@@ -83,17 +85,16 @@ namespace MegaApp.Controllers
                 user = await userService.GetUserAsync(userResult.Data);
             }
 
-            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
-            return Ok(new Result<SignInResponse>(new SignInResponse(token, string.Empty)));
+            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email), 10);
+            return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, "refresh-token")));
         }
 
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
         {
-            // var token = tokenService.GenerateToken(new(0, "Quang Phan", "oclockvn@gmail.com"));
-            // return Ok(new TokenResponse(token, ""));
             await Task.CompletedTask;
-            throw new NotImplementedException();
+            var token = tokenService.GenerateToken(new(0, "Quang Phan", "oclockvn@gmail.com"), 30);
+            return Ok(new SignInResponse(token.Token, token.ExpiryTime, "refresh-token"));
         }
     }
 }

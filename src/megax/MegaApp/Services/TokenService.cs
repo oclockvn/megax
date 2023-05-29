@@ -15,10 +15,11 @@ namespace MegaApp.Services
     }
 
     public record TokenClaim(long Id, string Name, string Email);
+    public record TokenRecord(string Token, DateTime ExpiryTime);
 
     public interface ITokenService
     {
-        string GenerateToken(TokenClaim claim, int expiryMinites = 1140);
+        TokenRecord GenerateToken(TokenClaim claim, int expiryMinites = 1140);
     }
 
     public class TokenService : ITokenService
@@ -30,7 +31,7 @@ namespace MegaApp.Services
             this.jwtOption = jwtOption.Value;
         }
 
-        public string GenerateToken(TokenClaim claim, int expiryMinites = 1140)
+        public TokenRecord GenerateToken(TokenClaim claim, int expiryMinites = 1140)
         {
             var claims = new List<Claim>
             {
@@ -39,23 +40,27 @@ namespace MegaApp.Services
                 new Claim(ClaimTypes.Email, claim.Email),
             };
 
+
+#if !DEBUG
             if (expiryMinites == 0)
             {
                 expiryMinites = Math.Max(jwtOption.ExpireMinutes, 60);
             }
+#endif
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.JwtSecret));
 
+            var expTime = DateTime.Now.AddMinutes(expiryMinites);
             var token = new JwtSecurityToken(
                 issuer: jwtOption.Issuer,
                 audience: jwtOption.Audience,
                 claims: claims,
                 notBefore: DateTime.Now,
                 // expires: expiryMinites == 0 ? DateTime.Now.AddSeconds(10) : DateTime.Now.AddMinutes(expiryMinites),
-                expires: DateTime.Now.AddMinutes(expiryMinites),
+                expires: expTime,
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new TokenRecord(new JwtSecurityTokenHandler().WriteToken(token), expTime);
         }
     }
 }

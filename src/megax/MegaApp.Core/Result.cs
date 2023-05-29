@@ -9,7 +9,7 @@ namespace MegaApp.Core
 
         public static Result Ok() => new();
 
-        public bool IsSuccess => !string.IsNullOrWhiteSpace(Code);
+        public bool IsSuccess => string.IsNullOrWhiteSpace(Code);
     }
 
     public record Result<T>(T Data) : Result

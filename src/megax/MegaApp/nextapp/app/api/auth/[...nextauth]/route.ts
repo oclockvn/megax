@@ -1,6 +1,14 @@
-import { googleSignIn } from "@/lib/apis/signin.api";
+import { googleSignIn, refreshAuthToken } from "@/lib/apis/signin.api";
+import datetime from "@/lib/datetime";
+import { SignInResponse } from "@/lib/models/signin.model";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+
+declare type TokenDto = {
+  authToken: string;
+  refreshToken: string;
+  expiryTime: Date;
+};
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -19,31 +27,54 @@ export const authOptions: NextAuthOptions = {
   // },
   callbacks: {
     async signIn({ user, account }) {
-      // validate token in the backend
+      // validate and assign token in the backend
       if (account && account.id_token) {
         const validationResult = await googleSignIn(account.id_token);
-        if (validationResult.isSuccess) {
-          // assign custom token returned from backend
-          const { token, refreshToken } = validationResult.data;
-          (user as any).authToken = token;
-          (user as any).refreshToken = refreshToken;
+        if (!validationResult || !validationResult.isSuccess) {
+          return false;
         }
+
+        const { token, refreshToken, expiryTime } = validationResult.data;
+        (user as any).authToken = token;
+        (user as any).refreshToken = refreshToken;
+        (user as any).expiryTime = expiryTime;
       }
+
       return true;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, session }) {
+      let authToken = "";
+      let refreshToken = "";
+      let expiryTime: Date | undefined;
+
       if (user) {
         // custom token from backend returned after signin
-        const { authToken, refreshToken } = user as any;
-        token.authToken = authToken;
-        token.refreshToken = refreshToken;
+        const apiUser = user as Partial<TokenDto>;
+        authToken = apiUser.authToken || "";
+        refreshToken = apiUser.refreshToken || "";
+        expiryTime = apiUser.expiryTime;
       }
 
-      console.log({ token, user });
-      // if (!token.authToken) {
-      //   return null;
-      // }
+      // note: this is backend refresh token
+      // we haven't done frontend refresh token yet
+      const tokenExp = datetime.parseFromServer(token.expiryTime as string);
+      if (tokenExp <= new Date() && token.refreshToken) {
+        const refreshTokenRes = await refreshAuthToken(
+          token.refreshToken as string
+        );
+        if (refreshTokenRes) {
+          authToken = refreshTokenRes.token;
+          refreshToken = refreshTokenRes.refreshToken;
+          expiryTime = refreshTokenRes.expiryTime;
+        }
+      }
+
+      if (authToken) {
+        token.authToken = authToken;
+        token.refreshToken = refreshToken;
+        token.expiryTime = expiryTime;
+      }
 
       return token;
     },
@@ -53,12 +84,8 @@ export const authOptions: NextAuthOptions = {
         ...session,
         authToken: token.authToken,
         refreshToken: token.refreshToken,
+        expiryTime: token.expiryTime,
       };
-    },
-  },
-  events: {
-    session({ session, token }) {
-      console.log("> event", { session, token });
     },
   },
 };
