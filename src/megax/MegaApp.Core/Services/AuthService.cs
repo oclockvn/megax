@@ -4,16 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
 
-public interface ISignInService
+public interface IAuthService
 {
     Task<Result<bool>> IsValidUserAsync(string username, string password);
 }
 
-internal class SignInService : ISignInService
+internal class AuthService : IAuthService
 {
     private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
 
-    public SignInService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public AuthService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

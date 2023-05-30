@@ -12,7 +12,7 @@ namespace MegaApp.Core
             return services
                 .AddDbContextFactory<ApplicationDbContext>(contextOptionBuilder)
                 .AddScoped<IUserService, UserService>()
-                .AddScoped<ISignInService, SignInService>()
+                .AddScoped<IAuthService, AuthService>()
                 ;
         }
     }
