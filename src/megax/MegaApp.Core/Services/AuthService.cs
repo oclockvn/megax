@@ -7,6 +7,7 @@ namespace MegaApp.Core.Services;
 public interface IAuthService
 {
     Task<Result<bool>> IsValidUserAsync(string username, string password);
+    Task<Guid> ReleaseRefreshTokenAsync(int userId, int expiryDay = 30);
 }
 
 internal class AuthService : IAuthService
@@ -33,5 +34,20 @@ internal class AuthService : IAuthService
         }
 
         return Result<bool>.Fail("invalid_username_or_password");
+    }
+
+    public async Task<Guid> ReleaseRefreshTokenAsync(int userId, int expiryDay = 30)
+    {
+        using var db = UseDb();
+        var entry = db.RefreshTokens.Add(new()
+        {
+            CreatedAt = DateTimeOffset.Now,
+            ExpiresAt = DateTimeOffset.Now.AddDays(expiryDay),
+            UserId = userId,
+        });
+
+        await db.SaveChangesAsync();
+
+        return entry.Entity.Id;
     }
 }

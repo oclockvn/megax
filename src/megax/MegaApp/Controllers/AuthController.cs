@@ -18,19 +18,19 @@ namespace MegaApp.Controllers
     {
         private readonly IGoogleAuthenticateClient googleAuthenticateClient;
         private readonly IUserService userService;
-        private readonly ISignInService signInService;
+        private readonly IAuthService authService;
         private readonly ITokenService tokenService;
 
         public AuthController(
             ITokenService tokenService,
             IGoogleAuthenticateClient googleAuthenticateClient,
             IUserService userService,
-            ISignInService signInService
+            IAuthService signInService
             )
         {
             this.googleAuthenticateClient = googleAuthenticateClient;
             this.userService = userService;
-            this.signInService = signInService;
+            this.authService = signInService;
             this.tokenService = tokenService;
         }
 
@@ -45,7 +45,7 @@ namespace MegaApp.Controllers
 
             var signInResult = Result<SignInResponse>.Default;
 
-            var userResult = await signInService.IsValidUserAsync(req.Username, req.Password);
+            var userResult = await authService.IsValidUserAsync(req.Username, req.Password);
             if (!userResult.IsSuccess)
             {
                 signInResult = signInResult.FromCode(userResult);
@@ -54,7 +54,9 @@ namespace MegaApp.Controllers
 
             var user = await userService.GetUserAsync(req.Username);
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email), 10);
-            signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, string.Empty) };
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id);
+
+            signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString()) };
 
             return Ok(signInResult);
         }
@@ -86,7 +88,9 @@ namespace MegaApp.Controllers
             }
 
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email), 10);
-            return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, "refresh-token")));
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id);
+
+            return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString())));
         }
 
         [HttpPost("refresh-token")]
