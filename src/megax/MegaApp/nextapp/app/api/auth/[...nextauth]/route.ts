@@ -63,10 +63,12 @@ export const authOptions: NextAuthOptions = {
         const refreshTokenRes = await refreshAuthToken(
           token.refreshToken as string
         );
-        if (refreshTokenRes) {
-          authToken = refreshTokenRes.token;
-          refreshToken = refreshTokenRes.refreshToken;
-          expiryTime = refreshTokenRes.expiryTime;
+        if (refreshTokenRes.isSuccess) {
+          authToken = refreshTokenRes.data.token;
+          refreshToken = refreshTokenRes.data.refreshToken;
+          expiryTime = refreshTokenRes.data.expiryTime;
+        } else {
+          // undone: handle unsuccess refresh token
         }
       }
 

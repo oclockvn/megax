@@ -13,8 +13,11 @@ export async function googleSignIn(idToken: string) {
 }
 
 export async function refreshAuthToken(refreshToken: string) {
-  const res = await client.post<SignInResponse>("/be/auth/refresh-token", {
-    refreshToken,
-  });
+  const res = await client.post<Result<SignInResponse>>(
+    "/be/auth/refresh-token",
+    {
+      refreshToken,
+    }
+  );
   return res.data;
 }
