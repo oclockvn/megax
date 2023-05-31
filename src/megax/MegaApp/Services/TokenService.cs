@@ -3,6 +3,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using MegaApp.Core;
+using System.Diagnostics;
 
 namespace MegaApp.Services
 {
@@ -14,12 +16,13 @@ namespace MegaApp.Services
         public int ExpireMinutes { get; set; }
     }
 
-    public record TokenClaim(long Id, string Name, string Email);
+    public record TokenClaim(int Id, string Name, string Email);
     public record TokenRecord(string Token, DateTime ExpiryTime);
 
     public interface ITokenService
     {
         TokenRecord GenerateToken(TokenClaim claim, int expiryMinites = 1140);
+        Result<TokenClaim> ReadToken(string token);
     }
 
     public class TokenService : ITokenService
@@ -61,6 +64,40 @@ namespace MegaApp.Services
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             return new TokenRecord(new JwtSecurityTokenHandler().WriteToken(token), expTime);
+        }
+
+        public Result<TokenClaim> ReadToken(string token)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.JwtSecret));
+
+            try
+            {
+                var validationResult = new JwtSecurityTokenHandler().ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidIssuer = jwtOption.Issuer,
+                    ValidAudience = jwtOption.Audience,
+                    SaveSigninToken = true,
+                    IssuerSigningKey = key,
+                    ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero,
+                }, out var _);
+
+                // cannot get id, something's wrong
+                if (int.TryParse(validationResult.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value, out var id) == false)
+                {
+                    return Result<TokenClaim>.Fail("invalid_token");
+                }
+
+                return Result<TokenClaim>.Ok(new TokenClaim(
+                    id,
+                    validationResult.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
+                    validationResult.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return Result<TokenClaim>.Fail("invalid_token");
+            }
         }
     }
 }

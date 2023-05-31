@@ -10,6 +10,11 @@ namespace MegaApp.Core
         public static Result Ok() => new();
 
         public bool IsSuccess => string.IsNullOrWhiteSpace(Code);
+
+        public static readonly string INVALID_TOKEN = "INVALID_TOKEN";
+        public static readonly string INVALID_REFRESH_TOKEN = "INVALID_REFRESH_TOKEN";
+        public static readonly string REFRESH_TOKEN_IS_REVOKED = "REFRESH_TOKEN_IS_REVOKED";
+        public static readonly string REFRESH_TOKEN_IS_EXPIRED = "REFRESH_TOKEN_IS_EXPIRED";
     }
 
     public record Result<T>(T Data) : Result

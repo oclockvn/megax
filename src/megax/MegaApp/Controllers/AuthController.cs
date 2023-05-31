@@ -1,15 +1,21 @@
-﻿using MegaApp.Core;
+﻿using Humanizer;
+using MegaApp.Core;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
 using MegaApp.Infrastructure.GoogleClient;
 using MegaApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace MegaApp.Controllers
 {
     public record GoogleToken(string IdToken);
-    public record TokenRefreshRequest(string RefreshToken);
+    public record TokenRefreshRequest
+    {
+        [Required] public Guid RefreshToken { get; set; }
+    };
     public record SignInResponse(string Token, DateTime ExpiryTime, string RefreshToken);
 
     [ApiController]
@@ -53,8 +59,8 @@ namespace MegaApp.Controllers
             }
 
             var user = await userService.GetUserAsync(req.Username);
-            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email), 10);
-            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id);
+            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
             signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString()) };
 
@@ -81,14 +87,14 @@ namespace MegaApp.Controllers
                     Email = claims.Email,
                     FullName = claims.Name,
                     Username = claims.Email,
-                    Password = "random-password", // undone: generate random password
+                    Password = Guid.NewGuid().ToString("N"), // undone: generate random password
                 });
 
                 user = await userService.GetUserAsync(userResult.Data);
             }
 
-            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email), 10);
-            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id);
+            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
             return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString())));
         }
@@ -96,9 +102,49 @@ namespace MegaApp.Controllers
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
         {
-            await Task.CompletedTask;
-            var token = tokenService.GenerateToken(new(0, "Quang Phan", "oclockvn@gmail.com"), 30);
-            return Ok(new SignInResponse(token.Token, token.ExpiryTime, "refresh-token"));
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var authorizationToken = GetAuthorizationToken();
+            var claimResult = tokenService.ReadToken(authorizationToken);
+            if (claimResult.IsSuccess == false)
+            {
+                // this should not happen as refresh token process is only invoked by the client
+                // and it has the correct token and refresh token
+                return BadRequest();
+            }
+
+            var user = claimResult.Data;
+
+            // we don't want to generate token everytime this api is called
+            var validResult = await authService.IsRefreshTokenValid(user.Id, request.RefreshToken, authorizationToken);
+            if (!validResult.IsSuccess)
+            {
+                return BadRequest(validResult);
+            }
+
+
+            var token = tokenService.GenerateToken(new(user.Id, user.Name, user.Email), 43200); // = 60 * 24 * 30 = 30 days
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
+
+            // revoke the old refresh token to prevent it from being used again
+            await authService.RevokeRefreshTokenAsync(request.RefreshToken);
+
+            return Ok(new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString()));
+        }
+
+        private string GetAuthorizationToken()
+        {
+            if (!Request.Headers.TryGetValue("Authorization", out var authorization) || string.IsNullOrWhiteSpace(authorization))
+            {
+                return string.Empty;
+            }
+
+            var value = authorization.ToString();
+            const int scheme = 6; // "Bearer".Length
+            return value.Length > scheme ? authorization.ToString()[scheme..].Trim() : string.Empty;
         }
     }
 }
