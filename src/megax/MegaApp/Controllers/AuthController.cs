@@ -1,5 +1,4 @@
-﻿using Humanizer;
-using MegaApp.Core;
+﻿using MegaApp.Core;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
 using MegaApp.Infrastructure.GoogleClient;
@@ -7,7 +6,6 @@ using MegaApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 
 namespace MegaApp.Controllers
 {
@@ -16,7 +14,8 @@ namespace MegaApp.Controllers
     {
         [Required] public Guid RefreshToken { get; set; }
     };
-    public record SignInResponse(string Token, DateTime ExpiryTime, string RefreshToken);
+    public record SignInResponse(string Token, DateTime ExpiryTime, Guid RefreshToken);
+    public record UserRegister([Required] string Username, [Required] string Password, [Required] string Name);
 
     [ApiController]
     [Route("api/[controller]")]
@@ -40,7 +39,27 @@ namespace MegaApp.Controllers
             this.tokenService = tokenService;
         }
 
-        [HttpPost("cre-signin")]
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(UserRegister userRegister)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var userResult = await userService.CreateUserAsync(new UserModel.NewUser
+            {
+                Username = userRegister.Username,
+                Email = userRegister.Username,
+                FullName = userRegister.Name,
+                Password = userRegister.Password,
+            });
+
+            return Ok(userResult);
+        }
+
+        [HttpPost("user-signin")]
         [AllowAnonymous]
         public async Task<IActionResult> UserSignIn(UserModel.UserLogin req)
         {
@@ -62,7 +81,7 @@ namespace MegaApp.Controllers
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
             var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
-            signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString()) };
+            signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, refreshToken) };
 
             return Ok(signInResult);
         }
@@ -96,7 +115,7 @@ namespace MegaApp.Controllers
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
             var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
-            return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString())));
+            return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken)));
         }
 
         [HttpPost("refresh-token")]
@@ -131,7 +150,7 @@ namespace MegaApp.Controllers
             // revoke the old refresh token to prevent it from being used again
             await authService.RevokeRefreshTokenAsync(request.RefreshToken);
 
-            return Ok(new SignInResponse(token.Token, token.ExpiryTime, refreshToken.ToString()));
+            return Ok(Result<SignInResponse>.Ok(new SignInResponse(token.Token, token.ExpiryTime, refreshToken)));
         }
 
         private string GetAuthorizationToken()
