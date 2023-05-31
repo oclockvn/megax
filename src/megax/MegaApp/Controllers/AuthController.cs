@@ -125,7 +125,6 @@ namespace MegaApp.Controllers
                 return BadRequest(validResult);
             }
 
-
             var token = tokenService.GenerateToken(new(user.Id, user.Name, user.Email), 43200); // = 60 * 24 * 30 = 30 days
             var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
@@ -142,9 +141,8 @@ namespace MegaApp.Controllers
                 return string.Empty;
             }
 
-            var value = authorization.ToString();
-            const int scheme = 6; // "Bearer".Length
-            return value.Length > scheme ? authorization.ToString()[scheme..].Trim() : string.Empty;
+            // Bearer xxxx
+            return authorization.ToString().Split(' ')[1];
         }
     }
 }
