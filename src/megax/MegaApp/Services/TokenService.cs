@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Options;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using System.Security.Claims;
+﻿using MegaApp.Core;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MegaApp.Core;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace MegaApp.Services
 {
@@ -22,7 +22,7 @@ namespace MegaApp.Services
     public interface ITokenService
     {
         TokenRecord GenerateToken(TokenClaim claim, int expiryMinites = 1140);
-        Result<TokenClaim> ReadToken(string token);
+        Result<TokenClaim> ReadToken(string token, bool skipExpiryCheck = false);
     }
 
     public class TokenService : ITokenService
@@ -52,7 +52,6 @@ namespace MegaApp.Services
 #endif
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.JwtSecret));
-
             var expTime = DateTime.Now.AddMinutes(expiryMinites);
             var token = new JwtSecurityToken(
                 issuer: jwtOption.Issuer,
@@ -66,7 +65,7 @@ namespace MegaApp.Services
             return new TokenRecord(new JwtSecurityTokenHandler().WriteToken(token), expTime);
         }
 
-        public Result<TokenClaim> ReadToken(string token)
+        public Result<TokenClaim> ReadToken(string token, bool skipExpiryCheck = false)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.JwtSecret));
 
@@ -79,7 +78,7 @@ namespace MegaApp.Services
                     SaveSigninToken = true,
                     IssuerSigningKey = key,
                     ValidateIssuerSigningKey = true,
-                    ClockSkew = TimeSpan.Zero,
+                    ClockSkew = skipExpiryCheck ? TokenValidationParameters.DefaultClockSkew : TimeSpan.Zero,
                 }, out var _);
 
                 // cannot get id, something's wrong

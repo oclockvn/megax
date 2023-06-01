@@ -1,6 +1,5 @@
 import { googleSignIn, refreshAuthToken } from "@/lib/apis/signin.api";
 import datetime from "@/lib/datetime";
-import { SignInResponse } from "@/lib/models/signin.model";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -61,8 +60,10 @@ export const authOptions: NextAuthOptions = {
       const tokenExp = datetime.parseFromServer(token.expiryTime as string);
       if (tokenExp <= new Date() && token.refreshToken) {
         const refreshTokenRes = await refreshAuthToken(
+          token.authToken as string,
           token.refreshToken as string
         );
+
         if (refreshTokenRes.isSuccess) {
           authToken = refreshTokenRes.data.token;
           refreshToken = refreshTokenRes.data.refreshToken;

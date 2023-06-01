@@ -10,10 +10,7 @@ using System.ComponentModel.DataAnnotations;
 namespace MegaApp.Controllers
 {
     public record GoogleToken(string IdToken);
-    public record TokenRefreshRequest
-    {
-        [Required] public Guid RefreshToken { get; set; }
-    };
+    public record TokenRefreshRequest([Required] string Token, [Required] Guid RefreshToken);
     public record SignInResponse(string Token, DateTime ExpiryTime, Guid RefreshToken);
     public record UserRegister([Required] string Username, [Required] string Password, [Required] string Name);
 
@@ -126,8 +123,7 @@ namespace MegaApp.Controllers
                 return BadRequest();
             }
 
-            var authorizationToken = GetAuthorizationToken();
-            var claimResult = tokenService.ReadToken(authorizationToken);
+            var claimResult = tokenService.ReadToken(request.Token, skipExpiryCheck: true);
             if (claimResult.IsSuccess == false)
             {
                 // this should not happen as refresh token process is only invoked by the client
@@ -138,7 +134,7 @@ namespace MegaApp.Controllers
             var user = claimResult.Data;
 
             // we don't want to generate token everytime this api is called
-            var validResult = await authService.IsRefreshTokenValid(user.Id, request.RefreshToken, authorizationToken);
+            var validResult = await authService.IsRefreshTokenValid(user.Id, request.RefreshToken, request.Token);
             if (!validResult.IsSuccess)
             {
                 return BadRequest(validResult);
@@ -151,17 +147,6 @@ namespace MegaApp.Controllers
             await authService.RevokeRefreshTokenAsync(request.RefreshToken);
 
             return Ok(Result<SignInResponse>.Ok(new SignInResponse(token.Token, token.ExpiryTime, refreshToken)));
-        }
-
-        private string GetAuthorizationToken()
-        {
-            if (!Request.Headers.TryGetValue("Authorization", out var authorization) || string.IsNullOrWhiteSpace(authorization))
-            {
-                return string.Empty;
-            }
-
-            // Bearer xxxx
-            return authorization.ToString().Split(' ')[1];
         }
     }
 }
