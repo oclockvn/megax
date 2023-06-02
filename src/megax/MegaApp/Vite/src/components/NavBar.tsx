@@ -5,7 +5,10 @@ function NavBar() {
   return (
     <div className="flex space-x-4 m-3">
       <NavLink to="/">Home</NavLink>
-      <NavLink to="/login">Login</NavLink>
+      <NavLink to="/service">Service</NavLink>
+      <NavLink to="/about-us">About Us</NavLink>
+      <NavLink to="/profile">Profile</NavLink>
+      <NavLink to="/logout">Logout</NavLink>
     </div>
   );
 }
