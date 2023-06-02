@@ -6,7 +6,8 @@ import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../provider/authProvider";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -16,7 +17,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 export default function CustomizedSnackbars() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
@@ -41,6 +42,14 @@ export default function CustomizedSnackbars() {
     setOpen(false);
   };
 
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    setToken("this is a test token");
+    navigate("/", { replace: true });
+  };
+
   const {
     register,
     handleSubmit,
@@ -54,8 +63,9 @@ export default function CustomizedSnackbars() {
           onSubmit={handleSubmit(values => {
             values.username === defaultValue.userName &&
             values.password === defaultValue.passworld
-              ? (setIsSuccess(true), setIsFailed(false), navigate("/"))
+              ? (setIsSuccess(true), setIsFailed(false), handleLogin())
               : (setIsFailed(true), setIsSuccess(false));
+            setTimeout(() => 3 * 1000);
           })}
           className="bg-white shadow-md rounded px-8 pt-6 pb-[80px] mb-4"
         >
@@ -122,7 +132,6 @@ export default function CustomizedSnackbars() {
                 open={open}
                 autoHideDuration={6000}
                 onClose={handleClose}
-                className="absolute -top-[240px] translate-x-[170%]"
               >
                 <Alert
                   onClose={handleClose}
