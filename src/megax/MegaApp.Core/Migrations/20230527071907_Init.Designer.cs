@@ -4,6 +4,7 @@ using MegaApp.Core.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MegaApp.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230527071907_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,36 +25,6 @@ namespace MegaApp.Core.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.RefreshToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("sysdatetimeoffset()");
-
-                    b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Token")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens");
-                });
-
             modelBuilder.Entity("MegaApp.Core.Db.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -59,6 +32,10 @@ namespace MegaApp.Core.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccessToken")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -72,6 +49,9 @@ namespace MegaApp.Core.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<long?>("ExpiresAt")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("FullName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -79,6 +59,10 @@ namespace MegaApp.Core.Migrations
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("RefreshToken")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -97,22 +81,6 @@ namespace MegaApp.Core.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("MegaApp.Core.Db.Entities.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.User", b =>
-                {
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,47 +1,45 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.ComponentModel.DataAnnotations;
 
-namespace MegaApp.Core.Db.Entities
+namespace MegaApp.Core.Db.Entities;
+public class User : ICreatedByEntity, IUpdatedByEntity
 {
-    public class User : ICreatedByEntity, IUpdatedByEntity
+    public int Id { get; set; }
+
+    [MaxLength(100)]
+    [Required]
+    public string Username { get; set; }
+
+    [MaxLength(100)]
+    public string Email { get; set; }
+
+    [MaxLength(100)]
+    public string FullName { get; set; }
+
+    [MaxLength(200)]
+    public string PasswordHash { get; set; }
+
+    public List<RefreshToken> RefreshTokens { get; set; } = new();
+
+    public DateTimeOffset CreatedAt { get; set; }
+    public Guid? CreatedBy { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public Guid? UpdatedBy { get; set; }
+}
+
+public class UserConfiguration : IEntityTypeConfiguration<User>
+{
+    public void Configure(EntityTypeBuilder<User> builder)
     {
-        public Guid Id { get; set; }
-        public string Email { get; set; }
-        public string Name { get; set; }
-        public DateTime? EmailVerified { get; set; }
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("sysdatetimeoffset()");
 
-        /// <summary>
-        /// profile image
-        /// </summary>
-        public string Image { get; set; }
+        builder.HasIndex(x => x.Username)
+            .IsUnique();
 
-        public bool IsDisabled { get; set; }
-
-        public List<Account> Accounts { get; set; } = new();
-        public List<Session> Sessions { get; set; } = new();
-
-        public DateTimeOffset CreatedAt { get; set; }
-        public Guid? CreatedBy { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
-        public Guid? UpdatedBy { get; set; }
-    }
-
-    public class UserConfiguration : IEntityTypeConfiguration<User>
-    {
-        public void Configure(EntityTypeBuilder<User> builder)
-        {
-            builder.HasKey(x => x.Id);
-
-            builder.HasMany(x => x.Accounts)
-                .WithOne(a => a.User)
-                .HasForeignKey(a => a.UserId);
-
-            builder.HasMany(x => x.Sessions)
-                .WithOne(s => s.User)
-                .HasForeignKey(s => s.UserId);
-
-            builder.Property(x => x.CreatedAt)
-                .HasDefaultValueSql("sysdatetimeoffset()");
-        }
+        builder.HasMany(x => x.RefreshTokens)
+            .WithOne(t => t.User)
+            .HasForeignKey(t => t.UserId);
     }
 }

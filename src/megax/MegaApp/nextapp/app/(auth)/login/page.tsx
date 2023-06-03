@@ -8,10 +8,9 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { Typography } from "@mui/material";
 
 export default function SignInPage() {
-  const session = useSession();
-  const isAuthenticated = session.status === "authenticated";
+  const { status } = useSession();
 
-  if (isAuthenticated) {
+  if (status === "authenticated") {
     redirect("/");
   }
 

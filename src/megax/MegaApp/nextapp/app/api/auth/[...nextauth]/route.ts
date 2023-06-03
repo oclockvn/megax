@@ -1,7 +1,13 @@
-import DotnetBackendAdapter from "@/lib/authLib/dotnetBackendAdapter";
-import { validateGoogleToken } from "@/lib/authLib/token.service";
+import { googleSignIn, refreshAuthToken } from "@/lib/apis/signin.api";
+import datetime from "@/lib/datetime";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+
+declare type TokenDto = {
+  authToken: string;
+  refreshToken: string;
+  expiryTime: Date;
+};
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -19,44 +25,69 @@ export const authOptions: NextAuthOptions = {
   //   strategy: "jwt",
   // },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log("> signin", { user, account, profile, email, credentials });
-      // validate token in the backend
+    async signIn({ user, account }) {
+      // validate and assign token in the backend
       if (account && account.id_token) {
-        const validationResult = await validateGoogleToken(account.id_token);
-        if (validationResult?.token) {
-          (user as any).jwtToken = validationResult.token; // assign custom token returned from backend
+        const validationResult = await googleSignIn(account.id_token);
+        if (!validationResult || !validationResult.isSuccess) {
+          return false;
         }
+
+        const { token, refreshToken, expiryTime } = validationResult.data;
+        (user as any).authToken = token;
+        (user as any).refreshToken = refreshToken;
+        (user as any).expiryTime = expiryTime;
       }
+
       return true;
     },
 
-    // async redirect({ url, baseUrl }) {
-    //   return baseUrl
-    // },
-    async jwt({ token, user, account, profile, isNewUser }) {
-      console.log("> jwt", { token, user, account, profile, isNewUser });
-      if (account) {
-        // add token to session
-        token.accessToken = account.access_token;
-        token.idToken = account.id_token;
-      }
+    async jwt({ token, user, session }) {
+      let authToken = "";
+      let refreshToken = "";
+      let expiryTime: Date | undefined;
 
       if (user) {
-        token.jwtToken = (user as any).jwtToken; // custom token from backend returned after signin
+        // custom token from backend returned after signin
+        const apiUser = user as Partial<TokenDto>;
+        authToken = apiUser.authToken || "";
+        refreshToken = apiUser.refreshToken || "";
+        expiryTime = apiUser.expiryTime;
+      }
+
+      // note: this is backend refresh token
+      // we haven't done frontend refresh token yet
+      const tokenExp = datetime.parseFromServer(token.expiryTime as string);
+      if (tokenExp <= new Date() && token.refreshToken) {
+        const refreshTokenRes = await refreshAuthToken(
+          token.authToken as string,
+          token.refreshToken as string
+        );
+
+        if (refreshTokenRes.isSuccess) {
+          authToken = refreshTokenRes.data.token;
+          refreshToken = refreshTokenRes.data.refreshToken;
+          expiryTime = refreshTokenRes.data.expiryTime;
+        } else {
+          // undone: handle unsuccess refresh token
+        }
+      }
+
+      if (authToken) {
+        token.authToken = authToken;
+        token.refreshToken = refreshToken;
+        token.expiryTime = expiryTime;
       }
 
       return token;
     },
 
-    async session({ session, user, token }) {
-      console.log("> session", { session, user, token });
-
+    async session({ session, token }) {
       return {
         ...session,
-        accessToken: token.accessToken,
-        idToken: token.idToken,
-        jwtToken: token.jwtToken,
+        authToken: token.authToken,
+        refreshToken: token.refreshToken,
+        expiryTime: token.expiryTime,
       };
     },
   },

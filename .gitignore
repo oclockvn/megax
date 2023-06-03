@@ -262,3 +262,5 @@ __pycache__/
 appsettings.Development.json
 
 LocalStorage/
+.vscode/
+.vscode
