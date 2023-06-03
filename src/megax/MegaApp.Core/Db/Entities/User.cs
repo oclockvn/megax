@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Db.Entities;
+
 public class User : ICreatedByEntity, IUpdatedByEntity
 {
     public int Id { get; set; }
