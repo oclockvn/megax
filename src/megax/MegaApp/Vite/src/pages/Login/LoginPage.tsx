@@ -1,77 +1,49 @@
-import * as React from "react";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../provider/authProvider";
-import { login } from "../../lib/apis/signin.api";
+import { useEffect } from "react";
+import { userLoginThunk } from "../../store/signin.slice";
+import { useAppDispatch, useAppSelector } from "../../store/store.hook";
+import storage from "../../lib/storage";
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  props,
-  ref
-) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+type LoginFormType = {
+  username: string;
+  password: string;
+};
 
-export default function CustomizedSnackbars() {
-  // const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isFailed, setIsFailed] = useState(false);
+export default function LoginPage() {
+  const { isAuthenticated, errorMessage, authToken } = useAppSelector(
+    s => s.signinSlice
+  );
+  console.log(errorMessage);
 
-  const defaultValue = {
-    userName: "khangnguyen2019@gmail.com",
-    passworld: "10091989",
-  };
-
-  const handleClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
+  useEffect(() => {
+    console.log({ isAuthenticated });
+    // store token if authenticated
+    if (isAuthenticated) {
+      storage.set("token", authToken);
     }
+  }, [isAuthenticated]);
 
-    setOpen(false);
+  const appDispatch = useAppDispatch();
+
+  const handleFormSubmit = (values: LoginFormType) => {
+    const { username, password } = values;
+    appDispatch(userLoginThunk({ username, password }));
   };
-
-  const { setToken } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    setToken("this is a test token");
-    navigate("/", { replace: true });
-  };
-
-  const async handleSubmit = () => {
-  
-  }
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<LoginFormType>();
 
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
       <div className="w-full pb-8">
         <form
-          onSubmit={handleSubmit(values => {
-            values.username === defaultValue.userName &&
-            values.password === defaultValue.passworld
-              ? (setIsSuccess(true), setIsFailed(false), handleLogin())
-              : (setIsFailed(true), setIsSuccess(false));
-            setTimeout(() => 3 * 1000);
-          })}
+          onSubmit={handleSubmit(handleFormSubmit)}
           className="bg-white shadow-md rounded px-8 pt-6 pb-[80px] mb-4"
         >
           <div className=" mb-4">
@@ -113,10 +85,12 @@ export default function CustomizedSnackbars() {
             </p>
           </div>
           <div className="flex flex-col items-start justify-between">
-            <Button variant="contained" type="submit" onClick={handleClick}>
+            <Button variant="contained" type="submit">
               Login In
             </Button>
-            {isSuccess && (
+
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            {/* {isSuccess && (
               <Snackbar
                 open={open}
                 autoHideDuration={6000}
@@ -131,8 +105,8 @@ export default function CustomizedSnackbars() {
                   Login success!
                 </Alert>
               </Snackbar>
-            )}
-            {isFailed && (
+            )} */}
+            {/* {isFailed && (
               <Snackbar
                 open={open}
                 autoHideDuration={6000}
@@ -146,7 +120,7 @@ export default function CustomizedSnackbars() {
                   Invalid username or password.
                 </Alert>
               </Snackbar>
-            )}
+            )} */}
           </div>
         </form>
       </div>
