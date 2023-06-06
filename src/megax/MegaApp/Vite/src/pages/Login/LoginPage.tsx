@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { userLoginThunk } from "../../store/signin.slice";
 import { useAppDispatch, useAppSelector } from "../../store/store.hook";
 import storage from "../../lib/storage";
+import { useNavigate } from "react-router";
 
 type LoginFormType = {
   username: string;
@@ -16,13 +17,12 @@ export default function LoginPage() {
   const { isAuthenticated, errorMessage, authToken } = useAppSelector(
     s => s.signinSlice
   );
-  console.log(errorMessage);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log({ isAuthenticated });
-    // store token if authenticated
     if (isAuthenticated) {
       storage.set("token", authToken);
+      navigate("/");
     }
   }, [isAuthenticated]);
 

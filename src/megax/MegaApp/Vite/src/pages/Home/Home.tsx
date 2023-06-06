@@ -1,7 +1,27 @@
-import * as React from "react";
+import { useAppDispatch, useAppSelector } from "../../store/store.hook";
+import { useEffect } from "react";
+import { getWeatherForecastThunk } from "../../store/home.slice";
 
 function HomePage() {
-  return <div>User HomePage</div>;
+  const forecastItems = useAppSelector(s => s.homeSlice.items);
+  const appDispatch = useAppDispatch();
+
+  useEffect(() => {
+    appDispatch(getWeatherForecastThunk());
+  }, []);
+
+  return (
+    <>
+      {forecastItems &&
+        forecastItems.map((i, index) => (
+          <>
+            <div key={index}>
+              {i.date} - {i.temperatureC} - {i.summary}
+            </div>
+          </>
+        ))}
+    </>
+  );
 }
 
 export default HomePage;

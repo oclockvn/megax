@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import signinSlice from "./signin.slice";
+import homeSlice from "./home.slice";
 
 const store = configureStore({
   reducer: {
     signinSlice,
+    homeSlice,
   },
 });
 
