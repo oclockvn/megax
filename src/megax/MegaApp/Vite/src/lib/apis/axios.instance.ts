@@ -1,8 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-    //baseURL: '',
-
+  //baseURL: '',
+  headers: {
+    "Content-type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 // todo: define interceptor
