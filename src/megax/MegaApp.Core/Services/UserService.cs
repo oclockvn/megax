@@ -34,24 +34,31 @@ internal class UserService : IUserService
     public async Task<Result<int>> CreateUserAsync(UserModel.NewUser user)
     {
         using var db = UseDb();
-        var userExist = await db.Users.Where(u => u.Username == user.Username).AnyAsync();
+        var userExist = await db.Users.Where(u => u.Accounts.Any(a => a.Username == user.Username)).AnyAsync();
         if (userExist)
         {
-            return "Username already exist".FromErr<int>();
+            return Result<int>.Fail("user_already_exist");
         }
 
         var entity = db.Users.Add(new()
         {
-            Username = user.Username,
             FullName = user.FullName,
             Email = user.Email,
             CreatedAt = DateTimeOffset.Now,
-            PasswordHash = user.Password.Hash()
         }).Entity;
+
+        // add account to user
+        entity.Accounts.Add(new Db.Entities.Account
+        {
+            Username = user.Username,
+            Password = user.Password,
+            OAuthType = user.OAuthType,
+            Provider = user.ProviderType,
+        });
 
         await db.SaveChangesAsync();
 
-        return entity.Id.FromValue();
+        return Result<int>.Ok(entity.Id);
     }
 
     public async Task<UserModel> GetUserAsync(string username)
@@ -60,9 +67,9 @@ internal class UserService : IUserService
             throw new ArgumentNullException(nameof(username));
 
         using var db = UseDb();
-        var user = await db.Users.Where(u => u.Username == username)
-        .Select(u => new UserModel(u))
-        .FirstOrDefaultAsync();
+        var user = await db.Users.Where(u => u.Accounts.Any(a => a.Username == username))
+            .Select(u => new UserModel(u))
+            .FirstOrDefaultAsync();
 
         return user;
     }

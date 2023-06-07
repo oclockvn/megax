@@ -15,6 +15,7 @@ namespace MegaApp.Core
         public static readonly string INVALID_REFRESH_TOKEN = "INVALID_REFRESH_TOKEN";
         public static readonly string REFRESH_TOKEN_IS_REVOKED = "REFRESH_TOKEN_IS_REVOKED";
         public static readonly string REFRESH_TOKEN_IS_EXPIRED = "REFRESH_TOKEN_IS_EXPIRED";
+        public static readonly string INVALID_USERNAME_OR_PASSWORD = "INVALID_USERNAME_OR_PASSWORD";
     }
 
     public record Result<T>(T Data) : Result
