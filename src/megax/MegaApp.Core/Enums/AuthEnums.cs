@@ -1,9 +1,13 @@
-﻿namespace MegaApp.Core.Enums
+﻿namespace MegaApp.Core.Enums;
+
+public enum OAuthType
 {
-    public enum ProviderType
-    {
-        OAuth,
-        Email,
-        Credentials,
-    }
+    Google,
+}
+
+public enum ProviderType
+{
+    OAuth,
+    Email,
+    Credentials,
 }
