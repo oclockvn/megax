@@ -1,12 +1,13 @@
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { userLoginThunk } from "../../store/signin.slice";
 import { useAppDispatch, useAppSelector } from "../../store/store.hook";
 import storage from "../../lib/storage";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 type LoginFormType = {
   username: string;
@@ -26,26 +27,27 @@ export default function LoginPage() {
     }
   }, [isAuthenticated]);
 
-  const appDispatch = useAppDispatch();
-
-  const handleFormSubmit = (values: LoginFormType) => {
-    const { username, password } = values;
-    appDispatch(userLoginThunk({ username, password }));
-  };
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormType>();
 
+  const appDispatch = useAppDispatch();
+  const handleFormSubmit = (values: LoginFormType) => {
+    const { username, password } = values;
+    appDispatch(userLoginThunk({ username, password }));
+  };
+
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
       <div className="w-full pb-8">
         <form
           onSubmit={handleSubmit(handleFormSubmit)}
-          className="bg-white shadow-md rounded px-8 pt-6 pb-[80px] mb-4"
+          className="bg-white shadow-md rounded px-8 pt-6 pb-[80px] mb-4 flex flex-col justify-center items-center"
         >
+          <Typography>Login</Typography>
+
           <div className=" mb-4">
             <TextField
               {...register("username", {
@@ -90,37 +92,6 @@ export default function LoginPage() {
             </Button>
 
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-            {/* {isSuccess && (
-              <Snackbar
-                open={open}
-                autoHideDuration={6000}
-                onClose={handleClose}
-                className="absolute -top-[80%] translate-x-[300%]"
-              >
-                <Alert
-                  onClose={handleClose}
-                  severity="success"
-                  sx={{ width: "100%" }}
-                >
-                  Login success!
-                </Alert>
-              </Snackbar>
-            )} */}
-            {/* {isFailed && (
-              <Snackbar
-                open={open}
-                autoHideDuration={6000}
-                onClose={handleClose}
-              >
-                <Alert
-                  onClose={handleClose}
-                  severity="error"
-                  sx={{ width: "100%" }}
-                >
-                  Invalid username or password.
-                </Alert>
-              </Snackbar>
-            )} */}
           </div>
         </form>
       </div>
