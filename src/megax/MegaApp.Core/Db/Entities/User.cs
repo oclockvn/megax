@@ -14,6 +14,13 @@ public class User : ICreatedByEntity
     [MaxLength(100)]
     public string FullName { get; set; }
 
+    [MaxLength(100)]
+    public string Phone { get; set; }
+    [MaxLength(200)]
+    public string Address { get; set; }
+    public DateOnly? Dob { get; set; }
+    public string IdentityNumber { get; set; }
+
     public List<Account> Accounts { get; set; } = new();
 
     public DateTimeOffset CreatedAt { get; set; }
