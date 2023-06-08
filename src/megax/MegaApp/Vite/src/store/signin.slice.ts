@@ -1,6 +1,8 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { login } from '../lib/apis/signin.api'
-import { UserLoginResponse, Result } from '../lib/models/login.model'
+import { UserLoginResponse } from '../lib/models/login.model'
+import { Result } from '../lib/models/common.model'
+
 
 
 export interface SignInState {
@@ -48,10 +50,13 @@ export const signinSlice = createSlice({
     if (isSuccess) {
       state.isAuthenticated = true
       state.authToken = token
+
     } else {
       state.isAuthenticated = false
       state.errorMessage = "Invalid username or password";
+
     }
+
   }
   )
 
