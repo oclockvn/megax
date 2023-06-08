@@ -4,8 +4,3 @@ export interface UserLoginResponse {
     expiryTime: Date,
 }
 
-export interface Result<T> {
-    data: T,
-    isSuccess: boolean,
-    code: string
-}

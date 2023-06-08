@@ -16,6 +16,7 @@ type LoginFormType = {
 };
 
 export default function LoginPage() {
+  const appDispatch = useAppDispatch();
   const { isAuthenticated, errorMessage, authToken } = useAppSelector(
     s => s.signinSlice
   );
@@ -36,7 +37,6 @@ export default function LoginPage() {
     }
   }, [isAuthenticated]);
 
-  const appDispatch = useAppDispatch();
   const handleFormSubmit = (values: LoginFormType) => {
     const { username, password } = values;
     appDispatch(userLoginThunk({ username, password }));
