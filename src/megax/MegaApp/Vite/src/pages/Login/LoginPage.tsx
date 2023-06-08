@@ -8,6 +8,7 @@ import { userLoginThunk } from "../../store/signin.slice";
 import { useAppDispatch, useAppSelector } from "../../store/store.hook";
 import storage from "../../lib/storage";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 type LoginFormType = {
   username: string;
@@ -18,20 +19,22 @@ export default function LoginPage() {
   const { isAuthenticated, errorMessage, authToken } = useAppSelector(
     s => s.signinSlice
   );
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      storage.set("token", authToken);
-      navigate("/");
-    }
-  }, [isAuthenticated]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormType>();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      storage.set("token", authToken);
+      toast.success("Login success!");
+      navigate("/");
+    }
+  }, [isAuthenticated]);
 
   const appDispatch = useAppDispatch();
   const handleFormSubmit = (values: LoginFormType) => {
