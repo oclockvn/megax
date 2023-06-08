@@ -1,20 +1,20 @@
 "use client";
 
-import client from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import { fetchWeatherForecastThunk } from "@/lib/store/weather.store";
+import { useEffect } from "react";
 
 export default function ProfilePage() {
-  const [weather, setWeather] = useState([]);
-  useEffect(() => {
-    async function fetchWeather() {
-      const res = await client.get("/be/weatherforecast");
-      setWeather(res.data);
-    }
+  const appDispatch = useAppDispatch();
+  const { weatherForecast: weather, loading } = useAppSelector(s => s.weather);
 
-    fetchWeather();
+  useEffect(() => {
+    appDispatch(fetchWeatherForecastThunk());
   }, []);
+
   return (
     <>
+      {loading && <div>Loading...</div>}
       {weather &&
         weather.map((x: { date: string; summary: string }) => (
           <div>
