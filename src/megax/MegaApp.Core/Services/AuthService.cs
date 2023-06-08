@@ -6,8 +6,8 @@ namespace MegaApp.Core.Services;
 
 public interface IAuthService
 {
-    Task<Result<bool>> IsValidUserAsync(string username, string password);
-    Task<Result<bool>> IsRefreshTokenValid(int userId, Guid refreshToken, string token);
+    Task<Result<int>> IsValidAccountAsync(string username, string password);
+    Task<Result<bool>> IsRefreshTokenValid(int accountId, Guid refreshToken, string token);
     Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30);
     Task RevokeRefreshTokenAsync(Guid refreshToken);
 }
@@ -23,19 +23,19 @@ internal class AuthService : IAuthService
 
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
 
-    public async Task<Result<bool>> IsValidUserAsync(string username, string password)
+    public async Task<Result<int>> IsValidAccountAsync(string username, string password)
     {
         using var db = UseDb();
-        var hashed = await db.Users.Where(u => u.Username == username)
-            .Select(u => u.PasswordHash)
+        var account = await db.Accounts.Where(u => u.Username == username)
+            .Select(u => new { u.Password, u.UserId })
             .SingleOrDefaultAsync();
 
-        if (!string.IsNullOrWhiteSpace(hashed) && hashed.IsHashedMatches(password))
+        if (account == null || !account.Password.IsHashedMatches(password))
         {
-            return new Result<bool>(true);
+            return Result<int>.Fail(Result.INVALID_USERNAME_OR_PASSWORD);
         }
 
-        return Result<bool>.Fail("invalid_username_or_password");
+        return Result<int>.Ok(account.UserId);
     }
 
     public async Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30)
@@ -45,8 +45,9 @@ internal class AuthService : IAuthService
         {
             CreatedAt = DateTimeOffset.Now,
             ExpiresAt = DateTimeOffset.Now.AddDays(expiryDay),
-            UserId = userId,
+            AccountId = userId,
             Token = token, // each refresh token must be attached to a jwt
+            IsActive = true,
         });
 
         await db.SaveChangesAsync();
@@ -54,12 +55,12 @@ internal class AuthService : IAuthService
         return entry.Entity.Id;
     }
 
-    public async Task<Result<bool>> IsRefreshTokenValid(int userId, Guid refreshToken, string token)
+    public async Task<Result<bool>> IsRefreshTokenValid(int accountId, Guid refreshToken, string token)
     {
         using var db = UseDb();
         var entity = await db.RefreshTokens
-            .Where(x => x.UserId == userId && x.Token == token && x.Id == refreshToken)
-            .Select(x => new { x.ExpiresAt, x.IsRevoked })
+            .Where(x => x.AccountId == accountId && x.Token == token && x.Id == refreshToken)
+            .Select(x => new { x.ExpiresAt, x.IsActive })
             .SingleOrDefaultAsync();
 
         if (entity == null)
@@ -67,7 +68,7 @@ internal class AuthService : IAuthService
             return Result<bool>.Fail(Result.INVALID_REFRESH_TOKEN);
         }
 
-        if (entity.IsRevoked)
+        if (!entity.IsActive)
         {
             return Result<bool>.Fail(Result.REFRESH_TOKEN_IS_REVOKED);
         }
@@ -84,6 +85,6 @@ internal class AuthService : IAuthService
     {
         using var db = UseDb();
         await db.RefreshTokens.Where(x => x.Id == refreshToken)
-            .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsRevoked, x => true));
+            .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsActive, x => false));
     }
 }

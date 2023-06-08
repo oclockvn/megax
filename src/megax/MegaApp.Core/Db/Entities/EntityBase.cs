@@ -3,12 +3,12 @@
     public interface ICreatedByEntity
     {
         DateTimeOffset CreatedAt { get; set; }
-        Guid? CreatedBy { get; set; }
+        int? CreatedBy { get; set; }
     }
 
     public interface IUpdatedByEntity
     {
         DateTimeOffset UpdatedAt { get; set; }
-        Guid? UpdatedBy { get; set; }
+        int? UpdatedBy { get; set; }
     }
 }

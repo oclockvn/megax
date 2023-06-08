@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MegaApp.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
 
 public class UserModel
 {
     public int Id { get; set; }
-    public string Username { get; set; }
+    // public string Username { get; set; }
     public string Email { get; set; }
     public string FullName { get; set; }
 
@@ -17,7 +18,7 @@ public class UserModel
     public UserModel(Db.Entities.User user)
     {
         Id = user.Id;
-        Username = user.Username;
+        // Username = user.Username;
         Email = user.Email;
         FullName = user.FullName;
     }
@@ -28,6 +29,8 @@ public class UserModel
         public string Email { get; set; }
         public string Password { get; set; }
         public string FullName { get; set; }
+        public ProviderType ProviderType { get; set; }
+        public OAuthType? OAuthType { get; set; }
     }
 
     public record UserLogin

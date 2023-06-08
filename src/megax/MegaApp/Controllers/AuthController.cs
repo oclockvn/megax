@@ -36,8 +36,15 @@ namespace MegaApp.Controllers
             this.tokenService = tokenService;
         }
 
+        /// <summary>
+        /// Register user account
+        /// </summary>
+        /// <param name="userRegister"><see cref="UserRegister" /></param>
+        /// <returns></returns>
         [HttpPost("register")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(Result<int>), 200)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register(UserRegister userRegister)
         {
             if (!ModelState.IsValid)
@@ -51,6 +58,7 @@ namespace MegaApp.Controllers
                 Email = userRegister.Username,
                 FullName = userRegister.Name,
                 Password = userRegister.Password,
+                ProviderType = Core.Enums.ProviderType.Credentials,
             });
 
             return Ok(userResult);
@@ -58,6 +66,8 @@ namespace MegaApp.Controllers
 
         [HttpPost("user-signin")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(Result<SignInResponse>), 200)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UserSignIn(UserModel.UserLogin req)
         {
             if (!ModelState.IsValid)
@@ -67,14 +77,14 @@ namespace MegaApp.Controllers
 
             var signInResult = Result<SignInResponse>.Default;
 
-            var userResult = await authService.IsValidUserAsync(req.Username, req.Password);
+            var userResult = await authService.IsValidAccountAsync(req.Username, req.Password);
             if (!userResult.IsSuccess)
             {
                 signInResult = signInResult.FromCode(userResult);
                 return Ok(signInResult);
             }
 
-            var user = await userService.GetUserAsync(req.Username);
+            var user = await userService.GetUserAsync(userResult.Data);
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
             var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
@@ -83,8 +93,15 @@ namespace MegaApp.Controllers
             return Ok(signInResult);
         }
 
+        /// <summary>
+        /// Signin to google using id token
+        /// </summary>
+        /// <param name="googleAuth"><see cref="GoogleToken" /></param>
+        /// <returns></returns>
         [HttpPost("google-signin")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(Result<SignInResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GoogleSignIn(GoogleToken googleAuth)
         {
             var (valid, claims) = await googleAuthenticateClient.ValidateAsync(googleAuth.IdToken);
@@ -104,6 +121,8 @@ namespace MegaApp.Controllers
                     FullName = claims.Name,
                     Username = claims.Email,
                     Password = Guid.NewGuid().ToString("N"), // undone: generate random password
+                    ProviderType = Core.Enums.ProviderType.OAuth,
+                    OAuthType = Core.Enums.OAuthType.Google,
                 });
 
                 user = await userService.GetUserAsync(userResult.Data);
@@ -116,6 +135,8 @@ namespace MegaApp.Controllers
         }
 
         [HttpPost("refresh-token")]
+        [ProducesResponseType(typeof(Result<SignInResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
         {
             if (!ModelState.IsValid)

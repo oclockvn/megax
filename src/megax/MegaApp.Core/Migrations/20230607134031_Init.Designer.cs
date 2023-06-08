@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MegaApp.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230531035626_UpdateRefreshToken")]
-    partial class UpdateRefreshToken
+    [Migration("20230607134031_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,11 +25,50 @@ namespace MegaApp.Core.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.Account", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("OAuthType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Password")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("Accounts", "auth");
+                });
+
             modelBuilder.Entity("MegaApp.Core.Db.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -39,20 +78,17 @@ namespace MegaApp.Core.Migrations
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<bool>("IsRevoked")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AccountId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", "auth");
                 });
 
             modelBuilder.Entity("MegaApp.Core.Db.Entities.User", b =>
@@ -68,8 +104,8 @@ namespace MegaApp.Core.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("sysdatetimeoffset()");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(100)
@@ -79,33 +115,19 @@ namespace MegaApp.Core.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("PasswordHash")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("Username")
-                        .IsUnique();
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.RefreshToken", b =>
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.Account", b =>
                 {
                     b.HasOne("MegaApp.Core.Db.Entities.User", "User")
-                        .WithMany("RefreshTokens")
+                        .WithMany("Accounts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -113,9 +135,25 @@ namespace MegaApp.Core.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.User", b =>
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("MegaApp.Core.Db.Entities.Account", "Account")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.Account", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.User", b =>
+                {
+                    b.Navigation("Accounts");
                 });
 #pragma warning restore 612, 618
         }
