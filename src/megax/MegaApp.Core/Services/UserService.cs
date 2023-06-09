@@ -1,5 +1,6 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Dtos;
+using MegaApp.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
@@ -50,7 +51,7 @@ internal class UserService : IUserService
         entity.Accounts.Add(new Db.Entities.Account
         {
             Username = user.Username,
-            Password = user.Password,
+            Password = user.Password.Hash(),
             OAuthType = user.OAuthType,
             Provider = user.ProviderType,
         });
