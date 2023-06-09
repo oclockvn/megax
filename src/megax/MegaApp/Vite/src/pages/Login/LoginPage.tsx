@@ -18,7 +18,7 @@ type LoginFormType = {
 export default function LoginPage() {
   const appDispatch = useAppDispatch();
   const { isAuthenticated, errorMessage, authToken } = useAppSelector(
-    s => s.signinSlice
+    state => state.signinSlice
   );
 
   const {
