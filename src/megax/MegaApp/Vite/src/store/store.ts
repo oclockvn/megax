@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import signinSlice from './signin.slice'
+import signupSlice from './signup.slice'
 import homeSlice from './home.slice'
 
 
@@ -7,7 +8,8 @@ import homeSlice from './home.slice'
 const store = configureStore({
   reducer: {
     signinSlice,
-    homeSlice
+    homeSlice,
+    signupSlice,
   }
 })
 
