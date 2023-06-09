@@ -5,14 +5,15 @@ import LoginPage from "../pages/Login/LoginPage";
 import About from "../pages/About/About";
 import { ProtectedRoute } from "./ProtectedRoute";
 import storage from "../lib/storage";
+import SignUpPage from "../pages/Register/SignUp";
 
 const Routes = () => {
   const token = storage.get("token");
 
   const routesForPublic = [
     {
-      path: "/service",
-      element: <div>Service Page</div>,
+      path: "/signup",
+      element: <HomeTemplate Component={SignUpPage} />,
     },
     {
       path: "/about-us",
