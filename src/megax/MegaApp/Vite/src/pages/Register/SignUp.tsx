@@ -3,9 +3,9 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+
 import { useAppDispatch, useAppSelector } from "../../store/store.hook";
-import storage from "../../lib/storage";
+
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { userSignupThunk } from "../../store/signup.slice";
@@ -18,6 +18,13 @@ type SignUpFormType = {
 
 function SignUpPage() {
   const appDispatch = useAppDispatch();
+  const { isRegister, errorMessage, successMessage } = useAppSelector(
+    state => state.signupSlice
+  );
+  console.log("successMessage: ", successMessage);
+  console.log("errorMessage: ", errorMessage);
+  console.log("isRegister: ", isRegister);
+
   const {
     register,
     handleSubmit,
@@ -29,7 +36,12 @@ function SignUpPage() {
   const handleFormSubmit = (values: SignUpFormType) => {
     const { username, password, name } = values;
     appDispatch(userSignupThunk({ username, password, name }));
-    console.log("values: ", values);
+    if (isRegister) {
+      toast.success("Register Success!");
+      navigate("/login");
+    } else {
+      toast.error("User already exist!");
+    }
   };
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
