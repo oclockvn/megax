@@ -1,4 +1,5 @@
-import { Result, UserLoginResponse } from "../models/login.model";
+import { UserLoginResponse } from "../models/login.model";
+import { Result } from '../models/common.model'
 import api from "./axios.instance";
 
 export async function login(username: string, password: string) {
