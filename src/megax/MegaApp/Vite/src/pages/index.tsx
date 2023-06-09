@@ -1,6 +1,6 @@
-import * as React from "react";
 import Header from "../components/Header";
 import Container from "@mui/material/Container";
+import Footer from "../components/Footer";
 
 function HomeTemplate({ Component }) {
   return (
@@ -11,8 +11,8 @@ function HomeTemplate({ Component }) {
         <div className="mt-4">
           <Component />
         </div>
-        <div>Footer</div>
       </Container>
+      <Footer />
     </>
   );
 }
