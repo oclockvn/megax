@@ -27,12 +27,6 @@ function Header() {
         { id: 2, name: "About", to: "/about-us" },
         { id: 3, name: "About", to: "/about-us" },
       ];
-  const settings = [
-    { id: 1, name: "Profile", to: "/profile" },
-    { id: 2, name: "Account", to: "/profile" },
-    { id: 3, name: "Dashboard", to: "/" },
-    { id: 3, name: "Logout", to: "/" },
-  ];
 
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -183,27 +177,11 @@ function Header() {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
-                  {settings.map(setting => (
-                    <MenuItem key={setting.id} onClick={handleCloseUserMenu}>
-                      <Typography textAlign="center">{setting.name}</Typography>
-                    </MenuItem>
-                  ))}
-                  {/* <MenuItem onClick={handleCloseUserMenu}>
-                    <div className="flex flex-col justify-start items-start">
-                      {settings.map(setting => (
-                        <React.Fragment key={setting.id}>
-                          <Link to={setting.to}>
-                            <Typography textAlign="center">
-                              {setting.name}
-                            </Typography>
-                          </Link>
-                        </React.Fragment>
-                      ))}
-                      <Typography textAlign="center" onClick={handleLogout}>
-                        Logout
-                      </Typography>
-                    </div>
-                  </MenuItem> */}
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center" onClick={handleLogout}>
+                      Logout
+                    </Typography>
+                  </MenuItem>
                 </Menu>
               </Box>
             ) : (
