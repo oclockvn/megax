@@ -1,16 +1,14 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { login } from '../lib/apis/signin.api'
-import { UserLoginResponse } from '../lib/models/login.model'
 import { Result } from '../lib/models/common.model'
 import { signup } from '../lib/apis/signup.api'
 import { UserSignupResponse } from '../lib/models/signup.model'
 
 
-
 export interface SignupState {
   errorMessage: string,
-  isAuthenticated: boolean,
-  authToken: string
+  successMessage: string,
+  isRegister: boolean,
+
 }
 
 type SignupRequest = {
@@ -27,16 +25,17 @@ export const userSignupThunk = createAsyncThunk(
   }
 )
 
-const signinState: SignupState = {
+const signupState: SignupState = {
   errorMessage: '',
-  isAuthenticated: false,
-  authToken: ''
+  successMessage: '',
+  isRegister: false,
+
 
 }
 
-export const signinSlice = createSlice({
+export const signupSlice = createSlice({
   name: 'signup',
-  initialState: signinState,
+  initialState: signupState,
   reducers: {
 
   },
@@ -52,12 +51,13 @@ export const signinSlice = createSlice({
     } = action
 
     if (isSuccess) {
-      state.isAuthenticated = true
+      state.isRegister = true
+      state.successMessage = 'Register success!'
 
 
     } else {
-      state.isAuthenticated = false
-      state.errorMessage = "Invalid username or password";
+      state.isRegister = false
+      state.errorMessage = "User already exist!";
 
     }
 
@@ -67,4 +67,4 @@ export const signinSlice = createSlice({
 })
 
 
-export default signinSlice.reducer
+export default signupSlice.reducer
