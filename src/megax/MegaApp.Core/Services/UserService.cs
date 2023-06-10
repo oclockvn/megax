@@ -2,6 +2,7 @@
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
+using MegaApp.Core.Db.Entities;
 
 namespace MegaApp.Core.Services;
 
@@ -9,6 +10,8 @@ public interface IUserService
 {
     Task<UserModel> GetUserAsync(int id);
     Task<UserModel> GetUserAsync(string username);
+    IAsyncEnumerable<UserModel> GetUsersAsync(Filter filter);
+
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 }
@@ -97,5 +100,36 @@ internal class UserService : IUserService
             .FirstOrDefaultAsync();
 
         return user;
+    }
+
+    public async IAsyncEnumerable<UserModel> GetUsersAsync(Filter filter)
+    {
+        using var db = UseDb();
+        var query = db.Users
+            .OrderByDescending(x => x.Id)
+            .Filter(filter?.Query);
+
+        if (!string.IsNullOrWhiteSpace(filter?.OrderBy))
+        {
+            var isAsc = filter.IsAsc == true;
+            switch (filter?.OrderBy)
+            {
+                case nameof(User.Email):
+                    query = query.Sort(x => x.Email, isAsc);
+                    break;
+                case nameof(User.FullName):
+                    query = query.Sort(x => x.FullName, isAsc);
+                    break;
+                case nameof(User.Dob):
+                    query = query.Sort(x => x.Dob, isAsc);
+                    break;
+                case nameof(User.Phone):
+                    query = query.Sort(x => x.Phone, isAsc);
+                    break;
+            }
+        }
+
+        await foreach (var user in query.AsAsyncEnumerable())
+            yield return new UserModel(user);
     }
 }

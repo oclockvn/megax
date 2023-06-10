@@ -29,6 +29,12 @@ public class User : ICreatedByEntity
     public int? CreatedBy { get; set; }
 }
 
+public static class UserQueryExtension
+{
+    public static IQueryable<User> Filter(this IQueryable<User> query, string q)
+        => string.IsNullOrWhiteSpace(q) ? query : query.Where(x => x.Email.Contains(q) || x.FullName.Contains(q));
+}
+
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
