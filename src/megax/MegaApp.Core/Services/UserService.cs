@@ -37,7 +37,7 @@ internal class UserService : IUserService
         var userExist = await db.Users.Where(u => u.Accounts.Any(a => a.Username == user.Username)).AnyAsync();
         if (userExist)
         {
-            return Result<int>.Fail("user_already_exist");
+            return Result<int>.Fail(Result.USER_ALREADY_EXIST);
         }
 
         var entity = db.Users.Add(new()
@@ -45,6 +45,10 @@ internal class UserService : IUserService
             FullName = user.FullName,
             Email = user.Email,
             CreatedAt = DateTimeOffset.Now,
+            Dob = user.Dob,
+            Phone = user.Phone,
+            Address = user.Address,
+            IdentityNumber = user.IdentityNumber,
         }).Entity;
 
         // add account to user
