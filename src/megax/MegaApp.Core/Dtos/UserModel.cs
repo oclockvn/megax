@@ -55,6 +55,21 @@ public class UserModel
         public OAuthType? OAuthType { get; set; }
     }
 
+    public class UpdateUser
+    {
+        [Required]
+        public string FullName { get; set; }
+
+        [Required]
+        [MaxLength(200)]
+        public string Address { get; set; }
+        public DateOnly? Dob { get; set; }
+        [MaxLength(100)]
+        public string Phone { get; set; }
+        [MaxLength(200)]
+        public string IdentityNumber { get; set; }
+    }
+
     public record UserLogin
     {
         [Required]

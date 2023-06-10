@@ -10,6 +10,7 @@ public interface IUserService
     Task<UserModel> GetUserAsync(int id);
     Task<UserModel> GetUserAsync(string username);
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
+    Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 }
 
 internal class UserService : IUserService
@@ -63,6 +64,26 @@ internal class UserService : IUserService
         await db.SaveChangesAsync();
 
         return Result<int>.Ok(entity.Id);
+    }
+
+    public async Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req)
+    {
+        using var db = UseDb();
+        var user = await db.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            return Result<int>.Fail(Result.USER_DOES_NOT_EXIST);
+        }
+
+        user.Dob = req.Dob;
+        user.Address = req.Address;
+        user.Phone = req.Phone;
+        user.IdentityNumber = req.IdentityNumber;
+
+        await db.SaveChangesAsync();
+
+        return Result<int>.Ok(user.Id);
     }
 
     public async Task<UserModel> GetUserAsync(string username)
