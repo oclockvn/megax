@@ -1,16 +1,27 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-
 import "./App.css";
-import LoginPage from "./pages/Login/LoginPage";
+import AuthProvider from "./provider/authProvider";
+import Routes from "./routes";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Routes />
+        <ToastContainer
+          position="top-right"
+          autoClose={1000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+      </AuthProvider>
     </>
   );
 }
