@@ -18,7 +18,7 @@ public class User : ICreatedByEntity
     public string Phone { get; set; }
     [MaxLength(200)]
     public string Address { get; set; }
-    public DateOnly? Dob { get; set; }
+    public DateTimeOffset? Dob { get; set; }
 
     [MaxLength(100)]
     public string IdentityNumber { get; set; }

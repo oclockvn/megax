@@ -8,7 +8,7 @@ public class UserModel
     public int Id { get; set; }
     public string Email { get; set; }
     public string FullName { get; set; }
-    public DateOnly? Dob { get; set; }
+    public DateTimeOffset? Dob { get; set; }
     public string Address { get; set; }
     public string Phone { get; set; }
     public string IdentityNumber { get; set; }
@@ -26,6 +26,7 @@ public class UserModel
         Phone = user.Phone;
         IdentityNumber = user.IdentityNumber;
         Address = user.Address;
+        Dob = user.Dob;
     }
 
     public class NewUser
@@ -45,7 +46,7 @@ public class UserModel
         [Required]
         [MaxLength(200)]
         public string Address { get; set; }
-        public DateOnly? Dob { get; set; }
+        public DateTimeOffset? Dob { get; set; }
         [MaxLength(100)]
         public string Phone { get; set; }
         [MaxLength(200)]
@@ -63,7 +64,7 @@ public class UserModel
         [Required]
         [MaxLength(200)]
         public string Address { get; set; }
-        public DateOnly? Dob { get; set; }
+        public DateTimeOffset? Dob { get; set; }
         [MaxLength(100)]
         public string Phone { get; set; }
         [MaxLength(200)]
