@@ -55,6 +55,12 @@ internal class UserService : IUserService
             IdentityNumber = user.IdentityNumber,
         }).Entity;
 
+        // generate random pw if doesn't specify one
+        if (string.IsNullOrEmpty(user.Password))
+        {
+            user.Password = Guid.NewGuid().ToString("N");
+        }
+
         // add account to user
         entity.Accounts.Add(new Db.Entities.Account
         {
