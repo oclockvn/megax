@@ -46,57 +46,61 @@ export default function Nav() {
             <Typography
               variant="h6"
               component="div"
-              sx={{ flexGrow: 1 }}
+              sx={{ flexGrow: 0 }}
               className={logoColor}
             >
               <Link href={"/"}>MegaX</Link>
             </Typography>
             {isAuthenticated ? (
-              <div>
-                <span className="mr-1">Hi {session.data?.user?.name}</span>
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleMenu}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={Boolean(anchorEl)}
-                  onClose={() => handleClose()}
-                >
-                  <MenuItem onClick={() => handleClose("/profile")}>
-                    Profile
-                  </MenuItem>
-                  <MenuItem onClick={() => signOut()}>Logout</MenuItem>
-                </Menu>
+              <div className="flex-1 flex">
+                <div className="flex-1 flex items-center justify-center">
+                  <Button
+                    variant="outlined"
+                    href="/admin/user"
+                    className="text-white"
+                  >
+                    Users
+                  </Button>
+                </div>
+                <div>
+                  <span className="mr-1">Hi {session.data?.user?.name}</span>
+                  <IconButton
+                    size="large"
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleMenu}
+                    color="inherit"
+                  >
+                    <AccountCircle />
+                  </IconButton>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorEl)}
+                    onClose={() => handleClose()}
+                  >
+                    <MenuItem onClick={() => handleClose("/profile")}>
+                      Profile
+                    </MenuItem>
+                    <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+                  </Menu>
+                </div>
               </div>
             ) : (
               <>
-                {/* {isLoading && (
-                  <Skeleton variant="circular" width={24} height={24} />
-                )} */}
                 <div>
-                  <Button>
-                    <Link href="/about">About</Link>
-                  </Button>
-                  <Button>
-                    <Link href="/login">Login</Link>
-                  </Button>
+                  <Button href="/about">About</Button>
+                  <Button href="/login">Login</Button>
                 </div>
               </>
             )}

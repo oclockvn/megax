@@ -2,7 +2,7 @@ import api from "@/lib/api";
 import { Result } from "@/lib/models/common.model";
 import { User } from "@/lib/models/user.model";
 
-export async function getUserList() {
+export async function fetchUserList() {
   const res = await api.get<User[]>("/be/user");
   return res.data;
 }

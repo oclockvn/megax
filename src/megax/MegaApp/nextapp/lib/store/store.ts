@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import weatherStore from "./weather.store";
+import weatherStore from "./weather.state";
+import userStore from "./user.state";
 
 export const store = configureStore({
   reducer: {
     weather: weatherStore,
+    user: userStore,
   },
 });
 
