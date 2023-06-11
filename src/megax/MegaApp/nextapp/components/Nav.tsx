@@ -10,16 +10,15 @@ import {
   Button,
   // Skeleton,
 } from "@mui/material";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import useAuth from "@/lib/auth/useAuth";
 
 export default function Nav() {
-  const session = useSession();
-  const isAuthenticated = session.status === "authenticated";
-  // const isLoading = session.status === "loading";
+  const [isAuthenticated, username] = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
@@ -63,7 +62,7 @@ export default function Nav() {
                   </Button>
                 </div>
                 <div>
-                  <span className="mr-1">Hi {session.data?.user?.name}</span>
+                  <span className="mr-1">Hi {username}</span>
                   <IconButton
                     size="large"
                     aria-label="account of current user"
