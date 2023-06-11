@@ -10,7 +10,7 @@ public interface IUserService
 {
     Task<UserModel> GetUserAsync(int id);
     Task<UserModel> GetUserAsync(string username);
-    IAsyncEnumerable<UserModel> GetUsersAsync(Filter filter);
+    Task<List<UserModel>> GetUsersAsync(Filter filter);
 
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
@@ -108,7 +108,7 @@ internal class UserService : IUserService
         return user;
     }
 
-    public async IAsyncEnumerable<UserModel> GetUsersAsync(Filter filter)
+    public async Task<List<UserModel>> GetUsersAsync(Filter filter)
     {
         using var db = UseDb();
         var query = db.Users
@@ -135,7 +135,8 @@ internal class UserService : IUserService
             }
         }
 
-        await foreach (var user in query.AsAsyncEnumerable())
-            yield return new UserModel(user);
+        return await query
+        .Paging(filter.Page, filter.PageSize)
+        .Select(x => new UserModel(x)).ToListAsync();
     }
 }
