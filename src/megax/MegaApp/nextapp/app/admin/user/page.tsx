@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { useMemo } from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchUsersThunk } from "@/lib/store/user.state";
+import datetime from "@/lib/datetime";
 
 export default function UserListPage() {
   const appDispatch = useAppDispatch();
@@ -16,12 +16,16 @@ export default function UserListPage() {
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Full Name", width: 200 },
-    { field: "email", headerName: "Email", width: 150 },
+    { field: "fullName", headerName: "Full Name", width: 400 },
+    { field: "email", headerName: "Email", width: 300 },
     {
       field: "dob",
       headerName: "Dob",
       width: 150,
+      valueFormatter: formatter =>
+        formatter.value
+          ? datetime.formatDate(formatter.value, "dd/MM/yyyy")
+          : "",
     },
     {
       field: "identityNumber",
@@ -30,31 +34,17 @@ export default function UserListPage() {
     },
   ];
 
-  // const rows = [
-  //   { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  //   { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  //   { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  //   { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  //   { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  //   { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  //   { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  //   { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  //   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-  // // ];
-
   return (
-    <div style={{ width: "100%" }}>
+    <div className="p-4">
       <DataGrid
         rows={users}
         columns={columns}
-        initialState={
-          {
-            // pagination: {
-            //   paginationModel: { page: 0, pageSize: 5 },
-            // },
-          }
-        }
-        // pageSizeOptions={[5, 10]}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 100 },
+          },
+        }}
+        pageSizeOptions={[100]}
         // checkboxSelection
       />
     </div>
