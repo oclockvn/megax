@@ -14,10 +14,25 @@ public class User : ICreatedByEntity
     [MaxLength(100)]
     public string FullName { get; set; }
 
+    [MaxLength(100)]
+    public string Phone { get; set; }
+    [MaxLength(200)]
+    public string Address { get; set; }
+    public DateTimeOffset? Dob { get; set; }
+
+    [MaxLength(100)]
+    public string IdentityNumber { get; set; }
+
     public List<Account> Accounts { get; set; } = new();
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+}
+
+public static class UserQueryExtension
+{
+    public static IQueryable<User> Filter(this IQueryable<User> query, string q)
+        => string.IsNullOrWhiteSpace(q) ? query : query.Where(x => x.Email.Contains(q) || x.FullName.Contains(q));
 }
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
