@@ -5,14 +5,12 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchUsersThunk } from "@/lib/store/user.state";
 import datetime from "@/lib/datetime";
+import { PageModel } from "@/lib/models/common.model";
 
 export default function UserListPage() {
   const appDispatch = useAppDispatch();
-  const { isLoading, users } = useAppSelector(s => s.user);
-
-  React.useEffect(() => {
-    appDispatch(fetchUsersThunk());
-  }, []);
+  const { isLoading, pagedUsers } = useAppSelector(s => s.user);
+  const [pageModel, setPageModel] = React.useState(new PageModel(0, 100));
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 70 },
@@ -34,17 +32,43 @@ export default function UserListPage() {
     },
   ];
 
+  const onPaging = (ev: PageModel) => {
+    setPageModel({
+      ...pageModel,
+      page: ev.page,
+    });
+  };
+
+  React.useEffect(() => {
+    appDispatch(
+      fetchUsersThunk({
+        page: pageModel.page,
+      })
+    );
+  }, [pageModel.page]);
+
+  // for initial load
+  React.useEffect(() => {
+    onPaging(new PageModel());
+  }, []);
+
   return (
-    <div className="p-4">
+    <div className="p-4 min-h-[400px]">
       <DataGrid
-        rows={users}
+        rows={pagedUsers.items}
         columns={columns}
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 100 },
           },
         }}
+        rowCount={pagedUsers.total}
+        paginationMode="server"
+        paginationModel={pageModel}
+        onPaginationModelChange={onPaging}
         pageSizeOptions={[100]}
+        loading={isLoading}
+        className="min-h-[400px]"
         // checkboxSelection
       />
     </div>

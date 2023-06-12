@@ -8,3 +8,5 @@ public record Filter
     public int Page { get; set; } = 0;
     public int PageSize { get; set; } = 100;
 }
+
+public record PagedResult<T>(List<T> Items, int Page, int Total, int PageSize = 100);
