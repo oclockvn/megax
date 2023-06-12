@@ -1,11 +1,46 @@
 "use client";
 
 import * as React from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  gridPageCountSelector,
+  GridPagination,
+  useGridApiContext,
+  useGridSelector,
+} from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchUsersThunk } from "@/lib/store/user.state";
 import datetime from "@/lib/datetime";
 import { PageModel } from "@/lib/models/common.model";
+
+import MuiPagination from "@mui/material/Pagination";
+import { TablePaginationProps } from "@mui/material/TablePagination";
+
+function Pagination({
+  page,
+  onPageChange,
+  className,
+}: Pick<TablePaginationProps, "page" | "onPageChange" | "className">) {
+  const apiRef = useGridApiContext();
+  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+  return (
+    <MuiPagination
+      color="primary"
+      className={className}
+      count={pageCount}
+      page={page + 1}
+      onChange={(event, newPage) => {
+        onPageChange(event as any, newPage - 1);
+      }}
+    />
+  );
+}
+
+function CustomPagination(props: any) {
+  return <GridPagination ActionsComponent={Pagination} {...props} />;
+}
 
 export default function UserListPage() {
   const appDispatch = useAppDispatch();
@@ -61,6 +96,10 @@ export default function UserListPage() {
           pagination: {
             paginationModel: { page: 0, pageSize: 100 },
           },
+        }}
+        pagination
+        slots={{
+          pagination: CustomPagination,
         }}
         rowCount={pagedUsers.total}
         paginationMode="server"
