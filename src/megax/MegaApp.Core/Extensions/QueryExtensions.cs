@@ -4,7 +4,7 @@ namespace MegaApp.Core.Extensions;
 
 public static class QueryExtensions
 {
-    public static IQueryable<T> Paging<T>(this IQueryable<T> query, int currentPage, int take = 20) where T : class
+    public static IQueryable<T> Paging<T>(this IQueryable<T> query, int currentPage, int take = 100) where T : class
     {
         var skip = Math.Max(0, currentPage) * take;
         return query.Skip(skip).Take(take);

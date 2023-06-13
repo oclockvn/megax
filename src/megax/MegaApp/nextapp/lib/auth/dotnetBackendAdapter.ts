@@ -1,4 +1,4 @@
-import client from "@/lib/api";
+import api from "@/lib/api";
 
 import {
   Adapter,
@@ -13,24 +13,24 @@ declare type SessionAndUser = { session: AdapterSession; user: AdapterUser };
 export default function DotnetBackendAdapter(): Adapter {
   return {
     async createUser(user: Omit<AdapterUser, "id">) {
-      const resp = await client.post<AdapterUser>("/be/auth/createUser", user);
+      const resp = await api.post<AdapterUser>("/be/auth/createUser", user);
       return resp.data;
     },
 
     async getUser(id: string) {
-      const resp = await client.get<AdapterUser>("/be/auth/getUser/" + id);
+      const resp = await api.get<AdapterUser>("/be/auth/getUser/" + id);
       return resp.data;
     },
 
     async getUserByEmail(email: string) {
-      const resp = await client.get<AdapterUser>(
+      const resp = await api.get<AdapterUser>(
         "/be/auth/getUserByEmail/" + email
       );
       return resp.data;
     },
 
     async getUserByAccount({ providerAccountId, provider }) {
-      const resp = await client.get<AdapterUser>(
+      const resp = await api.get<AdapterUser>(
         `/be/auth/getUserByAccount/${provider}/${providerAccountId}`
       );
       return resp.data;
@@ -42,11 +42,11 @@ export default function DotnetBackendAdapter(): Adapter {
     },
 
     async deleteUser(userId: string) {
-      await client.post("/be/auth/deleteUser/" + userId);
+      await api.post("/be/auth/deleteUser/" + userId);
     },
 
     async linkAccount(account: AdapterAccount) {
-      const res = await client.post<AdapterAccount>(
+      const res = await api.post<AdapterAccount>(
         "/be/auth/linkAccount",
         account
       );
@@ -66,7 +66,7 @@ export default function DotnetBackendAdapter(): Adapter {
       userId: string;
       expires: Date;
     }) {
-      const resp = await client.post<AdapterSession>("/be/auth/createSession", {
+      const resp = await api.post<AdapterSession>("/be/auth/createSession", {
         sessionToken,
         userId,
         expires,
@@ -76,7 +76,7 @@ export default function DotnetBackendAdapter(): Adapter {
     },
 
     async getSessionAndUser(sessionToken) {
-      const resp = await client.get<SessionAndUser>(
+      const resp = await api.get<SessionAndUser>(
         "/be/auth/getSessionAndUser/" + sessionToken
       );
       return resp.data;
@@ -85,7 +85,7 @@ export default function DotnetBackendAdapter(): Adapter {
     async updateSession(
       session: Partial<AdapterSession> & Pick<AdapterSession, "sessionToken">
     ) {
-      const res = await client.post<AdapterSession>(
+      const res = await api.post<AdapterSession>(
         "/be/auth/updateSession",
         session
       );
@@ -93,7 +93,7 @@ export default function DotnetBackendAdapter(): Adapter {
     },
 
     async deleteSession(sessionToken: string) {
-      await client.post(`/be/auth/deleteSession/${sessionToken}`);
+      await api.post(`/be/auth/deleteSession/${sessionToken}`);
     },
 
     // async createVerificationToken({ identifier, expires, token }) {

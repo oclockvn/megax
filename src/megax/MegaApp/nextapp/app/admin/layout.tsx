@@ -3,7 +3,7 @@ import "../globals.css";
 import { Roboto } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import StateProvider from "@/lib/store/state.provider";
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "700"],
@@ -11,7 +11,7 @@ const roboto = Roboto({
 });
 
 export const metadata = {
-  title: "MegaApp",
+  title: "MegaApp - Admin",
   description: "A Mega App for A Company",
 };
 

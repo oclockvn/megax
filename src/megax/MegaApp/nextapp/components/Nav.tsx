@@ -10,16 +10,15 @@ import {
   Button,
   // Skeleton,
 } from "@mui/material";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import useAuth from "@/lib/auth/useAuth";
 
 export default function Nav() {
-  const session = useSession();
-  const isAuthenticated = session.status === "authenticated";
-  // const isLoading = session.status === "loading";
+  const [isAuthenticated, username] = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
@@ -46,57 +45,61 @@ export default function Nav() {
             <Typography
               variant="h6"
               component="div"
-              sx={{ flexGrow: 1 }}
+              sx={{ flexGrow: 0 }}
               className={logoColor}
             >
               <Link href={"/"}>MegaX</Link>
             </Typography>
             {isAuthenticated ? (
-              <div>
-                <span className="mr-1">Hi {session.data?.user?.name}</span>
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleMenu}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={Boolean(anchorEl)}
-                  onClose={() => handleClose()}
-                >
-                  <MenuItem onClick={() => handleClose("/profile")}>
-                    Profile
-                  </MenuItem>
-                  <MenuItem onClick={() => signOut()}>Logout</MenuItem>
-                </Menu>
+              <div className="flex-1 flex">
+                <div className="flex-1 flex items-center justify-center">
+                  <Button
+                    variant="outlined"
+                    href="/admin/user"
+                    className="text-white"
+                  >
+                    Users
+                  </Button>
+                </div>
+                <div>
+                  <span className="mr-1">Hi {username}</span>
+                  <IconButton
+                    size="large"
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleMenu}
+                    color="inherit"
+                  >
+                    <AccountCircle />
+                  </IconButton>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorEl)}
+                    onClose={() => handleClose()}
+                  >
+                    <MenuItem onClick={() => handleClose("/profile")}>
+                      Profile
+                    </MenuItem>
+                    <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+                  </Menu>
+                </div>
               </div>
             ) : (
               <>
-                {/* {isLoading && (
-                  <Skeleton variant="circular" width={24} height={24} />
-                )} */}
                 <div>
-                  <Button>
-                    <Link href="/about">About</Link>
-                  </Button>
-                  <Button>
-                    <Link href="/login">Login</Link>
-                  </Button>
+                  <Button href="/about">About</Button>
+                  <Button href="/login">Login</Button>
                 </div>
               </>
             )}
