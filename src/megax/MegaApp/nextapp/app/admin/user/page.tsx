@@ -4,10 +4,11 @@ import * as React from "react";
 import {
   DataGrid,
   GridColDef,
-  gridPageCountSelector,
   GridPagination,
   useGridApiContext,
   useGridSelector,
+  gridRowCountSelector,
+  gridPageSizeSelector,
 } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchUsersThunk } from "@/lib/store/user.state";
@@ -23,18 +24,23 @@ function Pagination({
   className,
 }: Pick<TablePaginationProps, "page" | "onPageChange" | "className">) {
   const apiRef = useGridApiContext();
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+  const rowCount = useGridSelector(apiRef, gridRowCountSelector);
+  const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
+  const pageCount = Math.ceil(rowCount / pageSize);
 
-  return (
-    <MuiPagination
-      color="primary"
-      className={className}
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, newPage) => {
-        onPageChange(event as any, newPage - 1);
-      }}
-    />
+  return React.useMemo(
+    () => (
+      <MuiPagination
+        color="primary"
+        className={className}
+        count={pageCount}
+        page={page + 1}
+        onChange={(event, newPage) => {
+          onPageChange(event as any, newPage - 1);
+        }}
+      />
+    ),
+    [rowCount, pageSize, pageCount, page]
   );
 }
 
@@ -48,7 +54,6 @@ export default function UserListPage() {
   const [pageModel, setPageModel] = React.useState(new PageModel(0, 100));
 
   const columns: GridColDef[] = [
-    // { field: "id", headerName: "ID", width: 70 },
     { field: "fullName", headerName: "Full Name", width: 400 },
     { field: "email", headerName: "Email", width: 300 },
     {
