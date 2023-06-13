@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { fetchWeatherForecastThunk } from "@/lib/store/weather.store";
+import { fetchWeatherForecastThunk } from "@/lib/store/weather.state";
 import { useEffect } from "react";
 
 export default function ProfilePage() {

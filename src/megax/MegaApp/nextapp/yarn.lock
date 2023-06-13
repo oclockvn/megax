@@ -300,6 +300,17 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
+"@mui/x-data-grid@^6.7.0":
+  version "6.7.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-6.7.0.tgz#ebc89a6a8a008712af01ac9ebbd713238607e002"
+  integrity sha512-gkMjvIT2oMKs7VOxLXxu0NkSKFBhlh/AepHB89xKcf+XVMkKBEwq8VT2GtrccAO+7Lr7ciZhcX2EmiDHsXdhbA==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
+    "@mui/utils" "^5.13.1"
+    clsx "^1.2.1"
+    prop-types "^15.8.1"
+    reselect "^4.1.8"
+
 "@next/env@13.4.2":
   version "13.4.2"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-13.4.2.tgz#cf3ebfd523a33d8404c1216e02ac8d856a73170e"

@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const isProd = process.env.NODE_ENV === "production";
-const backendUrl = process.env.BACKEND_URL;
+const apiUrl = process.env.BACKEND_URL;
 
 const nextConfig = {
   swcMinify: true,
@@ -27,7 +27,7 @@ if (isProd) {
     {
       // source: "/api/:path((?!auth/).*)", // skip auth path for authentication
       source: "/be/:path*", // skip auth path for authentication
-      destination: backendUrl + "/api/:path*",
+      destination: apiUrl + "/api/:path*",
     },
   ];
 }

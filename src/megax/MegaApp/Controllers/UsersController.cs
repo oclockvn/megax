@@ -1,21 +1,18 @@
 ﻿using MegaApp.Core;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
-using MegaApp.Infrastructure.GoogleClient;
-using MegaApp.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Controllers;
 
 [ApiController]
+// [Route("api/[controller]")]
 [Route("api/[controller]")]
-public class UserController : ApplicationControllerBase
+public class UsersController : ApplicationControllerBase
 {
     private readonly IUserService userService;
 
-    public UserController(
+    public UsersController(
         IUserService userService
         )
     {
@@ -23,10 +20,12 @@ public class UserController : ApplicationControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IAsyncEnumerable<UserModel>), StatusCodes.Status200OK)]
-    public IAsyncEnumerable<UserModel> GetUsers(Filter filter)
+    // [ProducesResponseType(typeof(List<UserModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<UserModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUsers([FromQuery] Filter filter)
     {
-        return userService.GetUsersAsync(filter);
+        var users = await userService.GetUsersAsync(filter);
+        return Ok(users);
     }
 
     [HttpPost("{id}")]
