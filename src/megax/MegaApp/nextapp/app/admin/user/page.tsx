@@ -17,6 +17,7 @@ import { PageModel } from "@/lib/models/common.model";
 
 import MuiPagination from "@mui/material/Pagination";
 import { TablePaginationProps } from "@mui/material/TablePagination";
+import TextField from "@mui/material/TextField";
 
 function Pagination({
   page,
@@ -52,6 +53,7 @@ export default function UserListPage() {
   const appDispatch = useAppDispatch();
   const { isLoading, pagedUsers } = useAppSelector(s => s.user);
   const [pageModel, setPageModel] = React.useState(new PageModel(0, 100));
+  const [query, setQuery] = React.useState("");
 
   const columns: GridColDef[] = [
     { field: "fullName", headerName: "Full Name", width: 400 },
@@ -79,13 +81,22 @@ export default function UserListPage() {
     });
   };
 
+  const handleSearch = (
+    ev: React.KeyboardEvent & React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (ev.key === "Enter") {
+      setQuery(ev.target?.value);
+    }
+  };
+
   React.useEffect(() => {
     appDispatch(
       fetchUsersThunk({
         page: pageModel.page,
+        query,
       })
     );
-  }, [pageModel.page]);
+  }, [pageModel.page, query]);
 
   // for initial load
   React.useEffect(() => {
@@ -94,6 +105,16 @@ export default function UserListPage() {
 
   return (
     <div className="p-4 min-h-[400px]">
+      <div className="mb-4">
+        <TextField
+          label="Search"
+          variant="outlined"
+          placeholder="Type search term and enter to search"
+          className="min-w-[400px]"
+          onKeyUp={handleSearch}
+        />
+      </div>
+
       <DataGrid
         rows={pagedUsers.items}
         columns={columns}
