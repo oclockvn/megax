@@ -26,8 +26,8 @@ api.interceptors.response.use(
   originalResponse => {
     handleResponse(originalResponse.data);
     return originalResponse;
-  }
-  // async err => handleRefreshToken(err)
+  },
+  err => handleRefreshToken(err)
 );
 
 function handleRefreshToken(err: any) {
@@ -51,6 +51,8 @@ function handleRefreshToken(err: any) {
   // todo: handle if first request to protected resouces
   if (err.response.status === 401 && !originalConfig._retry) {
     originalConfig._retry = true;
+
+    window.location.href = "/expired";
 
     // try {
     //   const refreshTokenValue = storage.getRefreshToken();
