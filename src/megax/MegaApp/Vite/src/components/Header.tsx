@@ -13,7 +13,6 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { useAppSelector } from "../store/store.hook";
 
 function Header() {
   const token = storage.get("token");
@@ -70,7 +69,6 @@ function Header() {
               sx={{
                 mr: 2,
                 display: { xs: "none", md: "flex" },
-                // fontFamily: "monospace",
                 fontWeight: 700,
                 letterSpacing: ".3rem",
                 color: "inherit",
