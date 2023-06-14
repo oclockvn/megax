@@ -17,9 +17,9 @@ function UserPage() {
   const appDispatch = useAppDispatch();
 
   const [page, setPage] = useState(0);
-
   const [keyword, setKeyword] = useState("");
 
+  const totalUser = useAppSelector(state => state.usersSlice.items);
   const searchUserList = useAppSelector(state => state.searchUserSlice.items);
   const usersItems = useAppSelector(state => state.pageUsersSlice.items);
 
@@ -90,7 +90,7 @@ function UserPage() {
         </Table>
       </TableContainer>
       <Pagination
-        count={10}
+        count={Math.floor(totalUser / 100)}
         color="primary"
         onChange={(event, value: any) => setPage(value)}
       />
