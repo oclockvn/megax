@@ -1,6 +1,6 @@
 using MegaApp;
-using MegaApp.Controllers;
 using MegaApp.Core;
+using MegaApp.Generator;
 using MegaApp.Infrastructure;
 using MegaApp.Middlewares;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +19,7 @@ builder.Services
     {
         dbOption.UseSqlServer(connectionString);
     })
+    .AddGeneratorServices()
     .AddInfrastructureServices(builder.Configuration)
     ;
 
