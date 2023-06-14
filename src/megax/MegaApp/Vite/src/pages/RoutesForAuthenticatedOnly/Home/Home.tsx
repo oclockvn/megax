@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from "../../store/store.hook";
+import { useAppDispatch, useAppSelector } from "../../../store/store.hook";
 import { useEffect } from "react";
-import { getWeatherForecastThunk } from "../../store/home.slice";
+import { getWeatherForecastThunk } from "../../../store/home.slice";
 
 function HomePage() {
   const forecastItems = useAppSelector(s => s.homeSlice.items);
