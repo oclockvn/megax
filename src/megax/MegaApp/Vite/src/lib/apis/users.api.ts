@@ -4,7 +4,7 @@ import api from "./axios.instance";
 export async function fetchUsersInfo() {
     const response = await api.get<UsersInfo[]>("/api/users");
 
-    return response.data.items;
+    return response.data.total;
 }
 
 
