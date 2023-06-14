@@ -1,11 +1,12 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import HomeTemplate from "../pages";
-import HomePage from "../pages/Home/Home";
+import HomePage from "../pages/RoutesForAuthenticatedOnly/Home/Home";
 import LoginPage from "../pages/Login/LoginPage";
 import About from "../pages/About/About";
 import { ProtectedRoute } from "./ProtectedRoute";
 import storage from "../lib/storage";
 import SignUpPage from "../pages/Register/SignUp";
+import UserPage from "../pages/RoutesForAuthenticatedOnly/User/UserPage";
 
 const Routes = () => {
   const token = storage.get("token");
@@ -33,6 +34,10 @@ const Routes = () => {
         {
           path: "/profile",
           element: <div>User Profile</div>,
+        },
+        {
+          path: "/users-info",
+          element: <HomeTemplate Component={UserPage} />,
         },
       ],
     },
