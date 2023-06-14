@@ -29,7 +29,7 @@ public class UserGenerator : IUserGenerator
             .RuleFor(r => r.Address, f => f.Address.FullAddress())
             .RuleFor(r => r.IdentityNumber, f => f.Commerce.Ean13())
             .RuleFor(r => r.Phone, f => f.Phone.PhoneNumber())
-            .RuleFor(r => r.Dob, f => f.Date.Between(new DateTime(1980, 1, 1), new DateTime(2000, 1, 1)));
+            .RuleFor(r => r.Dob, f => f.Date.Between(DateTime.Now.AddYears(-50), DateTime.Now.AddYears(-5)));
 
         var users = faker.Generate(Math.Min(count, 1000));
         using var db = UseDb();
