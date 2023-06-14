@@ -17,13 +17,11 @@ function UserPage() {
   const appDispatch = useAppDispatch();
 
   const [page, setPage] = useState(0);
-  console.log("page: ", page);
+
   const [keyword, setKeyword] = useState("");
 
-  //   const usersItems = useAppSelector(state => state.usersSlice.items);
   const searchUserList = useAppSelector(state => state.searchUserSlice.items);
   const usersItems = useAppSelector(state => state.pageUsersSlice.items);
-  console.log("usersItems: ", usersItems);
 
   useEffect(() => {
     appDispatch(getUsersInfoThunk());

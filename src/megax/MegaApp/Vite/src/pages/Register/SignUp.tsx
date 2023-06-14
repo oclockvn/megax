@@ -21,9 +21,6 @@ function SignUpPage() {
   const { isRegister, errorMessage, successMessage } = useAppSelector(
     state => state.signupSlice
   );
-  console.log("successMessage: ", successMessage);
-  console.log("errorMessage: ", errorMessage);
-  console.log("isRegister: ", isRegister);
 
   const {
     register,
