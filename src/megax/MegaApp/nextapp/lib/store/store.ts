@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import weatherStore from "./weather.state";
-import userStore from "./user.state";
+import usersStore from "./users.state";
+import userDetailStore from "./userDetail.state";
 
 export const store = configureStore({
   reducer: {
     weather: weatherStore,
-    user: userStore,
+    users: usersStore,
+    user: userDetailStore,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
