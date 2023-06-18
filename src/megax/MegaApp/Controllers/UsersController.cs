@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace MegaApp.Controllers;
 
 [ApiController]
-// [Route("api/[controller]")]
 [Route("api/[controller]")]
 public class UsersController : ApplicationControllerBase
 {
@@ -20,7 +19,6 @@ public class UsersController : ApplicationControllerBase
     }
 
     [HttpGet]
-    // [ProducesResponseType(typeof(List<UserModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(List<UserModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUsers([FromQuery] Filter filter)
     {
