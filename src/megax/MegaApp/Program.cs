@@ -17,7 +17,12 @@ builder.Services
     .AddAppServices()
     .AddCoreServices(dbOption =>
     {
-        dbOption.UseSqlServer(connectionString);
+        dbOption.UseSqlServer(connectionString)
+#if DEBUG
+        .EnableDetailedErrors()
+        .EnableSensitiveDataLogging()
+#endif
+        ;
     })
     .AddGeneratorServices()
     .AddInfrastructureServices(builder.Configuration)

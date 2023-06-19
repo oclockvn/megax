@@ -27,9 +27,8 @@ export class PageModel {
 
 export declare type Filter = {
   query: string;
-  sortBy: string;
-  // isAsc: boolean;
-  sortDir: string;
+  sortBy: string | null | undefined;
+  sortDir: string | null | undefined;
   page: number;
   pageSize: number;
 };

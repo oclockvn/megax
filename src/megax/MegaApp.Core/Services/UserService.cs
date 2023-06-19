@@ -3,6 +3,7 @@ using MegaApp.Core.Dtos;
 using MegaApp.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace MegaApp.Core.Services;
 
@@ -19,10 +20,12 @@ public interface IUserService
 internal class UserService : IUserService
 {
     private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ILogger<IUserService> logger;
 
-    public UserService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public UserService(IDbContextFactory<ApplicationDbContext> dbContextFactory, ILogger<IUserService> logger)
     {
         this.dbContextFactory = dbContextFactory;
+        this.logger = logger;
     }
 
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
@@ -115,24 +118,17 @@ internal class UserService : IUserService
             .OrderByDescending(x => x.Id)
             .Filter(filter?.Query);
 
-        if (!string.IsNullOrWhiteSpace(filter?.OrderBy))
+        if (!string.IsNullOrWhiteSpace(filter?.SortBy))
         {
-            var isAsc = filter.IsAsc == true;
-            switch (filter?.OrderBy)
+            var isAsc = filter.IsAsc;
+            query = filter.SortBy.ToLower() switch
             {
-                case nameof(User.Email):
-                    query = query.Sort(x => x.Email, isAsc);
-                    break;
-                case nameof(User.FullName):
-                    query = query.Sort(x => x.FullName, isAsc);
-                    break;
-                case nameof(User.Dob):
-                    query = query.Sort(x => x.Dob, isAsc);
-                    break;
-                case nameof(User.Phone):
-                    query = query.Sort(x => x.Phone, isAsc);
-                    break;
-            }
+                "email" => query.Sort(x => x.Email, isAsc),
+                "fullname" => query.Sort(x => x.FullName, isAsc),
+                "dob" => query.Sort(x => x.Dob, isAsc),
+                "phone" => query.Sort(x => x.Phone, isAsc),
+                _ => query.Sort(x => x.Id, isAsc)
+            };
         }
 
         var total = await query.CountAsync();

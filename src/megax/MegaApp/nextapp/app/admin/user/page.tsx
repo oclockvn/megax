@@ -1,59 +1,26 @@
 "use client";
 
-import * as React from "react";
-import {
-  DataGrid,
-  GridColDef,
-  GridPagination,
-  useGridApiContext,
-  useGridSelector,
-  gridRowCountSelector,
-  gridPageSizeSelector,
-} from "@mui/x-data-grid";
+import { useState, useEffect } from "react";
+import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchUsersThunk } from "@/lib/store/user.state";
 import datetime from "@/lib/datetime";
-import { PageModel } from "@/lib/models/common.model";
+import { Filter, PageModel } from "@/lib/models/common.model";
 
-import MuiPagination from "@mui/material/Pagination";
-import { TablePaginationProps } from "@mui/material/TablePagination";
-import TextField from "@mui/material/TextField";
-
-function Pagination({
-  page,
-  onPageChange,
-  className,
-}: Pick<TablePaginationProps, "page" | "onPageChange" | "className">) {
-  const apiRef = useGridApiContext();
-  const rowCount = useGridSelector(apiRef, gridRowCountSelector);
-  const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
-  const pageCount = Math.ceil(rowCount / pageSize);
-
-  return React.useMemo(
-    () => (
-      <MuiPagination
-        color="primary"
-        className={className}
-        count={pageCount}
-        page={page + 1}
-        onChange={(event, newPage) => {
-          onPageChange(event as any, newPage - 1);
-        }}
-      />
-    ),
-    [rowCount, pageSize, pageCount, page]
-  );
-}
-
-function CustomPagination(props: any) {
-  return <GridPagination ActionsComponent={Pagination} {...props} />;
-}
+import CustomPagination from "@/components/grid/CustomPagination";
+import CommonSearch from "@/components/grid/CommonSearch";
 
 export default function UserListPage() {
   const appDispatch = useAppDispatch();
   const { isLoading, pagedUsers } = useAppSelector(s => s.user);
-  const [pageModel, setPageModel] = React.useState(new PageModel(0, 100));
-  const [query, setQuery] = React.useState("");
+  const [filter, setFilter] = useState<Partial<Filter>>({
+    page: 0,
+    pageSize: 100,
+  });
+  const pagingModel = {
+    page: filter.page || 0,
+    pageSize: filter.pageSize || 100,
+  };
 
   const columns: GridColDef[] = [
     { field: "fullName", headerName: "Full Name", width: 400 },
@@ -75,44 +42,49 @@ export default function UserListPage() {
   ];
 
   const onPaging = (ev: PageModel) => {
-    setPageModel({
-      ...pageModel,
+    setFilter({
+      ...filter,
       page: ev.page,
     });
   };
 
-  const handleSearch = (
-    ev: React.KeyboardEvent & React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (ev.key === "Enter") {
-      setQuery(ev.target?.value);
+  const onSorting = (e: GridSortModel) => {
+    const sortBy = e && e[0] ? e[0].field : undefined;
+    const sortDir = e && e[0] ? e[0].sort : undefined;
+
+    setFilter({
+      ...filter,
+      sortBy: sortBy,
+      sortDir: sortDir,
+    });
+  };
+
+  const onSearch = (q: string) => {
+    if (!q) {
+      setFilter({});
+    } else {
+      setFilter({
+        ...filter,
+        query: q,
+        sortBy: !q ? null : filter?.sortBy,
+        sortDir: !q ? null : filter?.sortDir,
+      });
     }
   };
 
-  React.useEffect(() => {
-    appDispatch(
-      fetchUsersThunk({
-        page: pageModel.page,
-        query,
-      })
-    );
-  }, [pageModel.page, query]);
+  useEffect(() => {
+    appDispatch(fetchUsersThunk(filter));
+  }, [filter]);
 
   // for initial load
-  React.useEffect(() => {
+  useEffect(() => {
     onPaging(new PageModel());
   }, []);
 
   return (
     <div className="p-4 min-h-[400px]">
       <div className="mb-4">
-        <TextField
-          label="Search"
-          variant="outlined"
-          placeholder="Type search term and enter to search"
-          className="min-w-[400px]"
-          onKeyUp={handleSearch}
-        />
+        <CommonSearch handleSearch={onSearch} />
       </div>
 
       <DataGrid
@@ -129,12 +101,13 @@ export default function UserListPage() {
         }}
         rowCount={pagedUsers.total}
         paginationMode="server"
-        paginationModel={pageModel}
+        paginationModel={pagingModel}
         onPaginationModelChange={onPaging}
         pageSizeOptions={[100]}
+        sortingMode="server"
+        onSortModelChange={onSorting}
         loading={isLoading}
         className="min-h-[400px]"
-        // checkboxSelection
       />
     </div>
   );
