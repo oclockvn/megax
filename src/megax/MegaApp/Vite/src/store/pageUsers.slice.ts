@@ -1,5 +1,5 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchPageUsers } from '../lib/apis/users.api'
+import { fetchPageUser } from "../lib/apis/users.api";
 import { UsersInfo } from "../lib/models/users.model";
 
 export interface UsersState {
@@ -9,7 +9,7 @@ export interface UsersState {
 export const getPageUsersThunk = createAsyncThunk(
     "usersPage/pageUser",
     async page => {
-        return await fetchPageUsers(page);
+        return await fetchPageUser(page);
     }
 );
 

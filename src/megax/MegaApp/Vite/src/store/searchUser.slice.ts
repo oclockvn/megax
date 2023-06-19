@@ -1,5 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchSearchUsers } from '../lib/apis/users.api'
+import { fetchSearchUser } from "../lib/apis/users.api";
+
 
 import { UsersInfo } from "../lib/models/users.model";
 
@@ -10,7 +11,7 @@ export interface UsersState {
 export const getSearchUsersThunk = createAsyncThunk(
     "usersPage/searchUser",
     async keyword => {
-        return await fetchSearchUsers(keyword);
+        return await fetchSearchUser(keyword);
     }
 );
 
