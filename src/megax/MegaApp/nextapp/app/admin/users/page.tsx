@@ -31,7 +31,7 @@ export default function UserListPage() {
       headerName: "Full Name",
       width: 400,
       renderCell: params => (
-        <Link href={`${pathname}/${params.id}/info`} className="text-blue-400">
+        <Link href={`${pathname}/${params.id}`} className="text-blue-400">
           {params.value}
         </Link>
       ),

@@ -7,11 +7,11 @@ const nextConfig = {
   swcMinify: true,
   async redirects() {
     return [
-      {
-        source: "/admin/users/:id",
-        destination: "/admin/users/:id/info",
-        permanent: true,
-      },
+      // {
+      //   source: "/admin/users/:id",
+      //   destination: "/admin/users/:id/info",
+      //   permanent: true,
+      // },
     ];
   },
 };
