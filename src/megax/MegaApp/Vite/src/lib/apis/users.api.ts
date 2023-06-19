@@ -4,16 +4,16 @@ import api from "./axios.instance";
 export async function fetchUsersInfo() {
     const response = await api.get<UsersInfo[]>("/api/users");
 
-    return response.data.total;
+    return response.data
 }
 
 
-export async function fetchSearchUsers(keyword: string) {
+export async function fetchSearchUser(keyword: string) {
     const response = await api.get<UsersInfo[]>(`api/users?query=${keyword}`)
-    return response.data.items
+    return response.data
 }
 
-export async function fetchPageUsers(page: string) {
-    const response = await api.get<UsersInfo[]>(`api/users?page=${page}`)
+export async function fetchPageUser(page: string) {
+    const response = await api.get<UsersInfo[]>(`api/users?query=${page}`)
     return response.data.items
 }
