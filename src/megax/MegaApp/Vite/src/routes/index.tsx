@@ -32,8 +32,12 @@ const Routes = () => {
           element: <HomeTemplate Component={HomePage} />,
         },
         {
-          path: "/profile",
-          element: <div>User Profile</div>,
+          path: "/userinfo",
+          element: <HomeTemplate Component={UserInfoPage} />,
+        },
+        {
+          path: "/users-info",
+          element: <HomeTemplate Component={UserPage} />,
         },
         {
           path: "/users-info",
