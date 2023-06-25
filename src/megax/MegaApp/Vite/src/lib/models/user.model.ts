@@ -7,3 +7,9 @@ export interface User {
     phone: string;
     identityNumber: string;
 }
+
+
+export interface UsersSearch {
+    page: number,
+    keyword: string
+}

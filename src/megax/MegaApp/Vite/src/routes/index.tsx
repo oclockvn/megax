@@ -6,7 +6,8 @@ import About from "../pages/About/About";
 import { ProtectedRoute } from "./ProtectedRoute";
 import storage from "../lib/storage";
 import SignUpPage from "../pages/Register/SignUp";
-import UserPage from "../pages/RoutesForAuthenticatedOnly/User/UserPage";
+import UserInfoPage from "../pages/UserInfo/UserInfo";
+import UserListPage from "../pages/RoutesForAuthenticatedOnly/User/UserList";
 
 const Routes = () => {
   const token = storage.get("token");
@@ -31,17 +32,15 @@ const Routes = () => {
           path: "/",
           element: <HomeTemplate Component={HomePage} />,
         },
-        {
-          path: "/userinfo",
-          element: <HomeTemplate Component={UserInfoPage} />,
-        },
+
         {
           path: "/users-info",
-          element: <HomeTemplate Component={UserPage} />,
+          element: <HomeTemplate Component={UserListPage} />,
         },
+
         {
-          path: "/users-info",
-          element: <HomeTemplate Component={UserPage} />,
+          path: "/profile",
+          element: <div>Profile</div>,
         },
       ],
     },

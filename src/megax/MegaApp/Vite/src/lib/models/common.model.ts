@@ -1,8 +1,9 @@
 export interface Result<T> {
-    code: string;
-    data: T;
-    isSuccess: boolean;
+    code: string,
+    data: T
+    isSuccess: boolean,
 }
+
 
 export interface PagedResult<T> {
     items: T[];
@@ -12,7 +13,7 @@ export interface PagedResult<T> {
 }
 
 export function EmptyPaged<T>(): PagedResult<T> {
-    return { items: [], page: 0, pageSize: 0, total: 0 } as PagedResult<T>;
+    return { items: [], page: 0, pageSize: 0, total: 0 } as PagedResult<T>
 }
 
 export class PageModel {
@@ -20,15 +21,15 @@ export class PageModel {
         this.page = page;
         this.pageSize = pageSize;
     }
-
     page: number;
     pageSize: number;
 }
 
 export declare type Filter = {
-    query: string;
-    sortBy: string | null | undefined;
-    sortDir: string | null | undefined;
-    page: number;
-    pageSize: number;
-};
+    query: string,
+    sortBy: string | null | undefined,
+    sortDir: string | null | undefined,
+    page: number,
+    pageSize: number,
+
+}
