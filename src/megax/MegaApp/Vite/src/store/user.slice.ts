@@ -3,20 +3,14 @@ import { fetchUserList } from "../lib/apis/user.api";
 import { EmptyPaged, Filter, PagedResult } from "../lib/models/common.model";
 import { User } from "../lib/models/user.model";
 
-
-
 export interface UsersState {
     pagedUsers: PagedResult<User>;
     isLoading: boolean;
-
-
 }
 
 const initialState: UsersState = {
     pagedUsers: EmptyPaged<User>(),
     isLoading: false,
-
-
 }
 
 export const fetchUsersThunk = createAsyncThunk(
@@ -26,6 +20,7 @@ export const fetchUsersThunk = createAsyncThunk(
         return await fetchUserList(filter)
     }
 )
+
 export const userSlice = createSlice({
     name: 'users',
     initialState,
@@ -47,5 +42,4 @@ export const userSlice = createSlice({
 });
 
 export const { setLoading } = userSlice.actions
-
 export default userSlice.reducer

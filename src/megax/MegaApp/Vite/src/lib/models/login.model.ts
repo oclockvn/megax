@@ -3,4 +3,3 @@ export interface UserLoginResponse {
     refreshToken: string,
     expiryTime: Date,
 }
-

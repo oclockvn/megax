@@ -4,7 +4,6 @@ export interface Result<T> {
     isSuccess: boolean,
 }
 
-
 export interface PagedResult<T> {
     items: T[];
     page: number;
@@ -31,5 +30,4 @@ export declare type Filter = {
     sortDir: string | null | undefined,
     page: number,
     pageSize: number,
-
 }

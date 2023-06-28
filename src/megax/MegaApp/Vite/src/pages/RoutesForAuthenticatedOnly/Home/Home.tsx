@@ -14,11 +14,9 @@ function HomePage() {
     <>
       {forecastItems &&
         forecastItems.map((i, index) => (
-          <>
-            <div key={index}>
-              {i.date} - {i.temperatureC} - {i.summary}
-            </div>
-          </>
+          <div key={index}>
+            {i.date} - {i.temperatureC} - {i.summary}
+          </div>
         ))}
       User HomePage
     </>

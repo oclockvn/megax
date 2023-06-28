@@ -7,7 +7,7 @@ import {
   useGridSelector,
 } from "@mui/x-data-grid";
 import MuiPagination from "@mui/material/Pagination";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 function Pagination({
   page,

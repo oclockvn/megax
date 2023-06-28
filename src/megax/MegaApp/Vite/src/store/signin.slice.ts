@@ -3,8 +3,6 @@ import { login } from '../lib/apis/signin.api'
 import { UserLoginResponse } from '../lib/models/login.model'
 import { Result } from '../lib/models/common.model'
 
-
-
 export interface SignInState {
   errorMessage: string,
   isAuthenticated: boolean,
@@ -14,7 +12,6 @@ export interface SignInState {
 type LoginRequest = {
   username: string,
   password: string
-
 }
 
 export const userLoginThunk = createAsyncThunk(
@@ -28,15 +25,12 @@ const signinState: SignInState = {
   errorMessage: '',
   isAuthenticated: false,
   authToken: ''
-
 }
 
 export const signinSlice = createSlice({
   name: 'signin',
   initialState: signinState,
-  reducers: {
-
-  },
+  reducers: {},
   extraReducers: builder => builder.addCase(
     userLoginThunk.fulfilled, (
       state: SignInState,
@@ -44,24 +38,16 @@ export const signinSlice = createSlice({
     ) => {
     const {
       payload: { isSuccess, data: { token }, },
-
     } = action
-
     if (isSuccess) {
       state.isAuthenticated = true
       state.authToken = token
-
     } else {
       state.isAuthenticated = false
       state.errorMessage = "Invalid username or password";
-
     }
-
   }
   )
-
 })
-
-
 
 export default signinSlice.reducer

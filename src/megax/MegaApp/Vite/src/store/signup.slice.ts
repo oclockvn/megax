@@ -3,19 +3,16 @@ import { Result } from '../lib/models/common.model'
 import { signup } from '../lib/apis/signup.api'
 import { UserSignupResponse } from '../lib/models/signup.model'
 
-
 export interface SignupState {
   errorMessage: string,
   successMessage: string,
   isRegister: boolean,
-
 }
 
 type SignupRequest = {
   username: string,
   password: string,
   name: string
-
 }
 
 export const userSignupThunk = createAsyncThunk(
@@ -29,16 +26,12 @@ const signupState: SignupState = {
   errorMessage: '',
   successMessage: '',
   isRegister: false,
-
-
 }
 
 export const signupSlice = createSlice({
   name: 'signup',
   initialState: signupState,
-  reducers: {
-
-  },
+  reducers: {},
   extraReducers: builder => builder.addCase(
     userSignupThunk.fulfilled, (
       state: SignupState,
@@ -46,25 +39,17 @@ export const signupSlice = createSlice({
     ) => {
     const {
       payload: { isSuccess, data: { SignupRequest }, },
-
-
     } = action
 
     if (isSuccess) {
       state.isRegister = true
       state.successMessage = 'Register success!'
-
-
     } else {
       state.isRegister = false
       state.errorMessage = "User already exist!";
-
     }
-
   }
   )
-
 })
-
 
 export default signupSlice.reducer

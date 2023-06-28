@@ -7,6 +7,5 @@ export async function login(username: string, password: string) {
     "/api/auth/user-signin",
     { username, password }
   );
-
   return response.data
 }

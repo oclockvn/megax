@@ -8,14 +8,12 @@ import CustomPagination from "./components/CustomPagination";
 import SearchUser from "./components/SearchUser";
 
 const columns: GridColDef[] = [
-  // {field: 'id', headerName: 'ID', width: 90}
   { field: "fullName", headerName: "Full Name", width: 300 },
   { field: "email", headerName: "Email", width: 300 },
   {
     field: "dob",
     headerName: "D.O.B",
     width: 300,
-
     valueFormatter: formatter =>
       formatter.value
         ? datetime.formatDate(new Date(formatter.value), "dd/MM/yyyy")
@@ -31,7 +29,6 @@ const columns: GridColDef[] = [
 function UserListPage() {
   const appDispatch = useAppDispatch();
   const { isLoading, pagedUsers } = useAppSelector(state => state.userSlice);
-
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
     pageSize: 100,
@@ -82,7 +79,6 @@ function UserListPage() {
       <div className="mb-4">
         <SearchUser handleSearch={onSearch} />
       </div>
-
       <DataGrid
         rows={pagedUsers.items}
         columns={columns}

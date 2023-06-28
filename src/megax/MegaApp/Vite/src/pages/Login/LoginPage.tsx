@@ -50,7 +50,6 @@ export default function LoginPage() {
           className="bg-white shadow-md rounded px-8 pt-6 pb-[80px] mb-4 flex flex-col justify-center items-center"
         >
           <Typography>Login</Typography>
-
           <div className=" mb-4">
             <TextField
               {...register("username", {
@@ -93,7 +92,6 @@ export default function LoginPage() {
             <Button variant="contained" type="submit">
               Login In
             </Button>
-
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           </div>
         </form>
