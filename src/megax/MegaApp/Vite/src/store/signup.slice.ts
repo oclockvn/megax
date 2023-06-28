@@ -29,27 +29,35 @@ const signupState: SignupState = {
 }
 
 export const signupSlice = createSlice({
-  name: 'signup',
+  name: "signup",
   initialState: signupState,
-  reducers: {},
-  extraReducers: builder => builder.addCase(
-    userSignupThunk.fulfilled, (
-      state: SignupState,
-      action: PayloadAction<Result<UserSignupResponse>>
-    ) => {
-    const {
-      payload: { isSuccess, data: { SignupRequest }, },
-    } = action
+  reducers: {
+    resetRegistration: state => {
+      state.isRegister = false;
+    },
+  },
+  extraReducers: builder =>
+    builder.addCase(
+      userSignupThunk.fulfilled,
+      (
+        state: SignupState,
+        action: PayloadAction<Result<UserSignupResponse>>
+      ) => {
+        const {
+          payload: { isSuccess },
+        } = action;
 
-    if (isSuccess) {
-      state.isRegister = true
-      state.successMessage = 'Register success!'
-    } else {
-      state.isRegister = false
-      state.errorMessage = "User already exist!";
-    }
-  }
-  )
-})
+        if (isSuccess) {
+          state.isRegister = true;
+          state.successMessage = "Register success!";
+        } else {
+          state.isRegister = false;
+          state.errorMessage = "User already exist!";
+        }
+      }
+    ),
+});
+
+export const { resetRegistration } = signupSlice.actions;
 
 export default signupSlice.reducer

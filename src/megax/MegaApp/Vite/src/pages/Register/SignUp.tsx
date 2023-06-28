@@ -3,12 +3,11 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
-
 import { useAppDispatch, useAppSelector } from "../../store/store.hook";
-
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { userSignupThunk } from "../../store/signup.slice";
+import { resetRegistration, userSignupThunk } from "../../store/signup.slice";
+import { useEffect, useState } from "react";
 
 type SignUpFormType = {
   username: string;
@@ -22,6 +21,8 @@ function SignUpPage() {
     state => state.signupSlice
   );
 
+  const [submitted, setSubmit] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -32,14 +33,28 @@ function SignUpPage() {
 
   const handleFormSubmit = (values: SignUpFormType) => {
     const { username, password, name } = values;
-    appDispatch(userSignupThunk({ username, password, name }));
+    appDispatch(userSignupThunk({ username, password, name })).then(() => {
+      setSubmit(true);
+    });
+  };
+
+  useEffect(() => {
+    appDispatch(resetRegistration());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (isRegister) {
       toast.success("Register Success!");
       navigate("/login");
-    } else {
-      toast.error("User already exist!");
+    } else if (submitted) {
+      toast.success("Register failed!");
+      setSubmit(false);
     }
-  };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRegister, submitted]);
+
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
       <div className="w-full pb-8">
