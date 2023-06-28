@@ -32,14 +32,21 @@ export default function LoginPage() {
   useEffect(() => {
     if (isAuthenticated) {
       storage.set("token", authToken);
-      toast.success("Login success!");
-      navigate("/");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
-  const handleFormSubmit = (values: LoginFormType) => {
+  const handleFormSubmit = async (values: LoginFormType) => {
     const { username, password } = values;
-    appDispatch(userLoginThunk({ username, password }));
+    const res = await appDispatch(
+      userLoginThunk({ username, password })
+    ).unwrap();
+    if (res.data !== null && res.data.token) {
+      toast.success("Login success!");
+      navigate("/");
+    } else {
+      toast.error("Login fail!");
+    }
   };
 
   return (

@@ -37,11 +37,11 @@ export const signinSlice = createSlice({
       action: PayloadAction<Result<UserLoginResponse>>
     ) => {
     const {
-      payload: { isSuccess, data: { token }, },
-    } = action
+      payload: { isSuccess, data },
+    } = action;
     if (isSuccess) {
       state.isAuthenticated = true
-      state.authToken = token
+      state.authToken = data.token;
     } else {
       state.isAuthenticated = false
       state.errorMessage = "Invalid username or password";
