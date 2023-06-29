@@ -4,37 +4,37 @@ import { signup } from '../lib/apis/signup.api'
 import { UserSignupResponse } from '../lib/models/signup.model'
 
 export interface SignupState {
-  errorMessage: string,
-  successMessage: string,
-  isRegister: boolean,
+  errorMessage: string;
+  successMessage: string;
+  // isRegister: boolean,
 }
 
 type SignupRequest = {
-  username: string,
-  password: string,
-  name: string
-}
+  username: string;
+  password: string;
+  name: string;
+};
 
 export const userSignupThunk = createAsyncThunk(
-  'auth/userSignup',
+  "auth/userSignup",
   async (request: SignupRequest) => {
-    return await signup(request.username, request.password, request.name)
+    return await signup(request.username, request.password, request.name);
   }
-)
+);
 
 const signupState: SignupState = {
-  errorMessage: '',
-  successMessage: '',
-  isRegister: false,
-}
+  errorMessage: "",
+  successMessage: "",
+  // isRegister: false,
+};
 
 export const signupSlice = createSlice({
   name: "signup",
   initialState: signupState,
   reducers: {
-    resetRegistration: state => {
-      state.isRegister = false;
-    },
+    // resetRegistration: state => {
+    //   state.isRegister = false;
+    // },
   },
   extraReducers: builder =>
     builder.addCase(
@@ -48,16 +48,16 @@ export const signupSlice = createSlice({
         } = action;
 
         if (isSuccess) {
-          state.isRegister = true;
+          // state.isRegister = true;
           state.successMessage = "Register success!";
         } else {
-          state.isRegister = false;
+          // state.isRegister = false;
           state.errorMessage = "User already exist!";
         }
       }
     ),
 });
 
-export const { resetRegistration } = signupSlice.actions;
+// export const { resetRegistration } = signupSlice.actions;
 
 export default signupSlice.reducer

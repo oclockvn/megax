@@ -17,11 +17,12 @@ type SignUpFormType = {
 
 function SignUpPage() {
   const appDispatch = useAppDispatch();
-  const { isRegister, errorMessage, successMessage } = useAppSelector(
+  const { errorMessage, successMessage } = useAppSelector(
     state => state.signupSlice
   );
-
-  const [submitted, setSubmit] = useState(false);
+   console.log("successMessage: ", successMessage);
+   console.log("errorMessage: ", errorMessage);
+  // const [submitted, setSubmit] = useState(false);
 
   const {
     register,
@@ -31,29 +32,42 @@ function SignUpPage() {
 
   const navigate = useNavigate();
 
-  const handleFormSubmit = (values: SignUpFormType) => {
+  //  const handleFormSubmit = (values: SignUpFormType) => {
+  //    const { username, password, name } = values;
+  //    appDispatch(userSignupThunk({ username, password, name })).then(() => {
+  //      setSubmit(true);
+  //    });
+  //  };
+
+  const handleFormSubmit = async (values: SignUpFormType) => {
     const { username, password, name } = values;
-    appDispatch(userSignupThunk({ username, password, name })).then(() => {
-      setSubmit(true);
-    });
+    const res = await appDispatch(
+      userSignupThunk({ username, password, name })
+    ).unwrap();
+    if (res && res.isSuccess) {
+      toast.success(successMessage);
+      navigate("/login");
+    } else {
+      toast.error(errorMessage);
+    }
   };
 
-  useEffect(() => {
-    appDispatch(resetRegistration());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //  useEffect(() => {
+  //    appDispatch(resetRegistration());
+  //    // eslint-disable-next-line react-hooks/exhaustive-deps
+  //  }, []);
 
-  useEffect(() => {
-    if (isRegister) {
-      toast.success("Register Success!");
-      navigate("/login");
-    } else if (submitted) {
-      toast.success("Register failed!");
-      setSubmit(false);
-    }
+  //  useEffect(() => {
+  //    if (isRegister) {
+  //      toast.success(successMessage);
+  //      navigate("/login");
+  //    } else if (submitted) {
+  //      toast.error(errorMessage);
+  //      setSubmit(false);
+  //    }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRegister, submitted]);
+  //    // eslint-disable-next-line react-hooks/exhaustive-deps
+  //  }, [isRegister, submitted]);
 
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
