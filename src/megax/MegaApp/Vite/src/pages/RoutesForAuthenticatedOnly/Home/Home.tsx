@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from "../../store/store.hook";
+import { useAppDispatch, useAppSelector } from "../../../store/store.hook";
 import { useEffect } from "react";
-import { getWeatherForecastThunk } from "../../store/home.slice";
+import { getWeatherForecastThunk } from "../../../store/home.slice";
 
 function HomePage() {
   const forecastItems = useAppSelector(s => s.homeSlice.items);
@@ -14,11 +14,9 @@ function HomePage() {
     <>
       {forecastItems &&
         forecastItems.map((i, index) => (
-          <>
-            <div key={index}>
-              {i.date} - {i.temperatureC} - {i.summary}
-            </div>
-          </>
+          <div key={index}>
+            {i.date} - {i.temperatureC} - {i.summary}
+          </div>
         ))}
       User HomePage
     </>

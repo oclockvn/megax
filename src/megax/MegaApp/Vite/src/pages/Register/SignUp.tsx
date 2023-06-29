@@ -3,49 +3,41 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { userLoginThunk } from "../../store/signin.slice";
 import { useAppDispatch, useAppSelector } from "../../store/store.hook";
-import storage from "../../lib/storage";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { userSignupThunk } from "../../store/signup.slice";
 
-type LoginFormType = {
+type SignUpFormType = {
   username: string;
   password: string;
+  name: string;
 };
 
-export default function LoginPage() {
+function SignUpPage() {
   const appDispatch = useAppDispatch();
-  const { isAuthenticated, errorMessage, authToken } = useAppSelector(
-    state => state.signinSlice
+  const { errorMessage, successMessage } = useAppSelector(
+    state => state.signupSlice
   );
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormType>();
+  } = useForm<SignUpFormType>();
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      storage.set("token", authToken);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
-
-  const handleFormSubmit = async (values: LoginFormType) => {
-    const { username, password } = values;
+  const handleFormSubmit = async (values: SignUpFormType) => {
+    const { username, password, name } = values;
     const res = await appDispatch(
-      userLoginThunk({ username, password })
+      userSignupThunk({ username, password, name })
     ).unwrap();
-    if (res.data !== null && res.data.token) {
-      toast.success("Login success!");
-      navigate("/");
+    if (res && res.isSuccess) {
+      toast.success(successMessage);
+      navigate("/login");
     } else {
-      toast.error("Login fail!");
+      toast.error(errorMessage);
     }
   };
 
@@ -56,8 +48,9 @@ export default function LoginPage() {
           onSubmit={handleSubmit(handleFormSubmit)}
           className="bg-white shadow-md rounded px-8 pt-6 pb-[80px] mb-4 flex flex-col justify-center items-center"
         >
-          <Typography>Login</Typography>
-          <div className=" mb-4">
+          <Typography>Sign Up</Typography>
+
+          <div className=" mb-4 mt-4">
             <TextField
               {...register("username", {
                 required: "Username is required.",
@@ -95,14 +88,30 @@ export default function LoginPage() {
               {errors.password?.message}
             </p>
           </div>
+          <div className="mb-6">
+            <TextField
+              {...register("name", {
+                required: "Name is required.",
+              })}
+              size="medium"
+              style={{ width: 400 }}
+              id="name"
+              label="Name"
+              type="text"
+            />
+            <p className="text-red-500 text-xs italic mt-3 text-left">
+              {errors.password?.message}
+            </p>
+          </div>
           <div className="flex flex-col items-start justify-between">
             <Button variant="contained" type="submit">
-              Login In
+              Sign Up
             </Button>
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           </div>
         </form>
       </div>
     </Stack>
   );
 }
+
+export default SignUpPage;
