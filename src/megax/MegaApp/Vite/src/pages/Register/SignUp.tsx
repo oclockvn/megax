@@ -6,8 +6,7 @@ import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "../../store/store.hook";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { resetRegistration, userSignupThunk } from "../../store/signup.slice";
-import { useEffect, useState } from "react";
+import { userSignupThunk } from "../../store/signup.slice";
 
 type SignUpFormType = {
   username: string;
@@ -20,9 +19,6 @@ function SignUpPage() {
   const { errorMessage, successMessage } = useAppSelector(
     state => state.signupSlice
   );
-   console.log("successMessage: ", successMessage);
-   console.log("errorMessage: ", errorMessage);
-  // const [submitted, setSubmit] = useState(false);
 
   const {
     register,
@@ -31,13 +27,6 @@ function SignUpPage() {
   } = useForm<SignUpFormType>();
 
   const navigate = useNavigate();
-
-  //  const handleFormSubmit = (values: SignUpFormType) => {
-  //    const { username, password, name } = values;
-  //    appDispatch(userSignupThunk({ username, password, name })).then(() => {
-  //      setSubmit(true);
-  //    });
-  //  };
 
   const handleFormSubmit = async (values: SignUpFormType) => {
     const { username, password, name } = values;
@@ -51,23 +40,6 @@ function SignUpPage() {
       toast.error(errorMessage);
     }
   };
-
-  //  useEffect(() => {
-  //    appDispatch(resetRegistration());
-  //    // eslint-disable-next-line react-hooks/exhaustive-deps
-  //  }, []);
-
-  //  useEffect(() => {
-  //    if (isRegister) {
-  //      toast.success(successMessage);
-  //      navigate("/login");
-  //    } else if (submitted) {
-  //      toast.error(errorMessage);
-  //      setSubmit(false);
-  //    }
-
-  //    // eslint-disable-next-line react-hooks/exhaustive-deps
-  //  }, [isRegister, submitted]);
 
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>

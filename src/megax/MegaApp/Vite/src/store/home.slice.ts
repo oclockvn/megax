@@ -18,20 +18,17 @@ const homeState: HomeState = {
 };
 
 export const homeSlice = createSlice({
-    name: "forecast",
-    initialState: homeState,
-    reducers: {
-        // increment: (state, action: PayloadAction<number>) => {},
-    },
-    extraReducers: builder =>
-        builder.addCase(
-            getWeatherForecastThunk.fulfilled,
-            (state: HomeState, action: PayloadAction<Forecast[]>) => {
-                const { payload: items } = action;
-
-                state.items = items;
-            }
-        ),
+  name: "forecast",
+  initialState: homeState,
+  reducers: {},
+  extraReducers: builder =>
+    builder.addCase(
+      getWeatherForecastThunk.fulfilled,
+      (state: HomeState, action: PayloadAction<Forecast[]>) => {
+        const { payload: items } = action;
+        state.items = items;
+      }
+    ),
 });
 
 export default homeSlice.reducer;

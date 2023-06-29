@@ -6,7 +6,6 @@ import { UserSignupResponse } from '../lib/models/signup.model'
 export interface SignupState {
   errorMessage: string;
   successMessage: string;
-  // isRegister: boolean,
 }
 
 type SignupRequest = {
@@ -25,17 +24,12 @@ export const userSignupThunk = createAsyncThunk(
 const signupState: SignupState = {
   errorMessage: "",
   successMessage: "",
-  // isRegister: false,
 };
 
 export const signupSlice = createSlice({
   name: "signup",
   initialState: signupState,
-  reducers: {
-    // resetRegistration: state => {
-    //   state.isRegister = false;
-    // },
-  },
+  reducers: {},
   extraReducers: builder =>
     builder.addCase(
       userSignupThunk.fulfilled,
@@ -48,16 +42,12 @@ export const signupSlice = createSlice({
         } = action;
 
         if (isSuccess) {
-          // state.isRegister = true;
           state.successMessage = "Register success!";
         } else {
-          // state.isRegister = false;
           state.errorMessage = "User already exist!";
         }
       }
     ),
 });
-
-// export const { resetRegistration } = signupSlice.actions;
 
 export default signupSlice.reducer
