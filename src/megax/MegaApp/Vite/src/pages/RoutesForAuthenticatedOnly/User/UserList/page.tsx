@@ -4,8 +4,10 @@ import datetime from "../../../../lib/datetime";
 import { Filter, PageModel } from "../../../../lib/models/common.model";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { fetchUsersThunk } from "../../../../store/user.slice";
-import CustomPagination from "../components/CustomPagination";
-import SearchUser from "../components/SearchUser";
+import CustomPagination from "./components/CustomPagination";
+import SearchUser from "./components/SearchUser";
+// import CustomPagination from "./components/CustomPagination";
+// import SearchUser from "./components/SearchUser";
 
 const columns: GridColDef[] = [
   { field: "fullName", headerName: "Full Name", width: 300 },
