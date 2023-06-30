@@ -88,6 +88,7 @@ internal class UserService : IUserService
             return Result<int>.Fail(Result.USER_DOES_NOT_EXIST);
         }
 
+        user.FullName = req.FullName;
         user.Dob = req.Dob;
         user.Address = req.Address;
         user.Phone = req.Phone;
