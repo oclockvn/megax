@@ -7,7 +7,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import storage from "../lib/storage";
 import SignUpPage from "../pages/Register/SignUp";
 import UserInfoPage from "../pages/UserInfo/UserInfo";
-import UserListPage from "../pages/RoutesForAuthenticatedOnly/User/UserList";
+import UserListPage from "../pages/RoutesForAuthenticatedOnly/User/UserList/UserList";
 
 const Routes = () => {
   const token = storage.get("token");
