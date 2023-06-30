@@ -1,7 +1,7 @@
 export interface Result<T> {
   code: string;
   data: T;
-  isSuccess: boolean;
+  success: boolean;
 }
 
 export interface PagedResult<T> {

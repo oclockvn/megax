@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
       // validate and assign token in the backend
       if (account && account.id_token) {
         const validationResult = await googleSignIn(account.id_token);
-        if (!validationResult || !validationResult.isSuccess) {
+        if (!validationResult || !validationResult.success) {
           return false;
         }
 
@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
           token.refreshToken as string
         );
 
-        if (refreshTokenRes.isSuccess) {
+        if (refreshTokenRes.success) {
           authToken = refreshTokenRes.data.token;
           refreshToken = refreshTokenRes.data.refreshToken;
           expiryTime = refreshTokenRes.data.expiryTime;

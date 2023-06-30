@@ -9,7 +9,7 @@ namespace MegaApp.Core
 
         public static Result Ok() => new();
 
-        public bool IsSuccess => string.IsNullOrWhiteSpace(Code);
+        public bool Success => string.IsNullOrWhiteSpace(Code);
 
         public static readonly string INVALID_TOKEN = "INVALID_TOKEN";
         public static readonly string INVALID_REFRESH_TOKEN = "INVALID_REFRESH_TOKEN";
