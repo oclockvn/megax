@@ -78,7 +78,7 @@ namespace MegaApp.Controllers
             var signInResult = Result<SignInResponse>.Default;
 
             var userResult = await authService.IsValidAccountAsync(req.Username, req.Password);
-            if (!userResult.IsSuccess)
+            if (!userResult.Success)
             {
                 signInResult = signInResult.FromCode(userResult);
                 return Ok(signInResult);
@@ -145,7 +145,7 @@ namespace MegaApp.Controllers
             }
 
             var claimResult = tokenService.ReadToken(request.Token, skipExpiryCheck: true);
-            if (claimResult.IsSuccess == false)
+            if (claimResult.Success == false)
             {
                 // this should not happen as refresh token process is only invoked by the client
                 // and it has the correct token and refresh token
@@ -156,7 +156,7 @@ namespace MegaApp.Controllers
 
             // we don't want to generate token everytime this api is called
             var validResult = await authService.IsRefreshTokenValid(user.Id, request.RefreshToken, request.Token);
-            if (!validResult.IsSuccess)
+            if (!validResult.Success)
             {
                 return BadRequest(validResult);
             }

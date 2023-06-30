@@ -15,7 +15,7 @@ import { usePathname } from "next/navigation";
 export default function UserListPage() {
   const pathname = usePathname();
   const appDispatch = useAppDispatch();
-  const { isLoading, pagedUsers } = useAppSelector(s => s.users);
+  const { loading, pagedUsers } = useAppSelector(s => s.users);
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
     pageSize: 100,
@@ -118,7 +118,7 @@ export default function UserListPage() {
         pageSizeOptions={[100]}
         sortingMode="server"
         onSortModelChange={onSorting}
-        loading={isLoading}
+        loading={loading}
         className="min-h-[400px]"
       />
     </div>

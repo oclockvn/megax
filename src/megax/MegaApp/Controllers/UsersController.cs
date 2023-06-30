@@ -40,7 +40,7 @@ public class UsersController : ApplicationControllerBase
     public async Task<IActionResult> UpdateUser(int id, UserModel.UpdateUser req)
     {
         var updateResult = await userService.UpdateUserDetailAsync(id, req);
-        if (!updateResult.IsSuccess)
+        if (!updateResult.Success)
         {
             return BadRequest(updateResult);
         }

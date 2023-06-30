@@ -1,94 +1,127 @@
+"use client";
+
 import CardContent from "@mui/material/CardContent";
 import Card from "@mui/material/Card";
-import TextField from "@mui/material/TextField";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
 import { User } from "@/lib/models/user.model";
-import { useForm } from "react-hook-form";
+import {
+  DatePickerElement,
+  FormContainer,
+  TextFieldElement,
+} from "react-hook-form-mui";
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import {
+  clearError,
+  reset as resetUser,
+  updateUserDetailThunk,
+} from "@/lib/store/userDetail.state";
+import toast from "react-hot-toast";
+import { Alert } from "@mui/material";
+import { useEffect } from "react";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
-  const { register, handleSubmit } = useForm<User>({
-    defaultValues: user,
-    values: user,
-  });
-  const handleFormSubmit = (v: User) => {
-    console.log(v);
+  const appDispatch = useAppDispatch();
+  const { loading, loadingState, error } = useAppSelector(s => s.user);
+
+  const handleFormSubmit = async (u: User) => {
+    const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
+    result.success && toast.success("User updated successfully");
   };
 
-  console.log(user);
+  const handleClearError = () => {
+    appDispatch(clearError());
+  };
+
+  useEffect(() => {
+    return () => {
+      appDispatch(resetUser());
+    };
+  }, [appDispatch]);
 
   return (
     <>
-      <Card>
-        <CardHeader sx={{ paddingBottom: 0 }} title={<h4>User detail</h4>} />
-        <CardContent>
-          <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <FormContainer values={user} onSuccess={handleFormSubmit}>
+        <Card>
+          <CardHeader title={<h4>User detail</h4>} />
+          <CardContent>
+            {error && (
+              <div className="mb-5">
+                <Alert severity="error" onClose={handleClearError}>
+                  {error}
+                </Alert>
+              </div>
+            )}
+
             <div className="mb-4">
-              <TextField
+              <TextFieldElement
                 fullWidth
                 label="Full name"
+                name="fullName"
                 variant="outlined"
-                {...register("fullName")}
               />
             </div>
 
             <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
               <Grid item xs={6}>
-                <TextField
+                <TextFieldElement
                   fullWidth
                   label="Email"
                   variant="outlined"
-                  {...register("email")}
+                  name="email"
+                  disabled
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField
+                <TextFieldElement
                   fullWidth
                   label="Phone"
                   variant="outlined"
-                  {...register("phone")}
+                  name="phone"
                 />
               </Grid>
             </Grid>
 
             <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
               <Grid item xs={6}>
-                <TextField
+                <TextFieldElement
                   fullWidth
                   label="Identity number"
                   variant="outlined"
-                  {...register("identityNumber")}
+                  name="identityNumber"
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Dob"
-                  variant="outlined"
-                  {...register("dob")}
-                />
+                <DatePickerElement name="dob" label="Dob" />
               </Grid>
             </Grid>
 
             <div className="mb-4">
-              <TextField
+              <TextFieldElement
                 fullWidth
                 label="Address"
                 variant="outlined"
-                {...register("address")}
+                name="address"
               />
             </div>
-          </form>
-        </CardContent>
+          </CardContent>
 
-        <CardActions className="bg-slate-100">
-          <Button color="primary" variant="text">
-            Save Changes
-          </Button>
-        </CardActions>
-      </Card>
+          <CardActions className="bg-slate-100">
+            <Button
+              color="primary"
+              variant="text"
+              type="submit"
+              disabled={loading}
+            >
+              Save Changes
+            </Button>
+
+            {loading && <div>{loadingState}</div>}
+          </CardActions>
+        </Card>
+      </FormContainer>
     </>
   );
 }
