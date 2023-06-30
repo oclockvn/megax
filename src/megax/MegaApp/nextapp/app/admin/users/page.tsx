@@ -3,16 +3,19 @@
 import { useState, useEffect } from "react";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { fetchUsersThunk } from "@/lib/store/user.state";
+import { fetchUsersThunk } from "@/lib/store/users.state";
 import datetime from "@/lib/datetime";
 import { Filter, PageModel } from "@/lib/models/common.model";
 
 import CustomPagination from "@/components/grid/CustomPagination";
 import CommonSearch from "@/components/grid/CommonSearch";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function UserListPage() {
+  const pathname = usePathname();
   const appDispatch = useAppDispatch();
-  const { isLoading, pagedUsers } = useAppSelector(s => s.user);
+  const { loading, pagedUsers } = useAppSelector(s => s.users);
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
     pageSize: 100,
@@ -23,7 +26,16 @@ export default function UserListPage() {
   };
 
   const columns: GridColDef[] = [
-    { field: "fullName", headerName: "Full Name", width: 400 },
+    {
+      field: "fullName",
+      headerName: "Full Name",
+      width: 400,
+      renderCell: params => (
+        <Link href={`${pathname}/${params.id}`} className="text-blue-400">
+          {params.value}
+        </Link>
+      ),
+    },
     { field: "email", headerName: "Email", width: 300 },
     {
       field: "dob",
@@ -106,7 +118,7 @@ export default function UserListPage() {
         pageSizeOptions={[100]}
         sortingMode="server"
         onSortModelChange={onSorting}
-        loading={isLoading}
+        loading={loading}
         className="min-h-[400px]"
       />
     </div>

@@ -26,13 +26,21 @@ public class UsersController : ApplicationControllerBase
         return Ok(users);
     }
 
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUser(int id)
+    {
+        var user = await userService.GetUserAsync(id);
+        return Ok(user);
+    }
+
     [HttpPost("{id}")]
     [ProducesResponseType(typeof(Result<UserModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateUser(int id, UserModel.UpdateUser req)
     {
         var updateResult = await userService.UpdateUserDetailAsync(id, req);
-        if (!updateResult.IsSuccess)
+        if (!updateResult.Success)
         {
             return BadRequest(updateResult);
         }

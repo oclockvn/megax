@@ -5,15 +5,15 @@ const apiUrl = process.env.BACKEND_URL;
 
 const nextConfig = {
   swcMinify: true,
-  // async redirects() {
-  //   return [
-  //     {
-  //       source: "/",
-  //       destination: "/dashboard",
-  //       permanent: true,
-  //     },
-  //   ];
-  // },
+  async redirects() {
+    return [
+      // {
+      //   source: "/admin/users/:id",
+      //   destination: "/admin/users/:id/info",
+      //   permanent: true,
+      // },
+    ];
+  },
 };
 
 if (isProd) {

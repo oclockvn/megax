@@ -3,18 +3,18 @@ import { User } from "../models/user.model";
 import { fetchUserList } from "../apis/user.api";
 import { EmptyPaged, Filter, PagedResult } from "../models/common.model";
 
-export interface UserState {
+export interface UsersState {
   pagedUsers: PagedResult<User>;
-  isLoading: boolean;
+  loading: boolean;
 }
 
-const initialState: UserState = {
+const initialState: UsersState = {
   pagedUsers: EmptyPaged<User>(),
-  isLoading: false,
+  loading: false,
 };
 
 export const fetchUsersThunk = createAsyncThunk(
-  "user/fetch",
+  "users/fetch",
   async (filter: Partial<Filter>, thunkApi) => {
     thunkApi.dispatch(userSlice.actions.setLoading(true));
     return await fetchUserList(filter);
@@ -22,21 +22,21 @@ export const fetchUsersThunk = createAsyncThunk(
 );
 
 export const userSlice = createSlice({
-  name: "user",
+  name: "users",
   initialState,
   reducers: {
     setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
+      state.loading = action.payload;
     },
   },
   extraReducers(builder) {
     builder
       .addCase(fetchUsersThunk.fulfilled, (state, action) => {
         state.pagedUsers = action.payload;
-        state.isLoading = false;
+        state.loading = false;
       })
       .addCase(fetchUsersThunk.pending, (state, action) => {
-        state.isLoading = true;
+        state.loading = true;
       });
   },
 });

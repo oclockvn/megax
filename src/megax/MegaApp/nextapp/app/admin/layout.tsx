@@ -4,6 +4,8 @@ import { Roboto } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import StateProvider from "@/lib/store/state.provider";
 import { getServerSession } from "next-auth";
+import DatePickerLocalizationProvider from "@/components/DatePickerLocalizationProvider";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "700"],
@@ -25,12 +27,16 @@ export default async function PortalLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <StateProvider>
-          <AuthProvider session={session}>
-            <Nav />
-            {children}
-          </AuthProvider>
-        </StateProvider>
+        <LayoutWrapper>
+          <StateProvider>
+            <DatePickerLocalizationProvider>
+              <AuthProvider session={session}>
+                <Nav />
+                {children}
+              </AuthProvider>
+            </DatePickerLocalizationProvider>
+          </StateProvider>
+        </LayoutWrapper>
       </body>
     </html>
   );

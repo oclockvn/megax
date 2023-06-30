@@ -55,7 +55,7 @@ export default function Nav() {
                 <div className="flex-1 flex items-center justify-center">
                   <Button
                     variant="outlined"
-                    href="/admin/user"
+                    href="/admin/users"
                     className="text-white"
                   >
                     Users
