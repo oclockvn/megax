@@ -37,7 +37,7 @@ public class DeviceConfiguration : IEntityTypeConfiguration<Device>
             .WithMany(t => t.Devices)
             .HasForeignKey(x => x.DeviceTypeId);
 
-        builder.HasIndex(x => x.Name)
+        builder.HasIndex(x => x.DeviceCode)
             .IsUnique();
     }
 }
