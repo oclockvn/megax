@@ -20,6 +20,7 @@ import {
   updateDeviceDetailThunk,
   reset as resetDevice,
   clearError,
+  addDeviceThunk,
 } from "@/lib/store/devices.state";
 
 export default function DeviceInfo({ device }: { device: Device | undefined }) {
@@ -29,8 +30,13 @@ export default function DeviceInfo({ device }: { device: Device | undefined }) {
   );
 
   const handleFormSubmit = async (req: Device) => {
-    const result = await appDispatch(updateDeviceDetailThunk(req)).unwrap();
-    result.success && toast.success("Device updated successfully");
+    if (device && device.id) {
+      const result = await appDispatch(updateDeviceDetailThunk(req)).unwrap();
+      result.success && toast.success("Device updated successfully");
+    } else {
+      const result = await appDispatch(addDeviceThunk(req)).unwrap();
+      result.success && toast.success("Device added successfully");
+    }
   };
 
   const handleClearError = () => {
@@ -76,6 +82,7 @@ export default function DeviceInfo({ device }: { device: Device | undefined }) {
 
                 <Grid item xs={4}>
                   <SelectElement
+                    required
                     fullWidth
                     label="Device type"
                     variant="outlined"

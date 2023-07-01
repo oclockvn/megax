@@ -17,19 +17,19 @@ import {
 } from "@/lib/store/devices.state";
 import DeviceInfo from "../DeviceInfo";
 
-export default function DevicePage({ params }: { params: { id: number } }) {
+export default function NewDevicePage() {
   const pathname = usePathname();
   const appDispatch = useAppDispatch();
-  const { currentDevice } = useAppSelector(s => s.devices);
+  // const { currentDevice } = useAppSelector(s => s.devices);
 
   useEffect(() => {
-    appDispatch(fetchDeviceDetailThunk(params.id));
+    // appDispatch(fetchDeviceDetailThunk(params.id));
     appDispatch(fetchDeviceTypesThunk());
 
     return () => {
       appDispatch(resetDevice());
     };
-  }, [params.id]);
+  }, [appDispatch]);
 
   return (
     <>
@@ -44,13 +44,13 @@ export default function DevicePage({ params }: { params: { id: number } }) {
               <ArrowBackIcon className="mr-2" />
               Devices
             </Link>
-            <div>{currentDevice?.name || "..."}</div>
+            <div>New Device</div>
           </Breadcrumbs>
         </div>
 
         <Grid container className="p-4">
           <Grid item xs={8}>
-            <DeviceInfo device={currentDevice} />
+            <DeviceInfo device={undefined} />
           </Grid>
 
           <Grid item xs={4}>

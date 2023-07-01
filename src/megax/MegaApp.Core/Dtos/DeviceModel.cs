@@ -17,10 +17,17 @@ public class DeviceModel
 
     public class NewDevice
     {
+        [Required, MaxLength(250)]
         public string Name { get; set; }
+
+        [MaxLength(250)]
         public string DeviceCode { get; set; }
+
+        [MaxLength(250)]
         public string Model { get; set; }
-        public int Qty { get; set; }
+        public int Qty { get; set; } = 1;
+
+        [Required]
         public int DeviceTypeId { get; set; }
     }
 }

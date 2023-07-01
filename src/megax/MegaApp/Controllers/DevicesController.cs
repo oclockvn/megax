@@ -13,9 +13,9 @@ public class DevicesController : ApplicationControllerBase
     private readonly IDeviceService deviceService;
     private readonly IMemoryCache cache;
 
-    public DevicesController(IDeviceService userService, IMemoryCache cache)
+    public DevicesController(IDeviceService deviceService, IMemoryCache cache)
     {
-        this.deviceService = userService;
+        this.deviceService = deviceService;
         this.cache = cache;
     }
 
@@ -54,10 +54,10 @@ public class DevicesController : ApplicationControllerBase
         return Ok(device);
     }
 
-    [HttpPost("{id}")]
+    [HttpPut("{id}")]
     [ProducesResponseType(typeof(Result<DeviceModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateUser(int id, DeviceModel req)
+    public async Task<IActionResult> UpdateDevice(int id, DeviceModel req)
     {
         var updateResult = await deviceService.UpdateDeviceAsync(id, req);
         if (!updateResult.Success)
@@ -66,6 +66,26 @@ public class DevicesController : ApplicationControllerBase
         }
 
         var device = await deviceService.GetDeviceAsync(id);
+        return Ok(Result<DeviceModel>.Ok(device));
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(Result<DeviceModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddDevice(DeviceModel.NewDevice req)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await deviceService.CreateDeviceAsync(req);
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        var device = await deviceService.GetDeviceAsync(result.Data);
         return Ok(Result<DeviceModel>.Ok(device));
     }
 }

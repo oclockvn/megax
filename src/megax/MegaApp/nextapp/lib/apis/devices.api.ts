@@ -14,7 +14,12 @@ export async function fetchDeviceDetail(id: number) {
 }
 
 export async function updateDevice(req: Device) {
-  const res = await api.post<Result<Device>>("/be/devices/" + req.id, req);
+  const res = await api.put<Result<Device>>("/be/devices/" + req.id, req);
+  return res.data;
+}
+
+export async function addDevice(req: Omit<Device, "id">) {
+  const res = await api.post<Result<Device>>("/be/devices", req);
   return res.data;
 }
 

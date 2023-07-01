@@ -54,10 +54,13 @@ internal class DeviceService : IDeviceService
     public async Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice req)
     {
         using var db = UseDb();
-        var deviceExist = await db.Devices.Where(d => d.Name == req.Name).AnyAsync();
-        if (deviceExist)
+        if (!string.IsNullOrWhiteSpace(req.DeviceCode))
         {
-            return Result<int>.Fail(Result.RECORD_DUPLICATED);
+            var deviceExist = await db.Devices.Where(d => d.DeviceCode == req.DeviceCode).AnyAsync();
+            if (deviceExist)
+            {
+                return Result<int>.Fail(Result.RECORD_DUPLICATED);
+            }
         }
 
         var entity = db.Devices.Add(new()
@@ -119,7 +122,7 @@ internal class DeviceService : IDeviceService
         }
         else
         {
-            query.Sort(x => x.Id, false);
+            query = query.Sort(x => x.Id, false);
         }
 
         var total = await query.CountAsync();

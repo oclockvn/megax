@@ -2,6 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { EmptyPaged, Filter, PagedResult } from "../models/common.model";
 import { Device, DeviceType } from "../models/device.model";
 import {
+  addDevice,
   fetchDeviceDetail,
   fetchDeviceList,
   getDeviceTypes,
@@ -26,7 +27,7 @@ const initialState: DevicesState = {
 export const fetchDevicesThunk = createAsyncThunk(
   "devices/fetch",
   async (filter: Partial<Filter>, thunkApi) => {
-    thunkApi.dispatch(devicesSlice.actions.setLoading(true));
+    thunkApi.dispatch(devicesSlice.actions.setLoadingState("Loading..."));
     return await fetchDeviceList(filter);
   }
 );
@@ -34,7 +35,7 @@ export const fetchDevicesThunk = createAsyncThunk(
 export const fetchDeviceDetailThunk = createAsyncThunk(
   "devices/fetch-detail",
   async (id: number, thunkApi) => {
-    thunkApi.dispatch(devicesSlice.actions.setLoading(true));
+    thunkApi.dispatch(devicesSlice.actions.setLoadingState("Loading..."));
     return await fetchDeviceDetail(id);
   }
 );
@@ -42,8 +43,18 @@ export const fetchDeviceDetailThunk = createAsyncThunk(
 export const updateDeviceDetailThunk = createAsyncThunk(
   "devices/update-detail",
   async (req: Device, thunkApi) => {
-    thunkApi.dispatch(devicesSlice.actions.setLoading(true));
+    thunkApi.dispatch(
+      devicesSlice.actions.setLoadingState("Saving changes...")
+    );
     return await updateDevice(req);
+  }
+);
+
+export const addDeviceThunk = createAsyncThunk(
+  "devices/add-device",
+  async (req: Omit<Device, "id">, thunkApi) => {
+    thunkApi.dispatch(devicesSlice.actions.setLoadingState("Processing..."));
+    return await addDevice(req);
   }
 );
 
@@ -61,10 +72,14 @@ export const devicesSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    setLoadingState: (state, action: PayloadAction<string>) => {
+      state.loadingState = action.payload;
+      state.loading = true;
+    },
     clearError: state => {
       state.error = undefined;
     },
-    reset: state => initialState,
+    reset: _ => initialState,
   },
   extraReducers(builder) {
     builder
@@ -97,10 +112,23 @@ export const devicesSlice = createSlice({
       })
       .addCase(fetchDeviceTypesThunk.fulfilled, (state, action) => {
         state.deviceTypes = action.payload;
+      })
+      .addCase(addDeviceThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loadingState = undefined;
+        if (!action.payload.success) {
+          state.error = `Couldn't add device. Error code: ${action.payload.code}`;
+        }
+      })
+      .addCase(addDeviceThunk.rejected, state => {
+        state.loading = false;
+        state.loadingState = undefined;
+        state.error = `Something went wrong`;
       });
   },
 });
 
-export const { setLoading, reset, clearError } = devicesSlice.actions;
+export const { setLoading, reset, clearError, setLoadingState } =
+  devicesSlice.actions;
 
 export default devicesSlice.reducer;

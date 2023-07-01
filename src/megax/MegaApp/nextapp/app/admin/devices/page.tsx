@@ -103,6 +103,7 @@ export default function DeviceListPage() {
             color="primary"
             className="bg-blue-500"
             startIcon={<AddIcon />}
+            href={`${pathname}/new`}
           >
             New Device
           </Button>
