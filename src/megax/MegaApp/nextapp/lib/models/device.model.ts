@@ -3,4 +3,10 @@ export interface Device {
   name: string;
   model: string;
   deviceCode: string;
+  deviceTypeId: number;
+}
+
+export interface DeviceType {
+  id: number;
+  name: string;
 }

@@ -12,8 +12,10 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import Grid from "@mui/material/Grid";
 import {
   fetchDeviceDetailThunk,
+  fetchDeviceTypesThunk,
   reset as resetDevice,
 } from "@/lib/store/devices.state";
+import DeviceInfo from "./DeviceInfo";
 // import UserInfo from "./UserInfo";
 
 export default function DevicePage({ params }: { params: { id: number } }) {
@@ -23,6 +25,7 @@ export default function DevicePage({ params }: { params: { id: number } }) {
 
   useEffect(() => {
     appDispatch(fetchDeviceDetailThunk(params.id));
+    appDispatch(fetchDeviceTypesThunk());
 
     return () => {
       appDispatch(resetDevice());
@@ -48,7 +51,7 @@ export default function DevicePage({ params }: { params: { id: number } }) {
 
         <Grid container className="p-4">
           <Grid item xs={8}>
-            {/* <UserInfo user={user} /> */}
+            <DeviceInfo device={currentDevice} />
           </Grid>
 
           <Grid item xs={4}>
