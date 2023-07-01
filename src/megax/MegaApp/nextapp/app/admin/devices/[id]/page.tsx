@@ -16,7 +16,6 @@ import {
   reset as resetDevice,
 } from "@/lib/store/devices.state";
 import DeviceInfo from "./DeviceInfo";
-// import UserInfo from "./UserInfo";
 
 export default function DevicePage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
