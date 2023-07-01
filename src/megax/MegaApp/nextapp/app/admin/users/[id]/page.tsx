@@ -9,14 +9,14 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { clearUser, fetchUserDetailThunk } from "@/lib/store/userDetail.state";
+import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
 import UserInfo from "./UserInfo";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
   const appDispatch = useAppDispatch();
-  const { user } = useAppSelector(s => s.user);
+  const { user } = useAppSelector(s => s.users);
 
   useEffect(() => {
     appDispatch(fetchUserDetailThunk(params.id));

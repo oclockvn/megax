@@ -17,14 +17,14 @@ import {
   clearError,
   reset as resetUser,
   updateUserDetailThunk,
-} from "@/lib/store/userDetail.state";
+} from "@/lib/store/users.state";
 import toast from "react-hot-toast";
 import { Alert } from "@mui/material";
 import { useEffect } from "react";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
-  const { loading, loadingState, error } = useAppSelector(s => s.user);
+  const { loading, loadingState, error } = useAppSelector(s => s.users);
 
   const handleFormSubmit = async (u: User) => {
     const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
