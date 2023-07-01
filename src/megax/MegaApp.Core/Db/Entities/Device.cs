@@ -49,16 +49,16 @@ public class DeviceTypeConfiguration : IEntityTypeConfiguration<DeviceType>
         builder.HasIndex(x => x.Name).IsUnique();
 
         builder.HasData(
-            new DeviceType { Name = "Monitor" },
-            new DeviceType { Name = "Mouse" },
-            new DeviceType { Name = "Keyboard" },
-            new DeviceType { Name = "Headset" },
-            new DeviceType { Name = "Graphic Card" },
-            new DeviceType { Name = "CPU" },
-            new DeviceType { Name = "RAM" },
-            new DeviceType { Name = "Wifi Router" },
-            new DeviceType { Name = "Camera" },
-            new DeviceType { Name = "Laptop" }
+            new DeviceType { Id = 1, Name = "Monitor" },
+            new DeviceType { Id = 2, Name = "Mouse" },
+            new DeviceType { Id = 3, Name = "Keyboard" },
+            new DeviceType { Id = 4, Name = "Headset" },
+            new DeviceType { Id = 5, Name = "Graphic Card" },
+            new DeviceType { Id = 6, Name = "CPU" },
+            new DeviceType { Id = 7, Name = "RAM" },
+            new DeviceType { Id = 8, Name = "Wifi Router" },
+            new DeviceType { Id = 9, Name = "Camera" },
+            new DeviceType { Id = 10, Name = "Laptop" }
         );
     }
 }
