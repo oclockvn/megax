@@ -58,6 +58,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
             <div className="mb-4">
               <TextFieldElement
                 fullWidth
+                required
                 label="Full name"
                 name="fullName"
                 variant="outlined"

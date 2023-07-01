@@ -61,7 +61,6 @@ public class UserModel
         [Required]
         public string FullName { get; set; }
 
-        [Required]
         [MaxLength(200)]
         public string Address { get; set; }
         public DateTimeOffset? Dob { get; set; }
