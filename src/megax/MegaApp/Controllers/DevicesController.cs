@@ -2,6 +2,7 @@
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MegaApp.Controllers;
 
@@ -10,18 +11,39 @@ namespace MegaApp.Controllers;
 public class DevicesController : ApplicationControllerBase
 {
     private readonly IDeviceService deviceService;
+    private readonly IMemoryCache cache;
 
-    public DevicesController(IDeviceService userService)
+    public DevicesController(IDeviceService userService, IMemoryCache cache)
     {
         this.deviceService = userService;
+        this.cache = cache;
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(List<DeviceModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDevices([FromQuery] Filter filter)
     {
-        var users = await deviceService.GetDevicesAsync(filter);
-        return Ok(users);
+        var devices = await deviceService.GetDevicesAsync(filter);
+        return Ok(devices);
+    }
+
+    [HttpGet("device-types")]
+    [ProducesResponseType(typeof(List<DeviceTypeRecord>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDeviceTypes(bool resetCache = false)
+    {
+        var cacheKey = nameof(DeviceTypeRecord);
+        if (resetCache)
+        {
+            cache.Remove(cacheKey);
+        }
+
+        var deviceTypes = await cache.GetOrCreateAsync(cacheKey, async (entry) =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+            return await deviceService.GetDeviceTypesAsync();
+        });
+
+        return Ok(deviceTypes);
     }
 
     [HttpGet("{id}")]

@@ -9,6 +9,7 @@ public interface IDeviceService
 {
     Task<DeviceModel> GetDeviceAsync(int id);
     Task<PagedResult<DeviceModel>> GetDevicesAsync(Filter filter);
+    Task<List<DeviceTypeRecord>> GetDeviceTypesAsync();
 
     Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice user);
     Task<Result<int>> UpdateDeviceAsync(int id, DeviceModel req);
@@ -40,6 +41,14 @@ internal class DeviceService : IDeviceService
                 DeviceType = d.DeviceType.Name,
             })
             .FirstOrDefaultAsync();
+    }
+
+    public async Task<List<DeviceTypeRecord>> GetDeviceTypesAsync()
+    {
+        using var db = UseDb();
+        return await db.DeviceTypes
+            .Select(d => new DeviceTypeRecord(d.Id, d.Name))
+            .ToListAsync();
     }
 
     public async Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice req)
