@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { Filter, PageModel } from "@/lib/models/common.model";
+import AddIcon from "@mui/icons-material/Add";
 
 import CustomPagination from "@/components/grid/CustomPagination";
 import CommonSearch from "@/components/grid/CommonSearch";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
 
 export default function DeviceListPage() {
   const pathname = usePathname();
@@ -90,9 +93,21 @@ export default function DeviceListPage() {
 
   return (
     <div className="p-4 min-h-[400px]">
-      <div className="mb-4">
-        <CommonSearch handleSearch={onSearch} />
-      </div>
+      <Grid container className="mb-4" alignItems={"center"}>
+        <Grid item xs={6}>
+          <CommonSearch handleSearch={onSearch} />
+        </Grid>
+        <Grid item xs={6} textAlign={"right"}>
+          <Button
+            variant="contained"
+            color="primary"
+            className="bg-blue-500"
+            startIcon={<AddIcon />}
+          >
+            New Device
+          </Button>
+        </Grid>
+      </Grid>
 
       <DataGrid
         rows={pagedDevices.items}
