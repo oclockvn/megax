@@ -36,6 +36,9 @@ public class DeviceConfiguration : IEntityTypeConfiguration<Device>
         builder.HasOne(x => x.DeviceType)
             .WithMany(t => t.Devices)
             .HasForeignKey(x => x.DeviceTypeId);
+
+        builder.HasIndex(x => x.Name)
+            .IsUnique();
     }
 }
 
@@ -43,6 +46,8 @@ public class DeviceTypeConfiguration : IEntityTypeConfiguration<DeviceType>
 {
     public void Configure(EntityTypeBuilder<DeviceType> builder)
     {
+        builder.HasIndex(x => x.Name).IsUnique();
+
         builder.HasData(
             new DeviceType { Name = "Monitor" },
             new DeviceType { Name = "Mouse" },
