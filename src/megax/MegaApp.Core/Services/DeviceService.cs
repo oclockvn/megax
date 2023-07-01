@@ -104,6 +104,7 @@ internal class DeviceService : IDeviceService
                 "model" => query.Sort(x => x.Model, isAsc),
                 "devicecode" => query.Sort(x => x.DeviceCode, isAsc),
                 "qty" => query.Sort(x => x.Qty, isAsc),
+                "devicetype" => query.Sort(x => x.DeviceTypeId, isAsc),
                 _ => query.Sort(x => x.Id, isAsc)
             };
         }

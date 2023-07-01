@@ -1,10 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { EmptyPaged, Filter, PagedResult } from "../models/common.model";
 import { Device } from "../models/device.model";
-import { fetchDeviceList } from "../apis/devices.api";
+import { fetchDeviceDetail, fetchDeviceList } from "../apis/devices.api";
 
 export interface DevicesState {
   pagedDevices: PagedResult<Device>;
+  currentDevice?: Device;
   loading: boolean;
 }
 
@@ -21,6 +22,14 @@ export const fetchDevicesThunk = createAsyncThunk(
   }
 );
 
+export const fetchDeviceDetailThunk = createAsyncThunk(
+  "devices/fetch-detail",
+  async (id: number, thunkApi) => {
+    thunkApi.dispatch(devicesSlice.actions.setLoading(true));
+    return await fetchDeviceDetail(id);
+  }
+);
+
 export const devicesSlice = createSlice({
   name: "devices",
   initialState,
@@ -28,6 +37,7 @@ export const devicesSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    reset: state => initialState,
   },
   extraReducers(builder) {
     builder
@@ -37,10 +47,17 @@ export const devicesSlice = createSlice({
       })
       .addCase(fetchDevicesThunk.pending, (state, action) => {
         state.loading = true;
+      })
+      .addCase(fetchDeviceDetailThunk.fulfilled, (state, action) => {
+        state.currentDevice = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchDeviceDetailThunk.pending, (state, action) => {
+        state.loading = true;
       });
   },
 });
 
-export const { setLoading } = devicesSlice.actions;
+export const { setLoading, reset } = devicesSlice.actions;
 
 export default devicesSlice.reducer;
