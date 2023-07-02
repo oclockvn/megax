@@ -36,7 +36,6 @@ export default function DeviceInfo({ device, redirectFn }: DeviceInfoProps) {
     s => s.devices
   );
   const isUpdate = device && device.id > 0;
-  console.log({ device, isUpdate });
 
   const handleClearError = () => {
     appDispatch(clearError());
