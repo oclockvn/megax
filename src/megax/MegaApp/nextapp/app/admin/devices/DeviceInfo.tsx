@@ -15,7 +15,6 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import toast from "react-hot-toast";
 import { Alert } from "@mui/material";
-import { useEffect } from "react";
 import { Device } from "@/lib/models/device.model";
 import {
   updateDeviceDetailThunk,
@@ -35,17 +34,11 @@ export default function DeviceInfo({ device, redirectFn }: DeviceInfoProps) {
   const { loading, loadingState, error, deviceTypes } = useAppSelector(
     s => s.devices
   );
-  const isUpdate = device && device.id > 0;
+  const isUpdate = Number(device?.id) > 0;
 
   const handleClearError = () => {
     appDispatch(clearError());
   };
-
-  useEffect(() => {
-    return () => {
-      appDispatch(resetDevice());
-    };
-  }, [appDispatch]);
 
   const deviceTypeOptions = deviceTypes?.map(d => ({
     id: d.id,
@@ -62,7 +55,7 @@ export default function DeviceInfo({ device, redirectFn }: DeviceInfoProps) {
       const result = await appDispatch(updateDeviceDetailThunk(req)).unwrap();
       if (result.success) {
         toast.success("Device updated successfully");
-        id = device.id;
+        id = result.data.id;
       }
     } else {
       const result = await appDispatch(addDeviceThunk(req)).unwrap();

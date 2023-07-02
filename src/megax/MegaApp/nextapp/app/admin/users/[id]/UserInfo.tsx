@@ -13,14 +13,9 @@ import {
   TextFieldElement,
 } from "react-hook-form-mui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import {
-  clearError,
-  reset as resetUser,
-  updateUserDetailThunk,
-} from "@/lib/store/users.state";
+import { clearError, updateUserDetailThunk } from "@/lib/store/users.state";
 import toast from "react-hot-toast";
 import { Alert } from "@mui/material";
-import { useEffect } from "react";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
@@ -34,12 +29,6 @@ export default function UserInfo({ user }: { user: User | undefined }) {
   const handleClearError = () => {
     appDispatch(clearError());
   };
-
-  useEffect(() => {
-    return () => {
-      appDispatch(resetUser());
-    };
-  }, [appDispatch]);
 
   return (
     <>
