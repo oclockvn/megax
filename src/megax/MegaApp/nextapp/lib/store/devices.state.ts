@@ -79,7 +79,11 @@ export const devicesSlice = createSlice({
     clearError: state => {
       state.error = undefined;
     },
-    reset: _ => initialState,
+    reset: state => ({
+      ...initialState,
+      currentDevice: undefined,
+      deviceTypes: state.deviceTypes,
+    }),
   },
   extraReducers(builder) {
     builder
@@ -116,7 +120,9 @@ export const devicesSlice = createSlice({
       .addCase(addDeviceThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.loadingState = undefined;
-        if (!action.payload.success) {
+        if (action.payload.success) {
+          state.currentDevice = action.payload.data;
+        } else {
           state.error = `Couldn't add device. Error code: ${action.payload.code}`;
         }
       })

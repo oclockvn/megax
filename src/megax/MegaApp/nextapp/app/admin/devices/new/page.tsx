@@ -5,7 +5,7 @@ import React from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
@@ -19,17 +19,20 @@ import DeviceInfo from "../DeviceInfo";
 
 export default function NewDevicePage() {
   const pathname = usePathname();
+  const router = useRouter();
   const appDispatch = useAppDispatch();
-  // const { currentDevice } = useAppSelector(s => s.devices);
 
   useEffect(() => {
-    // appDispatch(fetchDeviceDetailThunk(params.id));
     appDispatch(fetchDeviceTypesThunk());
 
     return () => {
       appDispatch(resetDevice());
     };
   }, [appDispatch]);
+
+  const redirectToPage = (id: number) => {
+    router.push(`${pathname}/../${id}`);
+  };
 
   return (
     <>
@@ -50,7 +53,7 @@ export default function NewDevicePage() {
 
         <Grid container className="p-4">
           <Grid item xs={8}>
-            <DeviceInfo device={undefined} />
+            <DeviceInfo device={undefined} redirectFn={redirectToPage} />
           </Grid>
 
           <Grid item xs={4}>
