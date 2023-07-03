@@ -53,7 +53,7 @@ export default function NewDevicePage() {
 
         <Grid container className="p-4">
           <Grid item xs={8}>
-            <DeviceInfo device={undefined} redirectFn={redirectToPage} />
+            <DeviceInfo device={undefined} onAdded={redirectToPage} />
           </Grid>
 
           <Grid item xs={4}>

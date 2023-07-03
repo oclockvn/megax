@@ -13,6 +13,7 @@ public interface IDeviceService
 
     Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice user);
     Task<Result<int>> UpdateDeviceAsync(int id, DeviceModel req);
+    Task<Result<bool>> DeleteDeviceAsync(int id);
 }
 
 internal class DeviceService : IDeviceService
@@ -142,5 +143,22 @@ internal class DeviceService : IDeviceService
         .ToListAsync();
 
         return new PagedResult<DeviceModel>(items, filter.Page, total);
+    }
+
+    public async Task<Result<bool>> DeleteDeviceAsync(int id)
+    {
+        using var db = UseDb();
+        var device = await db.Devices.Where(d => d.Id == id).FirstOrDefaultAsync();
+
+        if (device == null)
+        {
+            return Result<bool>.Fail(Result.RECORD_DOES_NOT_EXIST);
+        }
+
+        // undone: validate user devices
+        db.Devices.Remove(device);
+        await db.SaveChangesAsync();
+
+        return Result<bool>.Ok(true);
     }
 }

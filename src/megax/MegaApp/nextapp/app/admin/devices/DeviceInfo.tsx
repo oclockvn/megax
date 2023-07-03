@@ -14,7 +14,8 @@ import {
 } from "react-hook-form-mui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import toast from "react-hot-toast";
-import { Alert } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import ClearIcon from "@mui/icons-material/Clear";
 import { Device } from "@/lib/models/device.model";
 import {
   updateDeviceDetailThunk,
@@ -22,15 +23,23 @@ import {
   clearError,
   addDeviceThunk,
   setLoadingState,
+  deleteDeviceThunk,
 } from "@/lib/store/devices.state";
+import { useConfirm } from "material-ui-confirm";
 
 declare type DeviceInfoProps = {
   device?: Device;
-  redirectFn?: (id: number) => void;
+  onAdded?: (id: number) => void;
+  onDeleted?: () => void;
 };
 
-export default function DeviceInfo({ device, redirectFn }: DeviceInfoProps) {
+export default function DeviceInfo({
+  device,
+  onAdded,
+  onDeleted,
+}: DeviceInfoProps) {
   const appDispatch = useAppDispatch();
+  const confirm = useConfirm();
   const { loading, loadingState, error, deviceTypes } = useAppSelector(
     s => s.devices
   );
@@ -70,10 +79,30 @@ export default function DeviceInfo({ device, redirectFn }: DeviceInfoProps) {
       }
     }
 
-    if (redirect && !!redirectFn) {
+    if (redirect && !!onAdded) {
       appDispatch(setLoadingState("Redirecting..."));
-      redirectFn(id);
+      onAdded(id);
     }
+  };
+
+  const handleDeleteDevice = async () => {
+    const id = Number(device?.id);
+    const result = await appDispatch(deleteDeviceThunk(id)).unwrap();
+
+    if (result.success) {
+      toast.success("Successfully deleted");
+      onDeleted && onDeleted();
+    }
+  };
+
+  const confirmDelete = () => {
+    confirm({
+      description: "Delete this device?",
+    })
+      .then(handleDeleteDevice)
+      .catch(() => {
+        /* swallow error */
+      });
   };
 
   const { handleSubmit } = formContext;
@@ -139,15 +168,39 @@ export default function DeviceInfo({ device, redirectFn }: DeviceInfoProps) {
 
           <CardActions className="bg-slate-100">
             {isUpdate && (
-              <Button
-                color="primary"
-                variant="text"
-                type="button"
-                onClick={handleSubmit(e => onButtonSubmit(e))}
-                disabled={loading}
+              <Grid
+                container
+                justifyContent={"space-between"}
+                alignItems={"center"}
               >
-                Save Changes
-              </Button>
+                <Grid item>
+                  <Button
+                    color="primary"
+                    variant="text"
+                    type="button"
+                    onClick={handleSubmit(e => onButtonSubmit(e))}
+                    disabled={loading}
+                  >
+                    Save Changes
+                  </Button>
+                </Grid>
+                <Grid item flex={1}>
+                  {loading && <div className="ml-4">{loadingState}</div>}
+                </Grid>
+                <Grid item>
+                  <Button
+                    color="error"
+                    variant="outlined"
+                    type="button"
+                    className="bg-red-500 text-white hover:!bg-red-600"
+                    startIcon={<ClearIcon />}
+                    onClick={confirmDelete}
+                    disabled={loading}
+                  >
+                    Delete
+                  </Button>
+                </Grid>
+              </Grid>
             )}
             {!isUpdate && (
               <>
@@ -169,10 +222,10 @@ export default function DeviceInfo({ device, redirectFn }: DeviceInfoProps) {
                 >
                   Save and Redirect
                 </Button>
+
+                {loading && <div className="ml-4">{loadingState}</div>}
               </>
             )}
-
-            {loading && <div className="ml-4">{loadingState}</div>}
           </CardActions>
         </Card>
       </FormContainer>

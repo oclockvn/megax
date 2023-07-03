@@ -69,6 +69,15 @@ public class DevicesController : ApplicationControllerBase
         return Ok(Result<DeviceModel>.Ok(device));
     }
 
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeletedateDevice(int id)
+    {
+        var result = await deviceService.DeleteDeviceAsync(id);
+        return Ok(result);
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(Result<DeviceModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -23,6 +23,11 @@ export async function addDevice(req: Omit<Device, "id">) {
   return res.data;
 }
 
+export async function deleteDevice(id: number) {
+  const res = await api.delete<Result<Device>>("/be/devices/" + id);
+  return res.data;
+}
+
 export async function getDeviceTypes() {
   const res = await api.get<DeviceType[]>("/be/devices/device-types");
   return res.data;

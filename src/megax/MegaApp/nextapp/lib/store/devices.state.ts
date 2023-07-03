@@ -3,6 +3,7 @@ import { EmptyPaged, Filter, PagedResult } from "../models/common.model";
 import { Device, DeviceType } from "../models/device.model";
 import {
   addDevice,
+  deleteDevice,
   fetchDeviceDetail,
   fetchDeviceList,
   getDeviceTypes,
@@ -55,6 +56,14 @@ export const addDeviceThunk = createAsyncThunk(
   async (req: Omit<Device, "id">, thunkApi) => {
     thunkApi.dispatch(devicesSlice.actions.setLoadingState("Processing..."));
     return await addDevice(req);
+  }
+);
+
+export const deleteDeviceThunk = createAsyncThunk(
+  "devices/delete-device",
+  async (id: number, thunkApi) => {
+    thunkApi.dispatch(devicesSlice.actions.setLoadingState("Processing..."));
+    return await deleteDevice(id);
   }
 );
 
@@ -127,6 +136,18 @@ export const devicesSlice = createSlice({
         }
       })
       .addCase(addDeviceThunk.rejected, state => {
+        state.loading = false;
+        state.loadingState = undefined;
+        state.error = `Something went wrong`;
+      })
+      .addCase(deleteDeviceThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loadingState = undefined;
+        state.error = action.payload.success
+          ? undefined
+          : `Couldn't delete device. Error code: ${action.payload.code}`;
+      })
+      .addCase(deleteDeviceThunk.rejected, (state, _) => {
         state.loading = false;
         state.loadingState = undefined;
         state.error = `Something went wrong`;
