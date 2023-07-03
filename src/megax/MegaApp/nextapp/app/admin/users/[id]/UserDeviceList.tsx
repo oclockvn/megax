@@ -16,14 +16,24 @@ import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import React from "react";
+import { useAppSelector } from "@/lib/store/state.hook";
 
 function UserDeviceAdd() {
+  const { pagedDevices } = useAppSelector(s => s.devices);
   return (
     <div className="p-4 bg-slate-100">
       <div>
         <Autocomplete
-          options={["Monitor", "Keyboard", "Headset"]}
+          autoComplete
+          options={pagedDevices.items}
           renderInput={params => <TextField {...params} label="Device" />}
+          renderOption={(ele, o) => (
+            <li {...ele} key={o.id}>
+              {o.name}
+              {o.model ? " - " + o.model : ""}
+            </li>
+          )}
+          getOptionLabel={o => `${o.name}${o.model ? " - " + o.model : ""}`}
         />
       </div>
 

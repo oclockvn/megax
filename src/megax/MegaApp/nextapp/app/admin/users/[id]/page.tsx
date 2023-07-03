@@ -13,6 +13,7 @@ import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
 import UserInfo from "./UserInfo";
 import UserDeviceList from "./UserDeviceList";
+import { fetchDevicesThunk } from "@/lib/store/devices.state";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -21,10 +22,11 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
   useEffect(() => {
     appDispatch(fetchUserDetailThunk(params.id));
+    appDispatch(fetchDevicesThunk());
 
-    return () => {
-      appDispatch(clearUser());
-    };
+    // return () => {
+    //   appDispatch(clearUser());
+    // };
   }, [params.id]);
 
   return (
