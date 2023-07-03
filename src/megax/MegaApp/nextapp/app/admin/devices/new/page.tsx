@@ -5,26 +5,34 @@ import React from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
-import UserInfo from "./UserInfo";
+import {
+  fetchDeviceDetailThunk,
+  fetchDeviceTypesThunk,
+  reset as resetDevice,
+} from "@/lib/store/devices.state";
+import DeviceInfo from "../DeviceInfo";
 
-export default function UserPage({ params }: { params: { id: number } }) {
+export default function NewDevicePage() {
   const pathname = usePathname();
+  const router = useRouter();
   const appDispatch = useAppDispatch();
-  const { user } = useAppSelector(s => s.users);
 
   useEffect(() => {
-    appDispatch(fetchUserDetailThunk(params.id));
+    appDispatch(fetchDeviceTypesThunk());
 
     return () => {
-      appDispatch(clearUser());
+      appDispatch(resetDevice());
     };
-  }, [params.id]);
+  }, [appDispatch]);
+
+  const redirectToPage = (id: number) => {
+    router.push(`${pathname}/../${id}`);
+  };
 
   return (
     <>
@@ -37,15 +45,15 @@ export default function UserPage({ params }: { params: { id: number } }) {
               className="text-blue-500 flex items-center"
             >
               <ArrowBackIcon className="mr-2" />
-              Users
+              Devices
             </Link>
-            <div>{user?.fullName || "..."}</div>
+            <div>New Device</div>
           </Breadcrumbs>
         </div>
 
         <Grid container className="p-4">
           <Grid item xs={8}>
-            <UserInfo user={user} />
+            <DeviceInfo device={undefined} onAdded={redirectToPage} />
           </Grid>
 
           <Grid item xs={4}>

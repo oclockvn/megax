@@ -77,16 +77,16 @@ namespace MegaApp.Controllers
 
             var signInResult = Result<SignInResponse>.Default;
 
-            var userResult = await authService.IsValidAccountAsync(req.Username, req.Password);
-            if (!userResult.Success)
+            var accountResult = await authService.IsValidAccountAsync(req.Username, req.Password);
+            if (!accountResult.Success)
             {
-                signInResult = signInResult.FromCode(userResult);
+                signInResult = signInResult.FromCode(accountResult);
                 return Ok(signInResult);
             }
 
-            var user = await userService.GetUserAsync(userResult.Data);
+            var user = await userService.GetUserAsync(accountResult.Data.UserId);
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
-            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(accountResult.Data.Id, token.Token);
 
             signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, refreshToken) };
 

@@ -8,6 +8,7 @@ public static class ServiceCollectionExtension
     {
         return services
             .AddScoped<IUserGenerator, UserGenerator>()
+            .AddScoped<IDeviceGenerator, DeviceGenerator>()
             ;
     }
 }
