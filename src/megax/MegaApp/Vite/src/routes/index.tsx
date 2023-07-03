@@ -9,6 +9,7 @@ import SignUpPage from "../pages/Register/SignUp";
 import UserListPage from "../pages/RoutesForAuthenticatedOnly/User/UserList/page";
 import UserDetailPage from "../pages/RoutesForAuthenticatedOnly/User/UserDetail/page";
 
+
 const Routes = () => {
   const token = storage.get("token");
 
@@ -39,7 +40,7 @@ const Routes = () => {
         },
 
         {
-          path: "/users-detail",
+          path: "/users/:id",
           element: <HomeTemplate Component={UserDetailPage} />,
         },
 
