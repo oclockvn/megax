@@ -3,7 +3,6 @@ using MegaApp.Core.Dtos;
 using MegaApp.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
-using Microsoft.Extensions.Logging;
 
 namespace MegaApp.Core.Services;
 
@@ -15,17 +14,17 @@ public interface IUserService
 
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
+
+    Task<Result<bool>> AssignDeviceAsync(int id, int deviceId);
 }
 
 internal class UserService : IUserService
 {
     private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
-    private readonly ILogger<IUserService> logger;
 
-    public UserService(IDbContextFactory<ApplicationDbContext> dbContextFactory, ILogger<IUserService> logger)
+    public UserService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
-        this.logger = logger;
     }
 
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
@@ -139,5 +138,33 @@ internal class UserService : IUserService
         .Select(x => new UserModel(x)).ToListAsync();
 
         return new PagedResult<UserModel>(items, filter.Page, total);
+    }
+
+    public async Task<Result<bool>> AssignDeviceAsync(int id, int deviceId)
+    {
+        using var db = UseDb();
+        // current qty of this device
+        var deviceQty = await db.Devices.Where(d => d.Id == deviceId)
+            .Select(x => x.Qty)
+            .FirstOrDefaultAsync();
+
+        // qty borrowed by users
+        var borrowedQty = await db.UserDevices.Where(u => u.DeviceId == deviceId).SumAsync(x => x.Qty);
+        if (borrowedQty >= deviceQty)
+        {
+            return Result<bool>.Fail(Result.DEVICE_OUT_OF_QTY);
+        }
+
+        var userDevice = await db.UserDevices.FirstOrDefaultAsync(x => x.UserId == id && x.DeviceId == deviceId);
+        if (userDevice == null)
+        {
+            userDevice = new UserDevice { UserId = id, DeviceId = deviceId, Qty = 0 };
+            db.UserDevices.Add(userDevice);
+        }
+
+        userDevice.Qty += 1;
+        await db.SaveChangesAsync();
+
+        return new Result<bool>(true);
     }
 }

@@ -27,6 +27,9 @@ public class Device
 
     public int DeviceTypeId { get; set; }
     public DeviceType DeviceType { get; set; }
+
+    public int UserDeviceId { get; set; }
+    public UserDevice UserDevice { get; set; }
 }
 
 public class DeviceConfiguration : IEntityTypeConfiguration<Device>

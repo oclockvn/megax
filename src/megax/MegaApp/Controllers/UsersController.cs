@@ -48,4 +48,13 @@ public class UsersController : ApplicationControllerBase
         var user = await userService.GetUserAsync(id);
         return Ok(Result<UserModel>.Ok(user));
     }
+
+    [HttpPost("{id}/assign-device/{deviceId}")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AssignDevice(int id, int deviceId)
+    {
+        var result = await userService.AssignDeviceAsync(id, deviceId);
+        return Ok(result);
+    }
 }
