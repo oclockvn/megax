@@ -8,7 +8,6 @@ export interface User {
     identityNumber: string;
 }
 
-export interface UsersSearch {
-    page: number,
-    keyword: string
+export function EmptyUser(): User {
+  return {} as User;
 }
