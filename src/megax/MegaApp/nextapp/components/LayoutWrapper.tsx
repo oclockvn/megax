@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmProvider } from "material-ui-confirm";
 import { Toaster } from "react-hot-toast";
 
 export default function LayoutWrapper({
@@ -9,8 +10,10 @@ export default function LayoutWrapper({
 }) {
   return (
     <>
-      <Toaster />
-      {children}
+      <ConfirmProvider>
+        <Toaster />
+        {children}
+      </ConfirmProvider>
     </>
   );
 }

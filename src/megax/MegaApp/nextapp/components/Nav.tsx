@@ -60,6 +60,14 @@ export default function Nav() {
                   >
                     Users
                   </Button>
+
+                  <Button
+                    variant="outlined"
+                    href="/admin/devices"
+                    className="text-white"
+                  >
+                    Devices
+                  </Button>
                 </div>
                 <div>
                   <span className="mr-1">Hi {username}</span>
