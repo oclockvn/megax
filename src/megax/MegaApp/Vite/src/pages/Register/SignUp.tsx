@@ -33,7 +33,7 @@ function SignUpPage() {
     const res = await appDispatch(
       userSignupThunk({ username, password, name })
     ).unwrap();
-    if (res && res.isSuccess) {
+    if (res && res.success) {
       toast.success(successMessage);
       navigate("/login");
     } else {
