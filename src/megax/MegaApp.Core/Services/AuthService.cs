@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
 
+public record AccountValidationRecord(int Id, int UserId);
+
 public interface IAuthService
 {
-    Task<Result<int>> IsValidAccountAsync(string username, string password);
+    Task<Result<AccountValidationRecord>> IsValidAccountAsync(string username, string password);
     Task<Result<bool>> IsRefreshTokenValid(int accountId, Guid refreshToken, string token);
     Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30);
     Task RevokeRefreshTokenAsync(Guid refreshToken);
@@ -23,19 +25,19 @@ internal class AuthService : IAuthService
 
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
 
-    public async Task<Result<int>> IsValidAccountAsync(string username, string password)
+    public async Task<Result<AccountValidationRecord>> IsValidAccountAsync(string username, string password)
     {
         using var db = UseDb();
         var account = await db.Accounts.Where(u => u.Username == username)
-            .Select(u => new { u.Password, u.UserId })
+            .Select(u => new { u.Password, u.UserId, u.Id })
             .SingleOrDefaultAsync();
 
         if (account == null || !account.Password.IsHashedMatches(password))
         {
-            return Result<int>.Fail(Result.INVALID_USERNAME_OR_PASSWORD);
+            return Result<AccountValidationRecord>.Fail(Result.INVALID_USERNAME_OR_PASSWORD);
         }
 
-        return Result<int>.Ok(account.UserId);
+        return Result<AccountValidationRecord>.Ok(new(account.Id, account.UserId));
     }
 
     public async Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30)
