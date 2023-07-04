@@ -38,7 +38,7 @@ export const signupSlice = createSlice({
         action: PayloadAction<Result<UserSignupResponse>>
       ) => {
         const {
-          payload: { isSuccess },
+          payload: { success: isSuccess },
         } = action;
 
         if (isSuccess) {

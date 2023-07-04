@@ -33,11 +33,11 @@ function SignUpPage() {
     const res = await appDispatch(
       userSignupThunk({ username, password, name })
     ).unwrap();
-    if (res && res.isSuccess) {
-      toast.success(successMessage);
+    if (res && res.success) {
+      toast.success("Register Success!");
       navigate("/login");
     } else {
-      toast.error(errorMessage);
+      toast.error("Failed");
     }
   };
 

@@ -9,6 +9,11 @@ export interface User {
 }
 
 export interface UsersSearch {
-    page: number,
-    keyword: string
+  page: number;
+  keyword: string;
+}
+
+
+export function EmptyUser(): User {
+  return {} as User;
 }

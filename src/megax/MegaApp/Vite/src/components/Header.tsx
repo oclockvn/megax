@@ -18,7 +18,7 @@ function Header() {
   const token = storage.get("token");
   const pages = token
     ? [
-        { id: 1, name: "Users", to: "/users-info" },
+        { id: 1, name: "Users", to: "/users" },
         { id: 2, name: "Profile", to: "/profile" },
         { id: 3, name: "Profile", to: "/profile" },
       ]
