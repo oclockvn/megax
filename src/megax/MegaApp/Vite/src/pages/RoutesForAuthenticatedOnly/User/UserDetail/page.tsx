@@ -7,18 +7,21 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { useEffect } from "react";
-import { fetchUserDetailThunk } from "../../../../store/userDetail.slice";
+import { clearUser, fetchUserDetailThunk } from "../../../../store/user.slice";
 
 function UserDetailPage() {
   const params = useParams();
   const id = params.id;
   console.log("id: ", id);
   const appDispatch = useAppDispatch();
-  const { user } = useAppSelector(state => state.userDetailSlice);
+  const { user } = useAppSelector(state => state.userSlice);
   console.log("user: ", user);
 
   useEffect(() => {
     appDispatch(fetchUserDetailThunk(id));
+    return () => {
+      appDispatch(clearUser());
+    };
   }, [id]);
 
   return (

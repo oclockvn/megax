@@ -4,75 +4,92 @@ import {
   CardContent,
   CardHeader,
   Grid,
-  TextField,
 } from "@mui/material";
 import Button from "@mui/material/Button";
-import { useEffect } from "react";
+import {
+  DatePickerElement,
+  FormContainer,
+  TextFieldElement,
+} from "react-hook-form-mui";
+
+import { User } from "../../../../../lib/models/user.model";
 import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../store/store.hook";
-import { fetchUserDetailThunk } from "../../../../../store/userDetail.slice";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-function UserInfo({ id }: any) {
-  console.log("id: ", id);
-  const appDispatch = useAppDispatch();
-  const { user } = useAppSelector(state => state.userDetailSlice);
+function UserInfo({ user }: { user: User | undefined }) {
   console.log("user: ", user);
 
-  useEffect(() => {
-    appDispatch(fetchUserDetailThunk(id));
-  }, [id]);
+  const appDispatch = useAppDispatch();
+  const { loading, loadingState, error } = useAppSelector(
+    state => state.userSlice
+  );
+
   return (
     <>
-      <Card>
-        <CardHeader title={<h4>User Info</h4>} />
-        <CardContent>
-          <form>
+      <FormContainer values={user}>
+        <Card>
+          <CardHeader title={<h4>User Info</h4>} />
+          <CardContent>
             <Grid sx={{ marginBottom: "1rem" }}>
-              <TextField
+              <TextFieldElement
                 fullWidth
                 label="Full Name"
-                placeholder="{user.fullName}"
-                defaultValue={user.fullName}
+                name="fullName"
+                required
               />
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={6} sx={{ marginBottom: "1rem" }}>
-                <TextField fullWidth label="Email" defaultValue={user.email} />
+                <TextFieldElement
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  required
+                />
               </Grid>
               <Grid item xs={6}>
-                <TextField fullWidth label="Phone" defaultValue={user.phone} />
+                <TextFieldElement
+                  fullWidth
+                  label="Phone"
+                  name="phone"
+                  required
+                />
               </Grid>
             </Grid>
             <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
               <Grid item xs={6}>
-                <TextField
+                <TextFieldElement
                   fullWidth
                   label="Identity Number"
-                  defaultValue={user.identityNumber}
+                  name="identityNumber"
+                  required
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField fullWidth label="D.O.B" defaultValue={user.dob} />
+                <DatePickerElement label="D.O.B" name="dob" />
               </Grid>
             </Grid>
             <Grid sx={{ marginBottom: "1rem" }}>
-              <TextField
+              <TextFieldElement
                 fullWidth
                 label="Address"
-                defaultValue={user.address}
+                name="address"
+                required
               />
             </Grid>
-          </form>
-        </CardContent>
+          </CardContent>
 
-        <CardActions className="bg-slate-100">
-          <Button variant="outlined" color="primary">
-            Save Changes
-          </Button>
-        </CardActions>
-      </Card>
+          <CardActions className="bg-slate-100">
+            <Button variant="outlined" color="primary">
+              Save Changes
+            </Button>
+          </CardActions>
+        </Card>
+      </FormContainer>
     </>
   );
 }
