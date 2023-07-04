@@ -13,12 +13,17 @@ import ListItemText from "@mui/material/ListItemText/ListItemText";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { Device } from "@/lib/models/device.model";
-import { assignDeviceThunk, clearError } from "@/lib/store/userDevice.state";
+import {
+  assignDeviceThunk,
+  clearError,
+  getUserDevicesThunk,
+} from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
+import { UserDeviceModel } from "@/lib/models/user.model";
 
 function UserDeviceAdd({
   userId,
@@ -101,12 +106,20 @@ declare type UserDeviceListProps = {
 
 export default function UserDeviceList({ userId }: UserDeviceListProps) {
   const [isAddVisible, setAddVisible] = useState(false);
+  const appDispatch = useAppDispatch();
+  const { devices, loading } = useAppSelector(s => s.userDevice);
 
   const toggleAddDeviceVisibility = () => {
     setAddVisible(!isAddVisible);
   };
 
-  const DeviceItem = () => (
+  useEffect(() => {
+    if (userId > 0) {
+      appDispatch(getUserDevicesThunk(userId));
+    }
+  }, [userId]);
+
+  const DeviceItem = (d: UserDeviceModel) => (
     <ListItem
       secondaryAction={
         <Button
@@ -122,7 +135,10 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
       <ListItemIcon>
         <ComputerIcon />
       </ListItemIcon>
-      <ListItemText primary="Device" secondary="Asus" />
+      <ListItemText
+        primary={`${d.name}${d.model ? " - " + d.model : ""}`}
+        secondary={d.deviceType}
+      />
     </ListItem>
   );
 
@@ -152,14 +168,18 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
             />
           )}
 
-          <List>
-            {[1, 2, 3, 4].map(i => (
-              <React.Fragment key={i}>
-                <DeviceItem />
-                <Divider />
-              </React.Fragment>
-            ))}
-          </List>
+          {devices?.length ? (
+            <List>
+              {devices.map(i => (
+                <React.Fragment key={i.deviceId}>
+                  <DeviceItem {...i} />
+                  <Divider />
+                </React.Fragment>
+              ))}
+            </List>
+          ) : (
+            <>No devices</>
+          )}
         </CardContent>
         <CardActions></CardActions>
       </Card>

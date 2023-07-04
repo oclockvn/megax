@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
-import { User } from "@/lib/models/user.model";
+import { User, UserDeviceModel } from "@/lib/models/user.model";
 import { qs } from "../util";
 
 export async function fetchUserList(filter: Partial<Filter>) {
@@ -23,5 +23,10 @@ export async function assignDevice(id: number, deviceId: number) {
     `/be/users/${id}/assign-device/${deviceId}`,
     {}
   );
+  return res.data;
+}
+
+export async function getDevices(id: number) {
+  const res = await api.get<UserDeviceModel[]>(`/be/users/${id}/devices`);
   return res.data;
 }
