@@ -34,10 +34,10 @@ function SignUpPage() {
       userSignupThunk({ username, password, name })
     ).unwrap();
     if (res && res.success) {
-      toast.success(successMessage);
+      toast.success("Register Success!");
       navigate("/login");
     } else {
-      toast.error(errorMessage);
+      toast.error("Failed");
     }
   };
 
