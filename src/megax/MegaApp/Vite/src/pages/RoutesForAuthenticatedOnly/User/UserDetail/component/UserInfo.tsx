@@ -1,4 +1,5 @@
 import {
+  Alert,
   Card,
   CardActions,
   CardContent,
@@ -11,29 +12,47 @@ import {
   FormContainer,
   TextFieldElement,
 } from "react-hook-form-mui";
-
+import { toast } from "react-toastify";
 import { User } from "../../../../../lib/models/user.model";
 import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../store/store.hook";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import {
+  clearError,
+  updateUserDetailThunk,
+} from "../../../../../store/user.slice";
 
 function UserInfo({ user }: { user: User | undefined }) {
-  console.log("user: ", user);
-
   const appDispatch = useAppDispatch();
   const { loading, loadingState, error } = useAppSelector(
     state => state.userSlice
   );
 
+  const handleFornmSubmit = async (user: User) => {
+    const res = await appDispatch(updateUserDetailThunk(user)).unwrap();
+    if (res.success) {
+      toast.success("User update successfully!");
+    }
+  };
+
+  const handleClearError = () => {
+    appDispatch(clearError());
+  };
+
   return (
     <>
-      <FormContainer values={user}>
+      <FormContainer values={user} onSuccess={handleFornmSubmit}>
         <Card>
           <CardHeader title={<h4>User Info</h4>} />
           <CardContent>
+            {error && (
+              <Grid sx={{ marginBottom: "1rem" }}>
+                <Alert severity="error" onClose={handleClearError}>
+                  {error}
+                </Alert>
+              </Grid>
+            )}
             <Grid sx={{ marginBottom: "1rem" }}>
               <TextFieldElement
                 fullWidth
@@ -84,7 +103,7 @@ function UserInfo({ user }: { user: User | undefined }) {
           </CardContent>
 
           <CardActions className="bg-slate-100">
-            <Button variant="outlined" color="primary">
+            <Button variant="outlined" color="primary" type="submit">
               Save Changes
             </Button>
           </CardActions>
