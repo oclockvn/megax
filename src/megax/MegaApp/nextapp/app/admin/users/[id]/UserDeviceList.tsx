@@ -20,11 +20,17 @@ import { assignDeviceThunk, clearError } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
 
-function UserDeviceAdd({ userId }: { userId: number }) {
+function UserDeviceAdd({
+  userId,
+  onCancel,
+}: {
+  userId: number;
+  onCancel: () => void;
+}) {
   const appDispatch = useAppDispatch();
   const { pagedDevices } = useAppSelector(s => s.devices);
   const { error, loading, loadingState } = useAppSelector(s => s.userDevice);
-  const [value, setValue] = useState<Device | null>();
+  const [value, setValue] = useState<Device | null>(null);
 
   const handleAssignDevice = async () => {
     const result = await appDispatch(
@@ -69,7 +75,12 @@ function UserDeviceAdd({ userId }: { userId: number }) {
       </div>
 
       <div className="mt-2 flex gap-2">
-        <Button variant="text" className="flex-1" type="button">
+        <Button
+          variant="text"
+          className="flex-1"
+          type="button"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
         <Button
@@ -89,6 +100,12 @@ declare type UserDeviceListProps = {
 };
 
 export default function UserDeviceList({ userId }: UserDeviceListProps) {
+  const [isAddVisible, setAddVisible] = useState(false);
+
+  const toggleAddDeviceVisibility = () => {
+    setAddVisible(!isAddVisible);
+  };
+
   const DeviceItem = () => (
     <ListItem
       secondaryAction={
@@ -120,13 +137,20 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
               variant="contained"
               size="small"
               className="bg-blue-500 text-white hover:!bg-blue-600"
+              onClick={toggleAddDeviceVisibility}
+              disabled={isAddVisible}
             >
               Add Device
             </Button>
           }
         />
         <CardContent className="px-0">
-          <UserDeviceAdd userId={userId} />
+          {isAddVisible && (
+            <UserDeviceAdd
+              userId={userId}
+              onCancel={toggleAddDeviceVisibility}
+            />
+          )}
 
           <List>
             {[1, 2, 3, 4].map(i => (
