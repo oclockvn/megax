@@ -19,7 +19,13 @@ public class DevicesController : ApplicationControllerBase
         this.cache = cache;
     }
 
+    /// <summary>
+    /// Get paged devices, by default take first 100 items
+    /// </summary>
+    /// <param name="filter">The filter, <see cref="Filter" /></param>
+    /// <returns></returns>
     [HttpGet]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(List<DeviceModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDevices([FromQuery] Filter filter)
     {
@@ -27,7 +33,13 @@ public class DevicesController : ApplicationControllerBase
         return Ok(devices);
     }
 
+    /// <summary>
+    /// Get list device types
+    /// </summary>
+    /// <param name="resetCache">if true, reset the cache and fetch the latest data</param>
+    /// <returns></returns>
     [HttpGet("device-types")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(List<DeviceTypeRecord>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDeviceTypes(bool resetCache = false)
     {
@@ -46,7 +58,13 @@ public class DevicesController : ApplicationControllerBase
         return Ok(deviceTypes);
     }
 
+    /// <summary>
+    /// Get device detail by given id
+    /// </summary>
+    /// <param name="id">Device id</param>
+    /// <returns></returns>
     [HttpGet("{id}")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(DeviceModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDevice(int id)
     {
@@ -54,7 +72,14 @@ public class DevicesController : ApplicationControllerBase
         return Ok(device);
     }
 
+    /// <summary>
+    /// Update device detail
+    /// </summary>
+    /// <param name="id">The device id</param>
+    /// <param name="req"><see cref="DeviceModel" /></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(Result<DeviceModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateDevice(int id, DeviceModel req)
@@ -69,7 +94,13 @@ public class DevicesController : ApplicationControllerBase
         return Ok(Result<DeviceModel>.Ok(device));
     }
 
+    /// <summary>
+    /// Delete device by id
+    /// </summary>
+    /// <param name="id">The device id</param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeletedateDevice(int id)
@@ -78,7 +109,13 @@ public class DevicesController : ApplicationControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Add new device
+    /// </summary>
+    /// <param name="req"><see cref="DeviceModel.NewDevice" /></param>
+    /// <returns></returns>
     [HttpPost]
+    [Produces("application/json")]
     [ProducesResponseType(typeof(Result<DeviceModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddDevice(DeviceModel.NewDevice req)
