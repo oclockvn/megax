@@ -27,7 +27,7 @@ const initialState: DevicesState = {
 
 export const fetchDevicesThunk = createAsyncThunk(
   "devices/fetch",
-  async (filter: Partial<Filter>, thunkApi) => {
+  async (filter: Partial<Filter> | undefined, thunkApi) => {
     thunkApi.dispatch(devicesSlice.actions.setLoadingState("Loading..."));
     return await fetchDeviceList(filter);
   }

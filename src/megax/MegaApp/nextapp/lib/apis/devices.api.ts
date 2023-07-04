@@ -3,8 +3,9 @@ import { Filter, PagedResult, Result } from "@/lib/models/common.model";
 import { qs } from "../util";
 import { Device, DeviceType } from "../models/device.model";
 
-export async function fetchDeviceList(filter: Partial<Filter>) {
-  const res = await api.get<PagedResult<Device>>("/be/devices?" + qs(filter));
+export async function fetchDeviceList(filter: Partial<Filter> | undefined) {
+  const query = filter ? qs(filter) : "";
+  const res = await api.get<PagedResult<Device>>("/be/devices?" + query);
   return res.data;
 }
 

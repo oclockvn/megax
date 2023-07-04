@@ -12,6 +12,8 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
 import UserInfo from "./UserInfo";
+import UserDeviceList from "./UserDeviceList";
+import { fetchDevicesThunk } from "@/lib/store/devices.state";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -20,10 +22,11 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
   useEffect(() => {
     appDispatch(fetchUserDetailThunk(params.id));
+    appDispatch(fetchDevicesThunk());
 
-    return () => {
-      appDispatch(clearUser());
-    };
+    // return () => {
+    //   appDispatch(clearUser());
+    // };
   }, [params.id]);
 
   return (
@@ -43,13 +46,13 @@ export default function UserPage({ params }: { params: { id: number } }) {
           </Breadcrumbs>
         </div>
 
-        <Grid container className="p-4">
+        <Grid container spacing={2} className="p-4">
           <Grid item xs={8}>
             <UserInfo user={user} />
           </Grid>
 
           <Grid item xs={4}>
-            Sidebar
+            <UserDeviceList userId={user?.id || 0} />
           </Grid>
         </Grid>
       </div>

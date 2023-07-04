@@ -15,6 +15,7 @@ namespace MegaApp.Core.Db
 
         public DbSet<DeviceType> DeviceTypes { get; set; }
         public DbSet<Device> Devices { get; set; }
+        public DbSet<UserDevice> UserDevices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +26,7 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
             modelBuilder.ApplyConfiguration(new DeviceConfiguration());
             modelBuilder.ApplyConfiguration(new DeviceTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new UserDeviceConfiguration());
         }
     }
 }

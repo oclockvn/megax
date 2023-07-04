@@ -21,6 +21,7 @@ namespace MegaApp.Core
         public static readonly string RECORD_ALREADY_EXIST = "RECORD_ALREADY_EXIST";
         public static readonly string RECORD_DUPLICATED = "RECORD_DUPLICATED";
         public static readonly string RECORD_DOES_NOT_EXIST = "RECORD_DOES_NOT_EXIST";
+        public static readonly string DEVICE_OUT_OF_QTY = "DEVICE_OUT_OF_QTY";
     }
 
     public record Result<T>(T Data) : Result
