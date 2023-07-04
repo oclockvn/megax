@@ -178,7 +178,9 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
               ))}
             </List>
           ) : (
-            <>No devices</>
+            <div className="px-4">
+              <Alert severity="info">No devices yet!</Alert>
+            </div>
           )}
         </CardContent>
         <CardActions></CardActions>
