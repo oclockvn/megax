@@ -83,4 +83,18 @@ public class UsersController : ApplicationControllerBase
         var result = await userService.AssignDeviceAsync(id, deviceId);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Get all devices of user
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <returns></returns>
+    [HttpGet("{id}/devices")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(List<UserDeviceModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUserDevices(int id)
+    {
+        var result = await userService.GetUserDevicesAsync(id);
+        return Ok(result);
+    }
 }

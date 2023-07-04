@@ -16,6 +16,7 @@ public interface IUserService
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 
     Task<Result<bool>> AssignDeviceAsync(int id, int deviceId);
+    Task<List<UserDeviceModel>> GetUserDevicesAsync(int id);
 }
 
 internal class UserService : IUserService
@@ -166,5 +167,13 @@ internal class UserService : IUserService
         await db.SaveChangesAsync();
 
         return new Result<bool>(true);
+    }
+
+    public async Task<List<UserDeviceModel>> GetUserDevicesAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.Devices.Where(d => d.UserDevice.UserId == id)
+            .Select(d => new UserDeviceModel(id, d.Id, d.Name, d.Model, d.DeviceType.Name))
+            .ToListAsync();
     }
 }
