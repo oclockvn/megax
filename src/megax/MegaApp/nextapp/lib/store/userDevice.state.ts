@@ -45,6 +45,19 @@ export const userDeviceSlice = createSlice({
       state.error = undefined;
     },
     reset: state => initialState,
+    addDevice: (state, action: PayloadAction<UserDeviceModel>) => {
+      const {
+        payload: { deviceId },
+      } = action;
+      const exist = state.devices.find(d => d.deviceId === deviceId);
+      if (exist) {
+        state.devices = state.devices.map(d =>
+          d.deviceId === deviceId ? { ...d, qty: d.qty + 1 } : d
+        );
+      } else {
+        state.devices = [action.payload, ...state.devices];
+      }
+    },
   },
   extraReducers(builder) {
     builder
@@ -62,6 +75,7 @@ export const userDeviceSlice = createSlice({
   },
 });
 
-export const { setLoading, clearError, reset } = userDeviceSlice.actions;
+export const { setLoading, clearError, reset, addDevice } =
+  userDeviceSlice.actions;
 
 export default userDeviceSlice.reducer;

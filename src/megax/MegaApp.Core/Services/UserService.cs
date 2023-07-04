@@ -15,7 +15,7 @@ public interface IUserService
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 
-    Task<Result<bool>> AssignDeviceAsync(int id, int deviceId);
+    Task<Result<UserDeviceModel>> AssignDeviceAsync(int id, int deviceId);
     Task<List<UserDeviceModel>> GetUserDevicesAsync(int id);
 }
 
@@ -141,7 +141,7 @@ internal class UserService : IUserService
         return new PagedResult<UserModel>(items, filter.Page, total);
     }
 
-    public async Task<Result<bool>> AssignDeviceAsync(int id, int deviceId)
+    public async Task<Result<UserDeviceModel>> AssignDeviceAsync(int id, int deviceId)
     {
         using var db = UseDb();
         // current qty of this device
@@ -153,7 +153,7 @@ internal class UserService : IUserService
         var borrowedQty = await db.UserDevices.Where(u => u.DeviceId == deviceId).SumAsync(x => x.Qty);
         if (borrowedQty >= deviceQty)
         {
-            return Result<bool>.Fail(Result.DEVICE_OUT_OF_QTY);
+            return Result<UserDeviceModel>.Fail(Result.DEVICE_OUT_OF_QTY);
         }
 
         var userDevice = await db.UserDevices.FirstOrDefaultAsync(x => x.UserId == id && x.DeviceId == deviceId);
@@ -166,14 +166,19 @@ internal class UserService : IUserService
         userDevice.Qty += 1;
         await db.SaveChangesAsync();
 
-        return new Result<bool>(true);
+        var device = await db.Devices
+            .Where(d => d.Id == deviceId)
+            .Select(d => new UserDeviceModel(id, d.Id, d.Name, d.Model, d.DeviceType.Name, d.UserDevice.Qty))
+            .SingleAsync();
+
+        return new Result<UserDeviceModel>(device);
     }
 
     public async Task<List<UserDeviceModel>> GetUserDevicesAsync(int id)
     {
         using var db = UseDb();
         return await db.Devices.Where(d => d.UserDevice.UserId == id)
-            .Select(d => new UserDeviceModel(id, d.Id, d.Name, d.Model, d.DeviceType.Name))
+            .Select(d => new UserDeviceModel(id, d.Id, d.Name, d.Model, d.DeviceType.Name, d.UserDevice.Qty))
             .ToListAsync();
     }
 }

@@ -14,4 +14,5 @@ export interface UserDeviceModel {
   name: string;
   model: string;
   deviceType: string;
+  qty: number;
 }

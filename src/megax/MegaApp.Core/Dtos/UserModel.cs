@@ -80,4 +80,4 @@ public class UserModel
     }
 }
 
-public record UserDeviceModel(int UserId, int DeviceId, string Name, string Model, string DeviceType);
+public record UserDeviceModel(int UserId, int DeviceId, string Name, string Model, string DeviceType, int Qty);

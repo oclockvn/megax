@@ -20,17 +20,22 @@ import {
   assignDeviceThunk,
   clearError,
   getUserDevicesThunk,
+  addDevice as addUserDevice,
 } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
 import { UserDeviceModel } from "@/lib/models/user.model";
+import { assignDevice } from "@/lib/apis/user.api";
+import Badge from "@mui/material/Badge";
 
 function UserDeviceAdd({
   userId,
   onCancel,
+  onAdded,
 }: {
   userId: number;
   onCancel: () => void;
+  onAdded: (d: UserDeviceModel) => void;
 }) {
   const appDispatch = useAppDispatch();
   const { pagedDevices } = useAppSelector(s => s.devices);
@@ -41,7 +46,11 @@ function UserDeviceAdd({
     const result = await appDispatch(
       assignDeviceThunk({ userId, deviceId: Number(value?.id) })
     ).unwrap();
-    result?.data === true && toast.success("Successfully assign");
+
+    if (result?.data) {
+      toast.success("Successfully assign");
+      onAdded(result.data);
+    }
   };
 
   const handleCloseError = () => {
@@ -119,6 +128,10 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     }
   }, [userId]);
 
+  const onDeviceAdded = (d: UserDeviceModel) => {
+    appDispatch(addUserDevice(d));
+  };
+
   const DeviceItem = (d: UserDeviceModel) => (
     <ListItem
       secondaryAction={
@@ -133,7 +146,15 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
       }
     >
       <ListItemIcon>
-        <ComputerIcon />
+        {d.qty > 1 ? (
+          <>
+            <Badge badgeContent={d.qty} color="primary">
+              <ComputerIcon />
+            </Badge>
+          </>
+        ) : (
+          <ComputerIcon />
+        )}
       </ListItemIcon>
       <ListItemText
         primary={`${d.name}${d.model ? " - " + d.model : ""}`}
@@ -165,6 +186,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
             <UserDeviceAdd
               userId={userId}
               onCancel={toggleAddDeviceVisibility}
+              onAdded={onDeviceAdded}
             />
           )}
 

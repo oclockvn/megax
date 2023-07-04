@@ -19,7 +19,7 @@ export async function updateUserDetail(user: User) {
 }
 
 export async function assignDevice(id: number, deviceId: number) {
-  const res = await api.post<Result<boolean>>(
+  const res = await api.post<Result<UserDeviceModel>>(
     `/be/users/${id}/assign-device/${deviceId}`,
     {}
   );
