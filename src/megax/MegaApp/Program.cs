@@ -26,6 +26,24 @@ builder.Services
     })
     .AddGeneratorServices()
     .AddInfrastructureServices(builder.Configuration)
+    .AddSwaggerGen(o =>
+    {
+        o.SwaggerDoc("v1", new()
+        {
+            Version = "v1",
+            Contact = new()
+            {
+                Name = "Quang Phan",
+                Email = "oclockvn@gmailcom",
+            },
+            Description = "API for megax",
+            License = new() { },
+            Title = "MegaX",
+        });
+
+        var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    })
     ;
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -38,6 +56,11 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
     app.UseHttpsRedirection(); // for client app
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 // app.UseHttpsRedirection();

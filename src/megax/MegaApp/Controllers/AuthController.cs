@@ -45,6 +45,7 @@ namespace MegaApp.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(Result<int>), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
         public async Task<IActionResult> Register(UserRegister userRegister)
         {
             if (!ModelState.IsValid)
@@ -64,10 +65,16 @@ namespace MegaApp.Controllers
             return Ok(userResult);
         }
 
+        /// <summary>
+        /// Sign in using username and password
+        /// </summary>
+        /// <param name="req"><see cref="UserModel.UserLogin" /></param>
+        /// <returns></returns>
         [HttpPost("user-signin")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(Result<SignInResponse>), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
         public async Task<IActionResult> UserSignIn(UserModel.UserLogin req)
         {
             if (!ModelState.IsValid)
@@ -102,6 +109,7 @@ namespace MegaApp.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(Result<SignInResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Produces("application/json")]
         public async Task<IActionResult> GoogleSignIn(GoogleToken googleAuth)
         {
             var (valid, claims) = await googleAuthenticateClient.ValidateAsync(googleAuth.IdToken);
@@ -134,9 +142,15 @@ namespace MegaApp.Controllers
             return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken)));
         }
 
+        /// <summary>
+        /// Create new refresh token by the old one
+        /// </summary>
+        /// <param name="request"><see cref="TokenRefreshRequest" /></param>
+        /// <returns></returns>
         [HttpPost("refresh-token")]
         [ProducesResponseType(typeof(Result<SignInResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
         public async Task<IActionResult> RefreshToken(TokenRefreshRequest request)
         {
             if (!ModelState.IsValid)
