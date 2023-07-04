@@ -27,8 +27,8 @@ function UserDeviceAdd() {
           autoComplete
           options={pagedDevices.items}
           renderInput={params => <TextField {...params} label="Device" />}
-          renderOption={(ele, o) => (
-            <li {...ele} key={o.id}>
+          renderOption={(attrs, o) => (
+            <li {...attrs} key={o.id}>
               {o.name}
               {o.model ? " - " + o.model : ""}
             </li>
@@ -56,9 +56,14 @@ export default function UserDeviceList() {
   const DeviceItem = () => (
     <ListItem
       secondaryAction={
-        <IconButton edge="end" aria-label="delete">
-          <CloseIcon />
-        </IconButton>
+        <Button
+          title="Return device to admin"
+          type="button"
+          variant="text"
+          size="small"
+        >
+          Return
+        </Button>
       }
     >
       <ListItemIcon>
