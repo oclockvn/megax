@@ -38,12 +38,11 @@ function UserListPage() {
   ];
 
   const appDispatch = useAppDispatch();
-  const { isLoading, pagedUsers } = useAppSelector(state => state.userSlice);
+  const { loading, pagedUsers } = useAppSelector(state => state.userSlice);
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
     pageSize: 100,
   });
-  console.log("pagedUsers: ", pagedUsers);
 
   const pagingModel = {
     page: filter.page || 0,
@@ -109,7 +108,7 @@ function UserListPage() {
         pageSizeOptions={[100]}
         sortingMode="server"
         onSortModelChange={onSorting}
-        loading={isLoading}
+        loading={loading}
         className="min-h-[400px]"
       />
     </>

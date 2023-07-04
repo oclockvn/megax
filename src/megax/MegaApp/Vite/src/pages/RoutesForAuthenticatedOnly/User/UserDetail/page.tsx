@@ -12,10 +12,8 @@ import { clearUser, fetchUserDetailThunk } from "../../../../store/user.slice";
 function UserDetailPage() {
   const params = useParams();
   const id = params.id;
-  console.log("id: ", id);
   const appDispatch = useAppDispatch();
   const { user } = useAppSelector(state => state.userSlice);
-  console.log("user: ", user);
 
   useEffect(() => {
     appDispatch(fetchUserDetailThunk(id));
