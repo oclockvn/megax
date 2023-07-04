@@ -17,3 +17,11 @@ export async function updateUserDetail(user: User) {
   const res = await api.post<Result<User>>("/be/users/" + user.id, user);
   return res.data;
 }
+
+export async function assignDevice(id: number, deviceId: number) {
+  const res = await api.post<Result<boolean>>(
+    `/be/users/${id}/assign-device/${deviceId}`,
+    {}
+  );
+  return res.data;
+}

@@ -52,7 +52,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
           </Grid>
 
           <Grid item xs={4}>
-            <UserDeviceList />
+            <UserDeviceList userId={user?.id || 0} />
           </Grid>
         </Grid>
       </div>
