@@ -164,6 +164,12 @@ internal class UserService : IUserService
         }
 
         userDevice.Qty += 1;
+        userDevice.Histories.Add(new UserDeviceHistory
+        {
+            AssignAt = DateTimeOffset.Now, // set this if we want to have different date, just leave it for now
+            CreatedAt = DateTimeOffset.Now
+        });
+
         await db.SaveChangesAsync();
 
         var device = await db.UserDevices
