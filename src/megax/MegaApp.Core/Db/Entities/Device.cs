@@ -24,6 +24,7 @@ public class Device
     [MaxLength(250)]
     public string Model { get; set; }
     public int Qty { get; set; }
+    public bool Disabled { get; set; }
 
     public int DeviceTypeId { get; set; }
     public DeviceType DeviceType { get; set; }

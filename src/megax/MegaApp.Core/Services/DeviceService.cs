@@ -156,8 +156,13 @@ internal class DeviceService : IDeviceService
             return Result<bool>.Fail(Result.RECORD_DOES_NOT_EXIST);
         }
 
-        // undone: validate user devices
-        db.Devices.Remove(device);
+        var hasOwner = await db.UserDevices.AnyAsync(d => d.DeviceId == id && d.Qty > 0);
+        if (hasOwner)
+        {
+            return Result<bool>.Fail(Result.DEVICE_IS_BEING_USED);
+        }
+
+        device.Disabled = true;
         await db.SaveChangesAsync();
 
         return Result<bool>.Ok(true);
