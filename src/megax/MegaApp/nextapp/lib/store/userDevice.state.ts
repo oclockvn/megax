@@ -54,15 +54,6 @@ export const userDeviceSlice = createSlice({
       state.error = undefined;
     },
     reset: state => initialState,
-    // addDevice: (state, action: PayloadAction<UserDeviceModel>) => {
-    //   const { deviceId } = action.payload;
-    //   const exist = state.devices.find(d => d.deviceId === deviceId);
-    //   if (exist) {
-    //     exist.qty += 1;
-    //   } else {
-    //     state.devices = [action.payload, ...state.devices];
-    //   }
-    // },
   },
   extraReducers(builder) {
     builder
@@ -95,12 +86,16 @@ export const userDeviceSlice = createSlice({
           : `Coundn't return device. Error code: ${code}`;
 
         if (data) {
-          const device = state.devices.find(
-            d => d.deviceId === action.meta.arg.deviceId
-          );
+          const deviceId = action.meta.arg.deviceId;
+          const device = state.devices.find(d => d.deviceId === deviceId);
 
           if (device) {
             device.qty -= 1;
+            if (device.qty === 0) {
+              state.devices = state.devices.filter(
+                d => d.deviceId !== deviceId
+              );
+            }
           } else {
             throw new Error("something went wrong");
           }

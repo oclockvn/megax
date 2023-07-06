@@ -104,7 +104,7 @@ public class UsersController : ApplicationControllerBase
     /// <param name="id">The user id</param>
     /// <param name="deviceId">The device id</param>
     /// <returns></returns>
-    [HttpDelete("{id}/return-device/{deviceId}")]
+    [HttpPost("{id}/return-device/{deviceId}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(List<bool>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ReturnDeviceAsync(int id, int deviceId)
