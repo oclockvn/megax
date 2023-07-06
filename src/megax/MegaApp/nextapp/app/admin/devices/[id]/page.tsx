@@ -15,6 +15,7 @@ import {
   fetchDeviceTypesThunk,
 } from "@/lib/store/devices.state";
 import DeviceInfo from "../DeviceInfo";
+import DeviceOwnerList from "../DeviceOwnerList";
 
 export default function DevicePage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -48,13 +49,13 @@ export default function DevicePage({ params }: { params: { id: number } }) {
           </Breadcrumbs>
         </div>
 
-        <Grid container className="p-4">
+        <Grid container spacing={2} className="p-4">
           <Grid item xs={8}>
             <DeviceInfo device={currentDevice} onDeleted={onDeviceDeleted} />
           </Grid>
 
           <Grid item xs={4}>
-            Sidebar
+            {params.id > 0 && <DeviceOwnerList deviceId={params.id} />}
           </Grid>
         </Grid>
       </div>
