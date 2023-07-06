@@ -79,3 +79,5 @@ public class UserModel
         public string Password { get; set; }
     }
 }
+
+public record UserDeviceModel(int UserId, int DeviceId, string Name, string Model, string DeviceType, int Qty);

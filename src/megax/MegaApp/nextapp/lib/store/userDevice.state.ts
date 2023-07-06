@@ -1,20 +1,40 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { assignDevice } from "../apis/user.api";
+import { assignDevice, getDevices, returnDevice } from "../apis/user.api";
+import { UserDeviceModel } from "../models/user.model";
 
 export interface UserDeviceState {
   loading: boolean;
   loadingState?: string;
   error?: string;
+  devices: UserDeviceModel[];
 }
 
 const initialState: UserDeviceState = {
   loading: false,
+  devices: [],
 };
 
 export const assignDeviceThunk = createAsyncThunk(
   "users/assign-device",
   async (req: { userId: number; deviceId: number }, thunkApi) => {
+    thunkApi.dispatch(setLoading({ loading: true }));
     return await assignDevice(req.userId, req.deviceId);
+  }
+);
+
+export const returnDeviceThunk = createAsyncThunk(
+  "users/return-device",
+  async (req: { userId: number; deviceId: number }, thunkApi) => {
+    thunkApi.dispatch(setLoading({ loading: true }));
+    return await returnDevice(req.userId, req.deviceId);
+  }
+);
+
+export const getUserDevicesThunk = createAsyncThunk(
+  "users/devices",
+  async (id: number, thunkApi) => {
+    thunkApi.dispatch(setLoading({ loading: true }));
+    return await getDevices(id);
   }
 );
 
@@ -36,13 +56,51 @@ export const userDeviceSlice = createSlice({
     reset: state => initialState,
   },
   extraReducers(builder) {
-    builder.addCase(assignDeviceThunk.fulfilled, (state, action) => {
-      state.loading = false;
-      state.loadingState = undefined;
-      state.error = action.payload.success
-        ? undefined
-        : `Couldn't add device. Error code: ${action.payload.code}`;
-    });
+    builder
+      .addCase(assignDeviceThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loadingState = undefined;
+        const { success, data, code } = action.payload;
+        state.error = success
+          ? undefined
+          : `Couldn't add device. Error code: ${code}`;
+
+        if (success) {
+          const exist = state.devices.find(d => d.deviceId === data.deviceId);
+          if (exist) {
+            exist.qty += 1;
+          } else {
+            state.devices = [data, ...state.devices];
+          }
+        }
+      })
+      .addCase(getUserDevicesThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.devices = action.payload || [];
+      })
+      .addCase(returnDeviceThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        const { success, data, code } = action.payload;
+        state.error = success
+          ? undefined
+          : `Coundn't return device. Error code: ${code}`;
+
+        if (data) {
+          const deviceId = action.meta.arg.deviceId;
+          const device = state.devices.find(d => d.deviceId === deviceId);
+
+          if (device) {
+            device.qty -= 1;
+            if (device.qty === 0) {
+              state.devices = state.devices.filter(
+                d => d.deviceId !== deviceId
+              );
+            }
+          } else {
+            throw new Error("something went wrong");
+          }
+        }
+      });
   },
 });
 

@@ -3,6 +3,7 @@ using MegaApp.Core.Dtos;
 using MegaApp.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
+using MegaApp.Core.Exceptions;
 
 namespace MegaApp.Core.Services;
 
@@ -15,7 +16,9 @@ public interface IUserService
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 
-    Task<Result<bool>> AssignDeviceAsync(int id, int deviceId);
+    Task<Result<UserDeviceModel>> AssignDeviceAsync(int id, int deviceId);
+    Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId);
+    Task<List<UserDeviceModel>> GetUserDevicesAsync(int id);
 }
 
 internal class UserService : IUserService
@@ -140,7 +143,7 @@ internal class UserService : IUserService
         return new PagedResult<UserModel>(items, filter.Page, total);
     }
 
-    public async Task<Result<bool>> AssignDeviceAsync(int id, int deviceId)
+    public async Task<Result<UserDeviceModel>> AssignDeviceAsync(int id, int deviceId)
     {
         using var db = UseDb();
         // current qty of this device
@@ -152,7 +155,7 @@ internal class UserService : IUserService
         var borrowedQty = await db.UserDevices.Where(u => u.DeviceId == deviceId).SumAsync(x => x.Qty);
         if (borrowedQty >= deviceQty)
         {
-            return Result<bool>.Fail(Result.DEVICE_OUT_OF_QTY);
+            return Result<UserDeviceModel>.Fail(Result.DEVICE_OUT_OF_QTY);
         }
 
         var userDevice = await db.UserDevices.FirstOrDefaultAsync(x => x.UserId == id && x.DeviceId == deviceId);
@@ -163,8 +166,60 @@ internal class UserService : IUserService
         }
 
         userDevice.Qty += 1;
+        userDevice.Histories.Add(new UserDeviceHistory
+        {
+            AssignAt = DateTimeOffset.Now, // set this if we want to have different date, just leave it for now
+            CreatedAt = DateTimeOffset.Now,
+            Qty = 1,
+        });
+
         await db.SaveChangesAsync();
 
+        var device = await db.UserDevices
+            .Where(d => d.UserId == id && d.DeviceId == deviceId)
+            .Select(d => new UserDeviceModel(id, d.DeviceId, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
+            .SingleAsync();
+
+        return new Result<UserDeviceModel>(device);
+    }
+
+    public async Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId)
+    {
+        using var db = UseDb();
+        // current qty of this device
+        var deviceQty = await db.Devices.Where(d => d.Id == deviceId)
+            .Select(x => x.Qty)
+            .FirstOrDefaultAsync();
+
+        var userDevice = await db.UserDevices.FirstOrDefaultAsync(x => x.UserId == id && x.DeviceId == deviceId);
+        if (userDevice == null)
+        {
+            throw new EntityNotFoundException($"No device found by id {deviceId}");
+        }
+
+        if (userDevice.Qty < 1)
+        {
+            throw new BusinessRuleViolationException("This shit never could happen");
+        }
+
+        userDevice.Qty -= 1;
+        userDevice.Histories.Add(new UserDeviceHistory
+        {
+            AssignAt = DateTimeOffset.Now, // set this if we want to have different date, just leave it for now
+            CreatedAt = DateTimeOffset.Now,
+            Qty = -1,
+        });
+
+        await db.SaveChangesAsync();
         return new Result<bool>(true);
+    }
+
+    public async Task<List<UserDeviceModel>> GetUserDevicesAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.UserDevices.Where(d => d.UserId == id && d.Qty > 0)
+            .OrderByDescending(x => x.Id)
+            .Select(d => new UserDeviceModel(id, d.DeviceId, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
+            .ToListAsync();
     }
 }
