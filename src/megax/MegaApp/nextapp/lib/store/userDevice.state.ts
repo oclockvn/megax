@@ -46,14 +46,10 @@ export const userDeviceSlice = createSlice({
     },
     reset: state => initialState,
     addDevice: (state, action: PayloadAction<UserDeviceModel>) => {
-      const {
-        payload: { deviceId },
-      } = action;
+      const { deviceId } = action.payload;
       const exist = state.devices.find(d => d.deviceId === deviceId);
       if (exist) {
-        state.devices = state.devices.map(d =>
-          d.deviceId === deviceId ? { ...d, qty: d.qty + 1 } : d
-        );
+        exist.qty += 1;
       } else {
         state.devices = [action.payload, ...state.devices];
       }

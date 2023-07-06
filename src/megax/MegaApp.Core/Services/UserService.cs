@@ -178,6 +178,7 @@ internal class UserService : IUserService
     {
         using var db = UseDb();
         return await db.UserDevices.Where(d => d.UserId == id)
+            .OrderByDescending(x => x.Id)
             .Select(d => new UserDeviceModel(id, d.Id, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
             .ToListAsync();
     }
