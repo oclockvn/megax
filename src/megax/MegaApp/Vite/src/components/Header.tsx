@@ -19,7 +19,7 @@ function Header() {
   const pages = token
     ? [
         { id: 1, name: "Users", to: "/users" },
-        { id: 2, name: "Profile", to: "/profile" },
+        { id: 2, name: "Device", to: "/devices" },
         { id: 3, name: "Profile", to: "/profile" },
       ]
     : [

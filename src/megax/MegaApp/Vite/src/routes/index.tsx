@@ -8,7 +8,8 @@ import storage from "../lib/storage";
 import SignUpPage from "../pages/Register/SignUp";
 import UserListPage from "../pages/RoutesForAuthenticatedOnly/User/UserList/page";
 import UserDetailPage from "../pages/RoutesForAuthenticatedOnly/User/UserDetail/page";
-
+import DeviceListPage from "../pages/RoutesForAuthenticatedOnly/Device/DeviceList/page";
+import DeviceDetailPage from "../pages/RoutesForAuthenticatedOnly/Device/DeviceDetail/page";
 
 const Routes = () => {
   const token = storage.get("token");
@@ -45,8 +46,12 @@ const Routes = () => {
         },
 
         {
-          path: "/profile",
-          element: <div>Profile</div>,
+          path: "/devices",
+          element: <HomeTemplate Component={DeviceListPage} />,
+        },
+        {
+          path: "/devices/:id",
+          element: <HomeTemplate Component={DeviceDetailPage} />,
         },
       ],
     },
