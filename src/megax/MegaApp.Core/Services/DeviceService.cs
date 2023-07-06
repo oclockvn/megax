@@ -14,6 +14,7 @@ public interface IDeviceService
     Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice user);
     Task<Result<int>> UpdateDeviceAsync(int id, DeviceModel req);
     Task<Result<bool>> DeleteDeviceAsync(int id);
+    Task<List<DeviceOwnerRecord>> GetDeviceOwnersAsync(int id);
 }
 
 internal class DeviceService : IDeviceService
@@ -160,5 +161,13 @@ internal class DeviceService : IDeviceService
         await db.SaveChangesAsync();
 
         return Result<bool>.Ok(true);
+    }
+
+    public async Task<List<DeviceOwnerRecord>> GetDeviceOwnersAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.UserDevices.Where(d => d.DeviceId == id)
+            .Select(d => new DeviceOwnerRecord(d.UserId, d.User.FullName, d.User.Email, d.Qty))
+            .ToListAsync();
     }
 }

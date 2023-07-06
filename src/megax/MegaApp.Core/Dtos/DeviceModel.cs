@@ -33,3 +33,5 @@ public class DeviceModel
 }
 
 public record DeviceTypeRecord(int Id, string Name);
+
+public record DeviceOwnerRecord(int UserId, string FullName, string Email, int Qty);
