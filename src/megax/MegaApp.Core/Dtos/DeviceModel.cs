@@ -14,6 +14,7 @@ public class DeviceModel
     public int Qty { get; set; }
     public int DeviceTypeId { get; set; }
     public string DeviceType { get; set; }
+    public bool Disabled { get; set; }
 
     public class NewDevice
     {

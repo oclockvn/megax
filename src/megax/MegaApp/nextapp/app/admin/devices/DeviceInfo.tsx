@@ -58,6 +58,8 @@ export default function DeviceInfo({
     values: device,
   });
 
+  const disabled = device?.disabled === true;
+
   const onButtonSubmit = async (req: Device, redirect: boolean = false) => {
     let id = 0;
     if (isUpdate) {
@@ -90,14 +92,15 @@ export default function DeviceInfo({
     const result = await appDispatch(deleteDeviceThunk(id)).unwrap();
 
     if (result.success) {
-      toast.success("Successfully deleted");
+      toast.success("Successfully disabled");
       onDeleted && onDeleted();
     }
   };
 
   const confirmDelete = () => {
     confirm({
-      description: "Delete this device?",
+      description: "Disable this device?",
+      dialogProps: { maxWidth: "xs" },
     })
       .then(handleDeleteDevice)
       .catch(() => {
@@ -188,17 +191,30 @@ export default function DeviceInfo({
                   {loading && <div className="ml-4">{loadingState}</div>}
                 </Grid>
                 <Grid item>
-                  <Button
-                    color="error"
-                    variant="outlined"
-                    type="button"
-                    className="bg-red-500 text-white hover:!bg-red-600"
-                    startIcon={<ClearIcon />}
-                    onClick={confirmDelete}
-                    disabled={loading}
-                  >
-                    Delete
-                  </Button>
+                  {disabled ? (
+                    <Button
+                      color="success"
+                      variant="outlined"
+                      type="button"
+                      className="bg-green-500 text-white hover:!bg-green-600"
+                      onClick={confirmDelete}
+                      disabled={loading}
+                    >
+                      Enable
+                    </Button>
+                  ) : (
+                    <Button
+                      color="error"
+                      variant="outlined"
+                      type="button"
+                      className="bg-red-500 text-white hover:!bg-red-600"
+                      startIcon={<ClearIcon />}
+                      onClick={confirmDelete}
+                      disabled={loading}
+                    >
+                      Disable
+                    </Button>
+                  )}
                 </Grid>
               </Grid>
             )}

@@ -4,6 +4,7 @@ export interface Device {
   model: string;
   deviceCode: string;
   deviceTypeId: number;
+  disabled: boolean;
 }
 
 export interface DeviceType {
