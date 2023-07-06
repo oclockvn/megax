@@ -47,11 +47,15 @@ export default function UserPage({ params }: { params: { id: number } }) {
         </div>
 
         <Grid container spacing={2} className="p-4">
-          <Grid item xs={8}>
+          <Grid item xs={8} md={6}>
             <UserInfo user={user} />
           </Grid>
 
-          <Grid item xs={4}>
+          <Grid item xs={4} md={3}>
+            Leave
+          </Grid>
+
+          <Grid item xs={6} sm={6} md={3}>
             <UserDeviceList userId={user?.id || 0} />
           </Grid>
         </Grid>

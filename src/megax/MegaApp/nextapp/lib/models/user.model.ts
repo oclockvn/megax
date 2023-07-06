@@ -7,3 +7,12 @@ export interface User {
   phone: string;
   identityNumber: string;
 }
+
+export interface UserDeviceModel {
+  id: number;
+  deviceId: number;
+  name: string;
+  model: string;
+  deviceType: string;
+  qty: number;
+}

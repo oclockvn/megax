@@ -4,6 +4,7 @@ using MegaApp.Core.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MegaApp.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230705105602_UpdateUserDeviceRelationship")]
+    partial class UpdateUserDeviceRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -273,36 +276,6 @@ namespace MegaApp.Core.Migrations
                     b.ToTable("UserDevices");
                 });
 
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.UserDeviceHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("AssignAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Qty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserDeviceId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserDeviceId");
-
-                    b.ToTable("UserDeviceHistories");
-                });
-
             modelBuilder.Entity("MegaApp.Core.Db.Entities.Account", b =>
                 {
                     b.HasOne("MegaApp.Core.Db.Entities.User", "User")
@@ -355,17 +328,6 @@ namespace MegaApp.Core.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.UserDeviceHistory", b =>
-                {
-                    b.HasOne("MegaApp.Core.Db.Entities.UserDevice", "UserDevice")
-                        .WithMany("Histories")
-                        .HasForeignKey("UserDeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserDevice");
-                });
-
             modelBuilder.Entity("MegaApp.Core.Db.Entities.Account", b =>
                 {
                     b.Navigation("RefreshTokens");
@@ -386,11 +348,6 @@ namespace MegaApp.Core.Migrations
                     b.Navigation("Accounts");
 
                     b.Navigation("Devices");
-                });
-
-            modelBuilder.Entity("MegaApp.Core.Db.Entities.UserDevice", b =>
-                {
-                    b.Navigation("Histories");
                 });
 #pragma warning restore 612, 618
         }

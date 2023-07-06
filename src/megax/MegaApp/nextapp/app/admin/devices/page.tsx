@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
+import LinearProgress from "@mui/material/LinearProgress";
 
 export default function DeviceListPage() {
   const pathname = usePathname();
@@ -121,6 +122,7 @@ export default function DeviceListPage() {
         pagination
         slots={{
           pagination: CustomPagination,
+          loadingOverlay: LinearProgress,
         }}
         rowCount={pagedDevices.total}
         paginationMode="server"

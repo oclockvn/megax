@@ -28,8 +28,7 @@ public class Device
     public int DeviceTypeId { get; set; }
     public DeviceType DeviceType { get; set; }
 
-    public int UserDeviceId { get; set; }
-    public UserDevice UserDevice { get; set; }
+    public List<UserDevice> UserDevices { get; set; } = new();
 }
 
 public class DeviceConfiguration : IEntityTypeConfiguration<Device>
