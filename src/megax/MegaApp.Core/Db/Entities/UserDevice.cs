@@ -29,6 +29,8 @@ public class UserDeviceHistory : ICreatedByEntity
 
     public int? CreatedBy { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+
+    public int Qty { get; set; }
 }
 
 public class UserDeviceConfiguration : IEntityTypeConfiguration<UserDevice>

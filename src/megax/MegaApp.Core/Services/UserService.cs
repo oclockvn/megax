@@ -3,6 +3,7 @@ using MegaApp.Core.Dtos;
 using MegaApp.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
+using MegaApp.Core.Exceptions;
 
 namespace MegaApp.Core.Services;
 
@@ -16,6 +17,7 @@ public interface IUserService
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 
     Task<Result<UserDeviceModel>> AssignDeviceAsync(int id, int deviceId);
+    Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId);
     Task<List<UserDeviceModel>> GetUserDevicesAsync(int id);
 }
 
@@ -167,7 +169,8 @@ internal class UserService : IUserService
         userDevice.Histories.Add(new UserDeviceHistory
         {
             AssignAt = DateTimeOffset.Now, // set this if we want to have different date, just leave it for now
-            CreatedAt = DateTimeOffset.Now
+            CreatedAt = DateTimeOffset.Now,
+            Qty = 1,
         });
 
         await db.SaveChangesAsync();
@@ -178,6 +181,37 @@ internal class UserService : IUserService
             .SingleAsync();
 
         return new Result<UserDeviceModel>(device);
+    }
+
+    public async Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId)
+    {
+        using var db = UseDb();
+        // current qty of this device
+        var deviceQty = await db.Devices.Where(d => d.Id == deviceId)
+            .Select(x => x.Qty)
+            .FirstOrDefaultAsync();
+
+        var userDevice = await db.UserDevices.FirstOrDefaultAsync(x => x.UserId == id && x.DeviceId == deviceId);
+        if (userDevice == null)
+        {
+            throw new EntityNotFoundException($"No device found by id {deviceId}");
+        }
+
+        if (userDevice.Qty < 1)
+        {
+            throw new BusinessRuleViolationException("This shit never could happen");
+        }
+
+        userDevice.Qty -= 1;
+        userDevice.Histories.Add(new UserDeviceHistory
+        {
+            AssignAt = DateTimeOffset.Now, // set this if we want to have different date, just leave it for now
+            CreatedAt = DateTimeOffset.Now,
+            Qty = -1,
+        });
+
+        await db.SaveChangesAsync();
+        return new Result<bool>(true);
     }
 
     public async Task<List<UserDeviceModel>> GetUserDevicesAsync(int id)

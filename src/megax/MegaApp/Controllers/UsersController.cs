@@ -97,4 +97,19 @@ public class UsersController : ApplicationControllerBase
         var result = await userService.GetUserDevicesAsync(id);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Return device to company
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <param name="deviceId">The device id</param>
+    /// <returns></returns>
+    [HttpDelete("{id}/return-device/{deviceId}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(List<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ReturnDeviceAsync(int id, int deviceId)
+    {
+        var result = await userService.ReturnDeviceAsync(id, deviceId);
+        return Ok(result);
+    }
 }

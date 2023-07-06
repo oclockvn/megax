@@ -20,7 +20,8 @@ import {
   assignDeviceThunk,
   clearError,
   getUserDevicesThunk,
-  addDevice as addUserDevice,
+  returnDeviceThunk,
+  // addDevice as addUserDevice,
 } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
@@ -31,15 +32,15 @@ import LinearProgress from "@mui/material/LinearProgress";
 function UserDeviceAdd({
   userId,
   onCancel,
-  onAdded,
-}: {
+}: // onAdded,
+{
   userId: number;
   onCancel: () => void;
-  onAdded: (d: UserDeviceModel) => void;
+  // onAdded: (d: UserDeviceModel) => void;
 }) {
   const appDispatch = useAppDispatch();
   const { pagedDevices } = useAppSelector(s => s.devices);
-  const { error, loading, loadingState } = useAppSelector(s => s.userDevice);
+  const { error } = useAppSelector(s => s.userDevice);
   const [value, setValue] = useState<Device | null>(null);
 
   const handleAssignDevice = async () => {
@@ -49,7 +50,7 @@ function UserDeviceAdd({
 
     if (result?.data) {
       toast.success("Successfully assign");
-      onAdded(result.data);
+      // onAdded(result.data);
     }
   };
 
@@ -123,15 +124,22 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     setAddVisible(!isAddVisible);
   };
 
+  const handleReturn = async (deviceId: number) => {
+    const result = await appDispatch(
+      returnDeviceThunk({ userId, deviceId })
+    ).unwrap();
+    result?.data === true && toast.success(`Successfully returned`);
+  };
+
   useEffect(() => {
     if (userId > 0) {
       appDispatch(getUserDevicesThunk(userId));
     }
   }, [userId]);
 
-  const onDeviceAdded = (d: UserDeviceModel) => {
-    appDispatch(addUserDevice(d));
-  };
+  // const onDeviceAdded = (d: UserDeviceModel) => {
+  //   appDispatch(addUserDevice(d));
+  // };
 
   const DeviceItem = (d: UserDeviceModel) => (
     <ListItem
@@ -141,6 +149,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
           type="button"
           variant="text"
           size="small"
+          onClick={() => handleReturn(d.deviceId)}
         >
           Return
         </Button>
@@ -195,7 +204,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
             <UserDeviceAdd
               userId={userId}
               onCancel={toggleAddDeviceVisibility}
-              onAdded={onDeviceAdded}
+              // onAdded={onDeviceAdded}
             />
           )}
 

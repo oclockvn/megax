@@ -43,3 +43,24 @@ export async function getDevices(id: number) {
   const res = await api.get<UserDeviceModel[]>(`/be/users/${id}/devices`);
   return res.data;
 }
+
+export async function returnDevice(id: number, deviceId: number) {
+  try {
+    const res = await api.post<Result<boolean>>(
+      `/be/users/${id}/return-device/${deviceId}`,
+      {}
+    );
+    return res.data;
+  } catch (ex) {
+    let msg =
+      ex != null && ex instanceof AxiosError
+        ? ex.message
+        : "SOMETHING WENT WRONG";
+
+    return {
+      code: msg,
+      success: false,
+      data: false,
+    } as Result<boolean>;
+  }
+}
