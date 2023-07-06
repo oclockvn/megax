@@ -21,8 +21,8 @@ public class UserDeviceConfiguration : IEntityTypeConfiguration<UserDevice>
     public void Configure(EntityTypeBuilder<UserDevice> builder)
     {
         builder.HasOne(x => x.Device)
-            .WithOne(x => x.UserDevice)
-            .HasForeignKey<UserDevice>(x => x.DeviceId);
+            .WithMany(x => x.UserDevices)
+            .HasForeignKey(x => x.DeviceId);
 
         builder.HasOne(x => x.User)
             .WithMany(u => u.Devices)

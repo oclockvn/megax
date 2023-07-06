@@ -166,9 +166,9 @@ internal class UserService : IUserService
         userDevice.Qty += 1;
         await db.SaveChangesAsync();
 
-        var device = await db.Devices
-            .Where(d => d.Id == deviceId)
-            .Select(d => new UserDeviceModel(id, d.Id, d.Name, d.Model, d.DeviceType.Name, d.UserDevice.Qty))
+        var device = await db.UserDevices
+            .Where(d => d.UserId == id && d.DeviceId == deviceId)
+            .Select(d => new UserDeviceModel(id, d.Id, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
             .SingleAsync();
 
         return new Result<UserDeviceModel>(device);
@@ -177,8 +177,8 @@ internal class UserService : IUserService
     public async Task<List<UserDeviceModel>> GetUserDevicesAsync(int id)
     {
         using var db = UseDb();
-        return await db.Devices.Where(d => d.UserDevice.UserId == id)
-            .Select(d => new UserDeviceModel(id, d.Id, d.Name, d.Model, d.DeviceType.Name, d.UserDevice.Qty))
+        return await db.UserDevices.Where(d => d.UserId == id)
+            .Select(d => new UserDeviceModel(id, d.Id, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
             .ToListAsync();
     }
 }
