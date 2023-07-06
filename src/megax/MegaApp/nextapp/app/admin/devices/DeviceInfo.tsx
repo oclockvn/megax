@@ -49,10 +49,11 @@ export default function DeviceInfo({
     appDispatch(clearError());
   };
 
-  const deviceTypeOptions = deviceTypes?.map(d => ({
-    id: d.id,
-    label: d.name,
-  })) || [device?.deviceTypeId];
+  const deviceTypeOptions =
+    deviceTypes?.map(d => ({
+      id: d.id,
+      label: d.name,
+    })) || [];
 
   const formContext = useForm<Device>({
     values: device,
