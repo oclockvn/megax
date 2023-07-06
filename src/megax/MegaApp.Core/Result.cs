@@ -23,6 +23,7 @@ namespace MegaApp.Core
         public static readonly string RECORD_DOES_NOT_EXIST = "RECORD_DOES_NOT_EXIST";
         public static readonly string DEVICE_OUT_OF_QTY = "DEVICE_OUT_OF_QTY";
         public static readonly string DEVICE_IS_BEING_USED = "DEVICE_IS_BEING_USED";
+        public static readonly string DEVICE_IS_DISABLED = "DEVICE_IS_DISABLED";
     }
 
     public record Result<T>(T Data) : Result
