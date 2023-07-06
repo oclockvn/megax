@@ -25,8 +25,8 @@ import {
 import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
 import { UserDeviceModel } from "@/lib/models/user.model";
-import { assignDevice } from "@/lib/apis/user.api";
 import Badge from "@mui/material/Badge";
+import LinearProgress from "@mui/material/LinearProgress";
 
 function UserDeviceAdd({
   userId,
@@ -117,6 +117,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
   const [isAddVisible, setAddVisible] = useState(false);
   const appDispatch = useAppDispatch();
   const { devices, loading } = useAppSelector(s => s.userDevice);
+  const count = devices.reduce((p, c) => p + c.qty, 0);
 
   const toggleAddDeviceVisibility = () => {
     setAddVisible(!isAddVisible);
@@ -163,11 +164,18 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     </ListItem>
   );
 
+  const Header = () => (
+    <div className="flex items-center">
+      <h4 className="mr-6">Devices</h4>
+      <Badge badgeContent={count} color="primary"></Badge>
+    </div>
+  );
+
   return (
     <>
       <Card>
         <CardHeader
-          title={<h4>Devices</h4>}
+          title={<Header />}
           action={
             <Button
               type="button"
@@ -182,6 +190,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
           }
         />
         <CardContent className="px-0">
+          {loading && <LinearProgress />}
           {isAddVisible && (
             <UserDeviceAdd
               userId={userId}
@@ -200,7 +209,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
               ))}
             </List>
           ) : (
-            <div className="px-4">
+            <div className="px-4 pt-4">
               <Alert severity="info">No devices yet!</Alert>
             </div>
           )}

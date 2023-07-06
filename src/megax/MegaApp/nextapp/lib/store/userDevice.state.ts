@@ -17,6 +17,7 @@ const initialState: UserDeviceState = {
 export const assignDeviceThunk = createAsyncThunk(
   "users/assign-device",
   async (req: { userId: number; deviceId: number }, thunkApi) => {
+    thunkApi.dispatch(setLoading({ loading: true }));
     return await assignDevice(req.userId, req.deviceId);
   }
 );

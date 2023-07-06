@@ -11,6 +11,7 @@ import CustomPagination from "@/components/grid/CustomPagination";
 import CommonSearch from "@/components/grid/CommonSearch";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LinearProgress from "@mui/material/LinearProgress";
 
 export default function UserListPage() {
   const pathname = usePathname();
@@ -110,6 +111,7 @@ export default function UserListPage() {
         pagination
         slots={{
           pagination: CustomPagination,
+          loadingOverlay: LinearProgress,
         }}
         rowCount={pagedUsers.total}
         paginationMode="server"
