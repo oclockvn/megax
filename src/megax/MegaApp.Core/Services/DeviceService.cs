@@ -212,7 +212,7 @@ internal class DeviceService : IDeviceService
             return Result<bool>.Fail(Result.RECORD_DOES_NOT_EXIST);
         }
 
-        var hasOwner = await db.UserDevices.AnyAsync(d => d.DeviceId == id && d.Qty > 0);
+        var hasOwner = await db.DeviceHistories.AnyAsync(d => d.DeviceId == id && d.ReturnedAt == null);
         if (hasOwner)
         {
             return Result<bool>.Fail(Result.DEVICE_IS_BEING_USED);
@@ -227,8 +227,16 @@ internal class DeviceService : IDeviceService
     public async Task<List<DeviceOwnerRecord>> GetDeviceOwnersAsync(int id)
     {
         using var db = UseDb();
-        return await db.UserDevices.Where(d => d.DeviceId == id)
-            .Select(d => new DeviceOwnerRecord(d.UserId, d.User.FullName, d.User.Email, d.Qty))
+        var owners = await db.DeviceHistories
+            .Where(d => d.DeviceId == id)
+            .Select(d => new DeviceOwnerRecord(id, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
             .ToListAsync();
+
+        var activeOwner = owners.Where(x => x.ReturnedAt == null).SingleOrDefault();
+
+        owners.Remove(activeOwner);
+        owners.Insert(0, activeOwner);
+
+        return owners;
     }
 }

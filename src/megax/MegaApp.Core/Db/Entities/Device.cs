@@ -25,6 +25,8 @@ public class Device
 
     [MaxLength(250)]
     public string Model { get; set; }
+    [MaxLength(500)]
+    public string Notes { get; set; }
 
     public bool Disabled { get; set; }
 
@@ -38,12 +40,37 @@ public class Device
     public int DeviceTypeId { get; set; }
     public DeviceType DeviceType { get; set; }
 
+    public List<DeviceHistory> Histories { get; set; } = new();
+}
+
+public class DeviceHistory : ICreatedByEntity
+{
+    public int Id { get; set; }
+
+    public int DeviceId { get; set; }
+    public Device Device { get; set; }
+
+    public int UserId { get; set; }
+    public User User { get; set; }
+
+    public DateTimeOffset TakenAt { get; set; }
+    public DateTimeOffset? ReturnedAt { get; set; }
+
     [MaxLength(1000)]
     public string Notes { get; set; }
 
-    public List<UserDevice> UserDevices { get; set; } = new();
+    public DateTimeOffset CreatedAt { get; set; }
+    public int? CreatedBy { get; set; }
 }
 
+public class DeviceHistoryConfiguration : IEntityTypeConfiguration<DeviceHistory>
+{
+    public void Configure(EntityTypeBuilder<DeviceHistory> builder)
+    {
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("SYSDATETIMEOFFSET()");
+    }
+}
 public class DeviceConfiguration : IEntityTypeConfiguration<Device>
 {
     public void Configure(EntityTypeBuilder<Device> builder)
@@ -51,6 +78,10 @@ public class DeviceConfiguration : IEntityTypeConfiguration<Device>
         builder.HasOne(x => x.DeviceType)
             .WithMany(t => t.Devices)
             .HasForeignKey(x => x.DeviceTypeId);
+
+        builder.HasMany(x => x.Histories)
+            .WithOne(x => x.Device)
+            .HasForeignKey(x => x.DeviceId);
 
         builder.HasOne(x => x.Supplier)
             .WithMany()

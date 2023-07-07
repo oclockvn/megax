@@ -91,10 +91,10 @@ public class UsersController : ApplicationControllerBase
     /// <returns></returns>
     [HttpGet("{id}/devices")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(List<UserDeviceModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<UserDeviceRecord>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserDevices(int id)
     {
-        var result = await userService.GetUserDevicesAsync(id);
+        var result = await userService.UserDevicesAsync(id);
         return Ok(result);
     }
 
