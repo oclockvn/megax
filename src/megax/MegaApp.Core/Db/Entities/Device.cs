@@ -19,15 +19,27 @@ public class Device
 
     [MaxLength(250)]
     public string Name { get; set; }
+
     [MaxLength(250)]
-    public string DeviceCode { get; set; }
+    public string SerialNumber { get; set; }
+
     [MaxLength(250)]
     public string Model { get; set; }
-    public int Qty { get; set; }
+
     public bool Disabled { get; set; }
+
+    public DateTimeOffset PurchasedAt { get; set; }
+    public DateTimeOffset? WarrantyToDate { get; set; }
+    public decimal Price { get; set; }
+
+    public int? SupplierId { get; set; }
+    public Supplier Supplier { get; set; }
 
     public int DeviceTypeId { get; set; }
     public DeviceType DeviceType { get; set; }
+
+    [MaxLength(1000)]
+    public string Notes { get; set; }
 
     public List<UserDevice> UserDevices { get; set; } = new();
 }
@@ -40,7 +52,11 @@ public class DeviceConfiguration : IEntityTypeConfiguration<Device>
             .WithMany(t => t.Devices)
             .HasForeignKey(x => x.DeviceTypeId);
 
-        builder.HasIndex(x => x.DeviceCode)
+        builder.HasOne(x => x.Supplier)
+            .WithMany()
+            .HasForeignKey(x => x.SupplierId);
+
+        builder.HasIndex(x => x.SerialNumber)
             .IsUnique();
     }
 }

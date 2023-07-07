@@ -28,7 +28,7 @@ public class DeviceGenerator : IDeviceGenerator
         var faker = new Faker<Device>()
         .RuleFor(x => x.Name, r => r.Commerce.Product())
         .RuleFor(x => x.Model, r => r.Commerce.Categories(1)[0])
-        .RuleFor(x => x.DeviceCode, r => r.Commerce.Ean13())
+        .RuleFor(x => x.SerialNumber, r => r.Commerce.Ean13())
         .RuleFor(x => x.DeviceTypeId, r => r.PickRandom(deviceTypeIds));
 
         var devices = faker.Generate(Math.Min(count, 1000));

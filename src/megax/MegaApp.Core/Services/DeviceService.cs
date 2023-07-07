@@ -1,6 +1,7 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Extensions;
+using MegaApp.Core.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
@@ -37,11 +38,15 @@ internal class DeviceService : IDeviceService
                 Id = d.Id,
                 Name = d.Name,
                 Model = d.Model,
-                DeviceCode = d.DeviceCode,
-                Qty = d.Qty,
+                SerialNumber = d.SerialNumber,
                 DeviceTypeId = d.DeviceTypeId,
                 DeviceType = d.DeviceType.Name,
                 Disabled = d.Disabled,
+                Price = d.Price,
+                PurchasedAt = d.PurchasedAt,
+                SupplierId = d.SupplierId,
+                WarrantyToDate = d.WarrantyToDate,
+                Notes = d.Notes,
             })
             .FirstOrDefaultAsync();
     }
@@ -54,15 +59,47 @@ internal class DeviceService : IDeviceService
             .ToListAsync();
     }
 
+    private async Task<bool> SerialExistAsync(int id, string serial)
+    {
+        using var db = UseDb();
+        return await db.Devices.AnyAsync(d => d.Id != id && d.SerialNumber == serial);
+    }
+
     public async Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice req)
     {
         using var db = UseDb();
-        if (!string.IsNullOrWhiteSpace(req.DeviceCode))
+
+        if (!string.IsNullOrWhiteSpace(req.SerialNumber))
         {
-            var deviceExist = await db.Devices.Where(d => d.DeviceCode == req.DeviceCode).AnyAsync();
+            var deviceExist = await SerialExistAsync(0, req.SerialNumber);
             if (deviceExist)
             {
                 return Result<int>.Fail(Result.RECORD_DUPLICATED);
+            }
+        }
+        else // generate a unique serial number for this device
+        {
+            var count = 1;
+            var serialExist = true;
+
+            while (count <= 3)
+            {
+                req.SerialNumber = StringHelper.GetRandomString("SBOX");
+                serialExist = await SerialExistAsync(0, req.SerialNumber);
+                if (serialExist)
+                {
+                    count++;
+                }
+                else
+                {
+                    serialExist = false;
+                    break;
+                }
+            }
+
+            if (serialExist)
+            {
+                return Result<int>.Fail(Result.COULD_NOT_GENERATE_SERIAL_NUMBER);
             }
         }
 
@@ -70,9 +107,13 @@ internal class DeviceService : IDeviceService
         {
             Name = req.Name,
             Model = req.Model,
-            DeviceCode = req.DeviceCode,
+            SerialNumber = req.SerialNumber,
             DeviceTypeId = req.DeviceTypeId,
-            Qty = req.Qty,
+            Price = req.Price,
+            PurchasedAt = req.PurchasedAt,
+            SupplierId = req.SupplierId,
+            WarrantyToDate = req.WarrantyToDate,
+            Notes = req.Notes,
         }).Entity;
 
         await db.SaveChangesAsync();
@@ -90,10 +131,15 @@ internal class DeviceService : IDeviceService
             return Result<int>.Fail(Result.RECORD_DOES_NOT_EXIST);
         }
 
-        device.DeviceCode = req.DeviceCode;
+        device.SerialNumber = req.SerialNumber;
         device.DeviceTypeId = req.DeviceTypeId;
         device.Model = req.Model;
         device.Name = req.Name;
+        device.SupplierId = req.SupplierId;
+        device.WarrantyToDate = req.WarrantyToDate;
+        device.PurchasedAt = req.PurchasedAt;
+        device.Price = req.Price;
+        device.Notes = req.Notes;
 
         await db.SaveChangesAsync();
 
@@ -117,10 +163,12 @@ internal class DeviceService : IDeviceService
             {
                 "name" => query.Sort(x => x.Name, isAsc),
                 "model" => query.Sort(x => x.Model, isAsc),
-                "devicecode" => query.Sort(x => x.DeviceCode, isAsc),
-                "qty" => query.Sort(x => x.Qty, isAsc),
+                "devicecode" => query.Sort(x => x.SerialNumber, isAsc),
+                "price" => query.Sort(x => x.Price, isAsc),
                 "devicetype" => query.Sort(x => x.DeviceTypeId, isAsc),
                 "disabled" => query.Sort(x => x.Disabled, isAsc),
+                "purchasedat" => query.Sort(x => x.PurchasedAt, isAsc),
+                "warrantytodate" => query.Sort(x => x.WarrantyToDate, isAsc),
                 _ => query.Sort(x => x.Id, isAsc)
             };
         }
@@ -138,11 +186,16 @@ internal class DeviceService : IDeviceService
             Id = d.Id,
             Name = d.Name,
             Model = d.Model,
-            DeviceCode = d.DeviceCode,
-            Qty = d.Qty,
+            SerialNumber = d.SerialNumber,
             DeviceTypeId = d.DeviceTypeId,
             DeviceType = d.DeviceType.Name,
             Disabled = d.Disabled,
+            PurchasedAt = d.PurchasedAt,
+            WarrantyToDate = d.WarrantyToDate,
+            SupplierId = d.SupplierId,
+            Supplier = d.Supplier.Name,
+            Price = d.Price,
+            Notes = d.Notes,
         })
         .ToListAsync();
 
