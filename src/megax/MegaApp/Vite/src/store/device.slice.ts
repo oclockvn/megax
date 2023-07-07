@@ -3,6 +3,7 @@ import {
   fetchDeviceDetail,
   fetchDeviceList,
   getDeviceTypes,
+  updateDeviceDetail,
 } from "../lib/apis/device.api";
 import {
   EmptyPaged,
@@ -51,23 +52,16 @@ export const fetchDeviceTypesThunk = createAsyncThunk(
     return await getDeviceTypes();
   }
 );
-// export const updateUserDetailThunk = createAsyncThunk(
-//   "user/update-user",
-//   async (user: User, thunkApi) => {
-//     thunkApi.dispatch(
-//       deviceSlice.actions.setLoading({ loading: true, msg: "Saving change..." })
-//     );
-//     try {
-//       return await updateUserDetail(user);
-//     } catch {
-//       return Promise.resolve<Result<User>>({
-//         code: "Failed",
-//         data: user,
-//         success: false,
-//       });
-//     }
-//   }
-// );
+
+export const updateDeviceDetailThunk = createAsyncThunk(
+  "device/update-device",
+  async (device: Device, thunkApi) => {
+    thunkApi.dispatch(
+      deviceSlice.actions.setLoading({ loading: true, msg: "Saving change..." })
+    );
+    return await updateDeviceDetail(device);
+  }
+);
 
 export const deviceSlice = createSlice({
   name: "devices",
@@ -115,6 +109,19 @@ export const deviceSlice = createSlice({
       })
       .addCase(fetchDeviceTypesThunk.fulfilled, (state, action) => {
         state.deviceTypes = action.payload;
+      })
+      .addCase(updateDeviceDetailThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload.success) {
+          state.device = { ...action.payload.data };
+          state.error = undefined;
+        } else {
+          state.error = `Couldn't update device. Error code : ${action.payload.code}`;
+        }
+      })
+      .addCase(updateDeviceDetailThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = "Something went wrong";
       });
     // .addCase(updateUserDetailThunk.fulfilled, (state, action) => {
     //   state.loading = false;

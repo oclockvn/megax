@@ -17,7 +17,10 @@ import {
 } from "react-hook-form-mui";
 import { toast } from "react-toastify";
 import { Device, DeviceType } from "../../../../../lib/models/device.model";
-import { clearError } from "../../../../../store/device.slice";
+import {
+  clearError,
+  updateDeviceDetailThunk,
+} from "../../../../../store/device.slice";
 import {
   useAppDispatch,
   useAppSelector,
@@ -31,7 +34,9 @@ function DeviceInfo({
   deviceTypes: DeviceType[] | undefined;
 }) {
   const appDispatch = useAppDispatch();
-  const { error } = useAppSelector(state => state.deviceSlice);
+  const { error, loading, loadingState } = useAppSelector(
+    state => state.deviceSlice
+  );
 
   const deviceTypeOptions =
     deviceTypes?.map(type => ({
@@ -42,17 +47,15 @@ function DeviceInfo({
   const formContext = useForm<Device>({
     values: device,
   });
+  console.log("formContext: ", formContext);
 
-  // const deviceTypeOptions = [
-  //   {
-  //     id: "1",
-  //     label: "Label 1",
-  //   },
-  //   {
-  //     id: "2",
-  //     label: "label 2",
-  //   },
-  // ];
+  const handleFormSubmit = async (device: Device) => {
+    const res = await appDispatch(updateDeviceDetailThunk(device)).unwrap();
+    console.log("res: ", res);
+    if (res.success) {
+      toast.success("Device update successfully!");
+    }
+  };
 
   // const handleFornmSubmit = async (deivce: Device) => {
   //   const res = await appDispatch(updateUserDetailThunk(deivce)).unwrap();
@@ -67,10 +70,7 @@ function DeviceInfo({
 
   return (
     <>
-      <FormContainer
-        formContext={formContext}
-        // onSuccess={handleFornmSubmit}
-      >
+      <FormContainer formContext={formContext} onSuccess={handleFormSubmit}>
         <Card>
           <CardHeader title={<h4>Device Info</h4>} />
           <CardContent>

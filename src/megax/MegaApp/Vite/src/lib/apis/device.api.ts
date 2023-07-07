@@ -18,6 +18,9 @@ export async function getDeviceTypes() {
   return res.data;
 }
 export async function updateDeviceDetail(device: Device) {
-  const res = await api.post<Result<Device>>("/api/users/" + device.id, device);
+  const res = await api.put<Result<Device>>(
+    "/api/devices/" + device.id,
+    device
+  );
   return res.data;
 }

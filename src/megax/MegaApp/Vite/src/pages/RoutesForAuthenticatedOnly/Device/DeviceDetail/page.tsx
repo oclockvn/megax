@@ -6,7 +6,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { useEffect } from "react";
-import DeviceInfo from "./component/DeviceInfo";
+import DeviceInfo from "./components/DeviceInfo";
 import {
   clearDevice,
   fetchDeviceDetailThunk,
