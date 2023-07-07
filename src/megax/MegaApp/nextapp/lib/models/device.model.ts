@@ -12,9 +12,10 @@ export interface DeviceType {
   name: string;
 }
 
-export interface DeviceOwner {
-  userId: number;
+export interface DeviceOwnerRecord {
+  id: number;
   fullName: string;
   email: string;
-  qty: number;
+  takenAt: Date;
+  returnedAt?: Date;
 }

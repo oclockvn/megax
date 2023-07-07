@@ -24,7 +24,7 @@ import {
 } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
-import { UserDeviceModel } from "@/lib/models/user.model";
+import { UserDeviceRecord } from "@/lib/models/user.model";
 import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useConfirm } from "material-ui-confirm";
@@ -116,7 +116,6 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
   const appDispatch = useAppDispatch();
   const confirm = useConfirm();
   const { devices, loading } = useAppSelector(s => s.userDevice);
-  const count = devices.reduce((p, c) => p + c.qty, 0);
 
   const toggleAddDeviceVisibility = () => {
     setAddVisible(!isAddVisible);
@@ -146,7 +145,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     }
   }, [userId]);
 
-  const DeviceItem = (d: UserDeviceModel) => (
+  const DeviceItem = (d: UserDeviceRecord) => (
     <ListItem
       secondaryAction={
         <Button
@@ -154,26 +153,18 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
           type="button"
           variant="text"
           size="small"
-          onClick={() => confirmReturn(d.deviceId)}
+          onClick={() => confirmReturn(d.id)}
         >
           Return
         </Button>
       }
     >
       <ListItemIcon>
-        {d.qty > 1 ? (
-          <>
-            <Badge badgeContent={d.qty} color="primary">
-              <ComputerIcon />
-            </Badge>
-          </>
-        ) : (
-          <ComputerIcon />
-        )}
+        <ComputerIcon />
       </ListItemIcon>
       <ListItemText
-        primary={`${d.name}${d.model ? " - " + d.model : ""}`}
-        secondary={d.deviceType}
+        primary={`${d.name} - ${d.deviceType}`}
+        secondary={d.serialNumber}
       />
     </ListItem>
   );
@@ -181,7 +172,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
   const Header = () => (
     <div className="flex items-center">
       <h4 className="mr-6">Devices</h4>
-      <Badge badgeContent={count} color="primary"></Badge>
+      <Badge badgeContent={devices?.length} color="primary"></Badge>
     </div>
   );
 
@@ -215,7 +206,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
           {devices?.length ? (
             <List>
               {devices.map(i => (
-                <React.Fragment key={i.deviceId}>
+                <React.Fragment key={i.id}>
                   <DeviceItem {...i} />
                   <Divider />
                 </React.Fragment>

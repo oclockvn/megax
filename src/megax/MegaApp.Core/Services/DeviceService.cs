@@ -232,10 +232,18 @@ internal class DeviceService : IDeviceService
             .Select(d => new DeviceOwnerRecord(id, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
             .ToListAsync();
 
+        if (owners.Count == 0)
+        {
+            return owners;
+        }
+
         var activeOwner = owners.Where(x => x.ReturnedAt == null).SingleOrDefault();
 
-        owners.Remove(activeOwner);
-        owners.Insert(0, activeOwner);
+        if (activeOwner != null)
+        {
+            owners.Remove(activeOwner);
+            owners.Insert(0, activeOwner);
+        }
 
         return owners;
     }

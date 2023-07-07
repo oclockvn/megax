@@ -10,7 +10,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { DeviceOwner } from "@/lib/models/device.model";
+import { DeviceOwnerRecord } from "@/lib/models/device.model";
 import { getOwnersThunk } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import Badge from "@mui/material/Badge";
@@ -30,12 +30,8 @@ export default function DeviceOwnerList({ deviceId }: DeviceOwnerProps) {
     }
   }, [deviceId]);
 
-  const DeviceItem = (d: DeviceOwner) => (
-    <ListItem
-      secondaryAction={
-        <Badge className="mr-3" badgeContent={d.qty} color="primary"></Badge>
-      }
-    >
+  const OwnerItem = (d: DeviceOwnerRecord) => (
+    <ListItem>
       <ListItemText primary={`${d.fullName}`} secondary={d.email} />
     </ListItem>
   );
@@ -49,8 +45,8 @@ export default function DeviceOwnerList({ deviceId }: DeviceOwnerProps) {
           {owners?.length ? (
             <List>
               {owners.map(i => (
-                <React.Fragment key={i.userId}>
-                  <DeviceItem {...i} />
+                <React.Fragment key={i.id}>
+                  <OwnerItem {...i} />
                   <Divider />
                 </React.Fragment>
               ))}

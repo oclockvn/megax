@@ -52,4 +52,4 @@ public class DeviceModel
 
 public record DeviceTypeRecord(int Id, string Name);
 
-public record DeviceOwnerRecord(int UserId, string FullName, string Email, DateTimeOffset TakenAt, DateTimeOffset? ReturnedAt);
+public record DeviceOwnerRecord(int Id, string FullName, string Email, DateTimeOffset TakenAt, DateTimeOffset? ReturnedAt);
