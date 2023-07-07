@@ -14,6 +14,8 @@ import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
+import BlockIcon from "@mui/icons-material/Block";
+import CheckIcon from "@mui/icons-material/Check";
 
 export default function DeviceListPage() {
   const pathname = usePathname();
@@ -38,6 +40,17 @@ export default function DeviceListPage() {
           {params.value}
         </Link>
       ),
+    },
+    {
+      field: "disabled",
+      headerName: "Status",
+      width: 100,
+      renderCell: params =>
+        params.value ? (
+          <BlockIcon color="error" />
+        ) : (
+          <CheckIcon color="success" />
+        ),
     },
     { field: "model", headerName: "Model", width: 300 },
     {

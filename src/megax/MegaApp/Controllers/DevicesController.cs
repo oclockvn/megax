@@ -134,4 +134,18 @@ public class DevicesController : ApplicationControllerBase
         var device = await deviceService.GetDeviceAsync(result.Data);
         return Ok(Result<DeviceModel>.Ok(device));
     }
+
+    /// <summary>
+    /// Get owners of given device
+    /// </summary>
+    /// <param name="id">Device id</param>
+    /// <returns></returns>
+    [HttpGet("{id}/owners")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<DeviceOwnerRecord>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetOwners(int id)
+    {
+        var result = await deviceService.GetDeviceOwnersAsync(id);
+        return Ok(result);
+    }
 }

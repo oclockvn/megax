@@ -1,17 +1,21 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { assignDevice, getDevices, returnDevice } from "../apis/user.api";
 import { UserDeviceModel } from "../models/user.model";
+import { DeviceOwner } from "../models/device.model";
+import { fetchDeviceOwners } from "../apis/devices.api";
 
 export interface UserDeviceState {
   loading: boolean;
   loadingState?: string;
   error?: string;
   devices: UserDeviceModel[];
+  owners: DeviceOwner[];
 }
 
 const initialState: UserDeviceState = {
   loading: false,
   devices: [],
+  owners: [],
 };
 
 export const assignDeviceThunk = createAsyncThunk(
@@ -35,6 +39,14 @@ export const getUserDevicesThunk = createAsyncThunk(
   async (id: number, thunkApi) => {
     thunkApi.dispatch(setLoading({ loading: true }));
     return await getDevices(id);
+  }
+);
+
+export const getOwnersThunk = createAsyncThunk(
+  "users/owners",
+  async (deviceId: number, thunkApi) => {
+    thunkApi.dispatch(setLoading({ loading: true }));
+    return await fetchDeviceOwners(deviceId);
   }
 );
 
@@ -100,6 +112,10 @@ export const userDeviceSlice = createSlice({
             throw new Error("something went wrong");
           }
         }
+      })
+      .addCase(getOwnersThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.owners = action.payload || [];
       });
   },
 });

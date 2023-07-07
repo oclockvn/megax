@@ -1,7 +1,7 @@
 import api from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
 import { qs } from "../util";
-import { Device, DeviceType } from "../models/device.model";
+import { Device, DeviceOwner, DeviceType } from "../models/device.model";
 
 export async function fetchDeviceList(filter: Partial<Filter> | undefined) {
   const query = filter ? qs(filter) : "";
@@ -31,5 +31,10 @@ export async function deleteDevice(id: number) {
 
 export async function getDeviceTypes() {
   const res = await api.get<DeviceType[]>("/be/devices/device-types");
+  return res.data;
+}
+
+export async function fetchDeviceOwners(id: number) {
+  const res = await api.get<DeviceOwner[]>(`/be/devices/${id}/owners`);
   return res.data;
 }

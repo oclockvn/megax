@@ -14,6 +14,7 @@ public interface IDeviceService
     Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice user);
     Task<Result<int>> UpdateDeviceAsync(int id, DeviceModel req);
     Task<Result<bool>> DeleteDeviceAsync(int id);
+    Task<List<DeviceOwnerRecord>> GetDeviceOwnersAsync(int id);
 }
 
 internal class DeviceService : IDeviceService
@@ -40,6 +41,7 @@ internal class DeviceService : IDeviceService
                 Qty = d.Qty,
                 DeviceTypeId = d.DeviceTypeId,
                 DeviceType = d.DeviceType.Name,
+                Disabled = d.Disabled,
             })
             .FirstOrDefaultAsync();
     }
@@ -118,6 +120,7 @@ internal class DeviceService : IDeviceService
                 "devicecode" => query.Sort(x => x.DeviceCode, isAsc),
                 "qty" => query.Sort(x => x.Qty, isAsc),
                 "devicetype" => query.Sort(x => x.DeviceTypeId, isAsc),
+                "disabled" => query.Sort(x => x.Disabled, isAsc),
                 _ => query.Sort(x => x.Id, isAsc)
             };
         }
@@ -139,6 +142,7 @@ internal class DeviceService : IDeviceService
             Qty = d.Qty,
             DeviceTypeId = d.DeviceTypeId,
             DeviceType = d.DeviceType.Name,
+            Disabled = d.Disabled,
         })
         .ToListAsync();
 
@@ -155,10 +159,23 @@ internal class DeviceService : IDeviceService
             return Result<bool>.Fail(Result.RECORD_DOES_NOT_EXIST);
         }
 
-        // undone: validate user devices
-        db.Devices.Remove(device);
+        var hasOwner = await db.UserDevices.AnyAsync(d => d.DeviceId == id && d.Qty > 0);
+        if (hasOwner)
+        {
+            return Result<bool>.Fail(Result.DEVICE_IS_BEING_USED);
+        }
+
+        device.Disabled = true;
         await db.SaveChangesAsync();
 
         return Result<bool>.Ok(true);
+    }
+
+    public async Task<List<DeviceOwnerRecord>> GetDeviceOwnersAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.UserDevices.Where(d => d.DeviceId == id)
+            .Select(d => new DeviceOwnerRecord(d.UserId, d.User.FullName, d.User.Email, d.Qty))
+            .ToListAsync();
     }
 }

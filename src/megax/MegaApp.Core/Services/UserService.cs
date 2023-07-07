@@ -147,13 +147,18 @@ internal class UserService : IUserService
     {
         using var db = UseDb();
         // current qty of this device
-        var deviceQty = await db.Devices.Where(d => d.Id == deviceId)
-            .Select(x => x.Qty)
-            .FirstOrDefaultAsync();
+        var device = await db.Devices.Where(d => d.Id == deviceId)
+            .Select(x => new { x.Qty, x.Disabled })
+            .FirstOrDefaultAsync() ?? throw new BusinessRuleViolationException("Never fucking happen");
+
+        if (device.Disabled)
+        {
+            return Result<UserDeviceModel>.Fail(Result.DEVICE_IS_DISABLED);
+        }
 
         // qty borrowed by users
         var borrowedQty = await db.UserDevices.Where(u => u.DeviceId == deviceId).SumAsync(x => x.Qty);
-        if (borrowedQty >= deviceQty)
+        if (borrowedQty >= device.Qty)
         {
             return Result<UserDeviceModel>.Fail(Result.DEVICE_OUT_OF_QTY);
         }
@@ -175,12 +180,12 @@ internal class UserService : IUserService
 
         await db.SaveChangesAsync();
 
-        var device = await db.UserDevices
+        var owner = await db.UserDevices
             .Where(d => d.UserId == id && d.DeviceId == deviceId)
             .Select(d => new UserDeviceModel(id, d.DeviceId, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
             .SingleAsync();
 
-        return new Result<UserDeviceModel>(device);
+        return new Result<UserDeviceModel>(owner);
     }
 
     public async Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId)
