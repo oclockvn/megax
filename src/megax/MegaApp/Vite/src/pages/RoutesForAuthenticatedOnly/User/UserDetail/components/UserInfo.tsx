@@ -29,7 +29,7 @@ function UserInfo({ user }: { user: User | undefined }) {
     state => state.userSlice
   );
 
-  const handleFornmSubmit = async (user: User) => {
+  const handleFormSubmit = async (user: User) => {
     const res = await appDispatch(updateUserDetailThunk(user)).unwrap();
     if (res.success) {
       toast.success("User update successfully!");
@@ -42,7 +42,7 @@ function UserInfo({ user }: { user: User | undefined }) {
 
   return (
     <>
-      <FormContainer values={user} onSuccess={handleFornmSubmit}>
+      <FormContainer values={user} onSuccess={handleFormSubmit}>
         <Card>
           <CardHeader title={<h4>User Info</h4>} />
           <CardContent>

@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import UserInfo from "./component/UserInfo";
+import UserInfo from "./components/UserInfo";
 import { useParams } from "react-router";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
