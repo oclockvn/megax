@@ -44,16 +44,24 @@ export default function DeviceInfo({
   const { loading, loadingState, error, deviceTypes } = useAppSelector(
     s => s.devices
   );
+  const { pagedSuppliers } = useAppSelector(s => s.suppliers);
   const isUpdate = Number(device?.id) > 0;
 
   const handleClearError = () => {
     appDispatch(clearError());
   };
 
-  const deviceTypeOptions = deviceTypes?.map(d => ({
-    id: d.id,
-    label: d.name,
-  })) || [device?.deviceTypeId];
+  const deviceTypeOptions =
+    deviceTypes?.map(d => ({
+      id: d.id,
+      label: d.name,
+    })) || [];
+
+  const supplierOptions =
+    pagedSuppliers?.items?.map(x => ({
+      id: x.id,
+      label: x.name + (x.website ? " - " + x.website : ""),
+    })) || [];
 
   const formContext = useForm<Device>({
     values: device,
@@ -201,6 +209,17 @@ export default function DeviceInfo({
                 />
               </Grid>
             </Grid>
+
+            <div className="mt-4">
+              <SelectElement
+                required
+                fullWidth
+                label="Supplier"
+                variant="outlined"
+                name="supplierId"
+                options={supplierOptions}
+              />
+            </div>
           </CardContent>
 
           <CardActions className="bg-slate-100">

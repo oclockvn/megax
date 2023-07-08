@@ -83,6 +83,12 @@ export default function DeviceListPage() {
       valueFormatter: params =>
         params.value ? dateLib.formatDate(params.value, "dd/MM/yyyy") : "",
     },
+    {
+      field: "supplier",
+      headerName: "Supplier",
+      width: 200,
+      sortable: false,
+    },
   ];
 
   const onPaging = (ev: PageModel) => {

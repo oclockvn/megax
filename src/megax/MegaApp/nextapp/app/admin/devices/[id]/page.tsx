@@ -16,6 +16,7 @@ import {
 } from "@/lib/store/devices.state";
 import DeviceInfo from "../DeviceInfo";
 import DeviceOwnerList from "../DeviceOwnerList";
+import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
 
 export default function DevicePage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -26,6 +27,7 @@ export default function DevicePage({ params }: { params: { id: number } }) {
   useEffect(() => {
     appDispatch(fetchDeviceDetailThunk(params.id));
     appDispatch(fetchDeviceTypesThunk());
+    appDispatch(fetchSuppliersThunk());
   }, [params.id]);
 
   const onDeviceDeleted = () => {
