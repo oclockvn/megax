@@ -16,7 +16,7 @@ public interface IUserService
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 
-    Task<Result<DeviceOwnerRecord>> AssignDeviceAsync(int id, int deviceId);
+    Task<Result<UserDeviceRecord>> AssignDeviceAsync(int id, int deviceId);
     Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId);
     Task<List<UserDeviceRecord>> UserDevicesAsync(int id);
 }
@@ -143,7 +143,7 @@ internal class UserService : IUserService
         return new PagedResult<UserModel>(items, filter.Page, total);
     }
 
-    public async Task<Result<DeviceOwnerRecord>> AssignDeviceAsync(int id, int deviceId)
+    public async Task<Result<UserDeviceRecord>> AssignDeviceAsync(int id, int deviceId)
     {
         using var db = UseDb();
         var device = await db.Devices.Where(d => d.Id == deviceId)
@@ -152,12 +152,12 @@ internal class UserService : IUserService
 
         if (device.Disabled)
         {
-            return Result<DeviceOwnerRecord>.Fail(Result.DEVICE_IS_DISABLED);
+            return Result<UserDeviceRecord>.Fail(Result.DEVICE_IS_DISABLED);
         }
 
         if (device.IsOccupied)
         {
-            return Result<DeviceOwnerRecord>.Fail(Result.DEVICE_IS_UNAVAILABLE);
+            return Result<UserDeviceRecord>.Fail(Result.DEVICE_IS_UNAVAILABLE);
         }
 
         db.DeviceHistories.Add(new DeviceHistory
@@ -173,10 +173,10 @@ internal class UserService : IUserService
         var owner = await db.DeviceHistories
             .Where(d => d.DeviceId == deviceId && d.UserId == id)
             .Where(d => d.ReturnedAt == null)
-            .Select(d => new DeviceOwnerRecord(id, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
+            .Select(x => new UserDeviceRecord(x.Id, x.Device.Name, x.Device.SerialNumber, x.Device.DeviceType.Name, x.TakenAt, x.ReturnedAt))
             .SingleOrDefaultAsync();
 
-        return new Result<DeviceOwnerRecord>(owner);
+        return new Result<UserDeviceRecord>(owner);
     }
 
     public async Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId)

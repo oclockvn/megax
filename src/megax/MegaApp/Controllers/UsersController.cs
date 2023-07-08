@@ -76,7 +76,7 @@ public class UsersController : ApplicationControllerBase
     /// <returns></returns>
     [HttpPost("{id}/assign-device/{deviceId}")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<UserDeviceRecord>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AssignDevice(int id, int deviceId)
     {
