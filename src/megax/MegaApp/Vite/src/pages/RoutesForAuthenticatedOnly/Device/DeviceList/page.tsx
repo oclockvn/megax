@@ -1,3 +1,4 @@
+import { Button, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -6,6 +7,7 @@ import { fetchDevicesThunk } from "../../../../store/device.slice";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import CustomPagination from "./components/CustomPagination";
 import SearchDevice from "./components/SearchDevice";
+import AddIcon from "@mui/icons-material/Add";
 
 function DeviceListPage() {
   const columns: GridColDef[] = [
@@ -85,6 +87,17 @@ function DeviceListPage() {
       <div className="mb-4">
         <SearchDevice handleSearch={onSearch} />
       </div>
+      <Grid item xs={6} textAlign={"right"} className=" pb-2">
+        <Button
+          variant="contained"
+          color="primary"
+          className="bg-blue-500"
+          startIcon={<AddIcon />}
+          href={`/devices/new`}
+        >
+          New Device
+        </Button>
+      </Grid>
       <DataGrid
         rows={pagedDevices.items}
         columns={columns}

@@ -24,3 +24,14 @@ export async function updateDeviceDetail(device: Device) {
   );
   return res.data;
 }
+
+export async function addDevice(req: Omit<Device, "id">) {
+  const res = await api.post<Result<Device>>("/api/devices", req);
+  return res.data;
+}
+
+export async function deleteDevice(id: number) {
+  const res = await api.delete<Result<Device>>("/api/devices/" + id);
+  return res.data;
+}
+

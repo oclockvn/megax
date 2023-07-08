@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  addDevice,
+  deleteDevice,
   fetchDeviceDetail,
   fetchDeviceList,
   getDeviceTypes,
@@ -62,7 +64,21 @@ export const updateDeviceDetailThunk = createAsyncThunk(
     return await updateDeviceDetail(device);
   }
 );
+export const addDeviceThunk = createAsyncThunk(
+  "devices/add-device",
+  async (device: Omit<Device, "id">, thunkApi) => {
+    thunkApi.dispatch(deviceSlice.actions.setLoadingState("Processing..."));
+    return await addDevice(device);
+  }
+);
 
+export const deleteDeviceThunk = createAsyncThunk(
+  "devices/delete-device",
+  async (id: number, thunkApi) => {
+    thunkApi.dispatch(deviceSlice.actions.setLoadingState("Processing..."));
+    return await deleteDevice(id);
+  }
+);
 export const deviceSlice = createSlice({
   name: "devices",
   initialState,
@@ -122,22 +138,37 @@ export const deviceSlice = createSlice({
       .addCase(updateDeviceDetailThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = "Something went wrong";
+      })
+      .addCase(deleteDeviceThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loadingState = undefined;
+        state.error = action.payload.success
+          ? undefined
+          : `Counld't delete device. Error code: ${action.payload.code} `;
+      })
+      .addCase(deleteDeviceThunk.rejected, state => {
+        state.loading = false;
+        state.loadingState = undefined;
+        state.error = `Something went wrong`;
+      })
+
+      .addCase(addDeviceThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loadingState = undefined;
+        if (action.payload.success) {
+          state.device = action.payload.data;
+        } else {
+          state.error = `Cound't add device. Error code : ${action.payload.code}`;
+        }
+      })
+      .addCase(addDeviceThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.loadingState = undefined;
+        state.error = "Something went wrong";
       });
-    // .addCase(updateUserDetailThunk.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   if (action.payload.success) {
-    //     state.user = { ...action.payload.data };
-    //   } else {
-    //     state.error = `Couldn't update user. Error code: ${action.payload.code} `;
-    //   }
-    // })
-    // .addCase(updateUserDetailThunk.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.error = "Something went wrong";
-    // });
   },
 });
 
-export const { setLoading, clearError, clearDevice, reset } =
+export const { setLoading, clearError, clearDevice, reset, setLoadingState } =
   deviceSlice.actions;
 export default deviceSlice.reducer;

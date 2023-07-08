@@ -6,31 +6,31 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { useEffect } from "react";
-import DeviceInfo from "./components/DeviceInfo";
 import {
   clearDevice,
-  fetchDeviceDetailThunk,
   fetchDeviceTypesThunk,
 } from "../../../../store/device.slice";
+import DeviceInfo from "../DeviceDetail/components/DeviceInfo";
 
-function DeviceDetailPage() {
+function NewDevicePage() {
   const params = useParams();
   const id = params.id;
   const navigate = useNavigate();
+
   const appDispatch = useAppDispatch();
   const { device, error, deviceTypes } = useAppSelector(
     state => state.deviceSlice
   );
 
   useEffect(() => {
-    appDispatch(fetchDeviceDetailThunk(id));
     appDispatch(fetchDeviceTypesThunk());
     return () => {
       appDispatch(clearDevice());
     };
   }, [id]);
-  const onDeviceDeleted = () => {
-    navigate("/devices");
+
+  const redirectToPage = (id: number) => {
+    navigate(`/devices/${id}`);
   };
 
   return (
@@ -45,16 +45,12 @@ function DeviceDetailPage() {
             <ArrowBackIcon className="mr-2" />
             Devices
           </NavLink>
-          <div>{device?.name || "..."}</div>
+          <div>{device?.name || "New Device"}</div>
         </Breadcrumbs>
       </div>
       <Grid container spacing={2}>
         <Grid item xs={8}>
-          <DeviceInfo
-            device={device}
-            deviceTypes={deviceTypes}
-            onDeleted={onDeviceDeleted}
-          />
+          <DeviceInfo deviceTypes={deviceTypes} onAdded={redirectToPage} />
         </Grid>
         <Grid item xs={4}>
           Sidebar
@@ -64,4 +60,4 @@ function DeviceDetailPage() {
   );
 }
 
-export default DeviceDetailPage;
+export default NewDevicePage;
