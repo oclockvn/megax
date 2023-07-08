@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
 import {
+  DatePickerElement,
   FormContainer,
   SelectElement,
   TextFieldElement,
@@ -150,7 +151,15 @@ export default function DeviceInfo({
             </div>
 
             <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
-              <Grid item xs={6}>
+              <Grid item xs>
+                <TextFieldElement
+                  fullWidth
+                  label="Price"
+                  variant="outlined"
+                  name="price"
+                />
+              </Grid>
+              <Grid item xs>
                 <TextFieldElement
                   fullWidth
                   label="Model"
@@ -158,12 +167,37 @@ export default function DeviceInfo({
                   name="model"
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs>
                 <TextFieldElement
                   fullWidth
                   label="Code"
                   variant="outlined"
                   name="serialNumber"
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2}>
+              <Grid item>
+                <DatePickerElement
+                  label="Purchased At"
+                  name="purchasedAt"
+                  slotProps={{
+                    actionBar: {
+                      actions: ["today", "cancel", "accept"],
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <DatePickerElement
+                  label="Warranty To"
+                  name="warrantyToDate"
+                  slotProps={{
+                    actionBar: {
+                      actions: ["today", "cancel", "accept"],
+                    },
+                  }}
                 />
               </Grid>
             </Grid>
