@@ -8,7 +8,6 @@ import CardHeader from "@mui/material/CardHeader";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
-import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -30,6 +29,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { useConfirm } from "material-ui-confirm";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import DeviceIconSelector from "@/components/admin/device/DeviceIconSelector";
 
 function UserDeviceAdd({
   userId,
@@ -162,7 +162,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
       }
     >
       <ListItemIcon>
-        <ComputerIcon />
+        <DeviceIconSelector deviceType={d.deviceType} />
       </ListItemIcon>
       <ListItemText
         primary={
