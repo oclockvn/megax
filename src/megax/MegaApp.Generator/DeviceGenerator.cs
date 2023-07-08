@@ -29,7 +29,10 @@ public class DeviceGenerator : IDeviceGenerator
         .RuleFor(x => x.Name, r => r.Commerce.Product())
         .RuleFor(x => x.Model, r => r.Commerce.Categories(1)[0])
         .RuleFor(x => x.SerialNumber, r => r.Commerce.Ean13())
-        .RuleFor(x => x.DeviceTypeId, r => r.PickRandom(deviceTypeIds));
+        .RuleFor(x => x.DeviceTypeId, r => r.PickRandom(deviceTypeIds))
+        .RuleFor(x => x.Price, r => r.Finance.Amount() * 1000)
+        .RuleFor(x => x.PurchasedAt, r => r.Date.Past())
+        .RuleFor(x => x.WarrantyToDate, r => r.Date.Future(2));
 
         var devices = faker.Generate(Math.Min(count, 1000));
         await db.Devices.AddRangeAsync(devices);
