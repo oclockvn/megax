@@ -163,7 +163,7 @@ export default function DeviceInfo({
                   fullWidth
                   label="Code"
                   variant="outlined"
-                  name="deviceCode"
+                  name="serialNumber"
                 />
               </Grid>
             </Grid>

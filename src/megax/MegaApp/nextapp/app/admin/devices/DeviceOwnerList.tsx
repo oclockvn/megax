@@ -13,8 +13,12 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { DeviceOwnerRecord } from "@/lib/models/device.model";
 import { getOwnersThunk } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
-import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
+import Link from "next/link";
+import Grid from "@mui/material/Grid";
+import dateLib from "@/lib/datetime";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import RedoIcon from "@mui/icons-material/Redo";
 
 declare type DeviceOwnerProps = {
   deviceId: number;
@@ -32,7 +36,40 @@ export default function DeviceOwnerList({ deviceId }: DeviceOwnerProps) {
 
   const OwnerItem = (d: DeviceOwnerRecord) => (
     <ListItem>
-      <ListItemText primary={`${d.fullName}`} secondary={d.email} />
+      <ListItemText
+        primary={
+          <Grid
+            container
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Grid item>
+              <Link
+                href={`/admin/users/${d.id}`}
+                className="text-blue-400"
+                title="Open user"
+              >
+                {d.fullName}
+              </Link>
+            </Grid>
+            <Grid item position={"relative"}>
+              <div>
+                <small className="text-green-500 flex items-center">
+                  <EventAvailableIcon className="mr-2" fontSize="small" />
+                  Taken in {dateLib.formatDate(d.takenAt, "dd/MM/yyyy")}
+                </small>
+              </div>
+              {d.returnedAt && (
+                <small className="text-gray-400 absolute right-0 whitespace-nowrap">
+                  <RedoIcon className="mr-2" fontSize="small" />
+                  Returned in {dateLib.formatDate(d.returnedAt, "dd/MM/yyyy")}
+                </small>
+              )}
+            </Grid>
+          </Grid>
+        }
+        secondary={d.email}
+      />
     </ListItem>
   );
 

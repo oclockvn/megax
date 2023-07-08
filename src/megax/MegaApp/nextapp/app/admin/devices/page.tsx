@@ -36,9 +36,14 @@ export default function DeviceListPage() {
       headerName: "Device name",
       width: 400,
       renderCell: params => (
-        <Link href={`${pathname}/${params.id}`} className="text-blue-400">
-          {params.value}
-        </Link>
+        <div>
+          <Link href={`${pathname}/${params.id}`} className="text-blue-400">
+            {params.value}
+          </Link>
+          <div>
+            <small className="text-gray-400">#{params.row.serialNumber}</small>
+          </div>
+        </div>
       ),
     },
     {

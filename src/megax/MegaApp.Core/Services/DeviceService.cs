@@ -153,7 +153,7 @@ internal class DeviceService : IDeviceService
 
         if (!string.IsNullOrEmpty(filter.Query))
         {
-            query = query.Where(d => d.Name.Contains(filter.Query) || d.Model.Contains(filter.Query));
+            query = query.Where(d => d.Name.Contains(filter.Query) || d.SerialNumber.Contains(filter.Query));
         }
 
         if (!string.IsNullOrWhiteSpace(filter?.SortBy))
@@ -229,7 +229,7 @@ internal class DeviceService : IDeviceService
         using var db = UseDb();
         var owners = await db.DeviceHistories
             .Where(d => d.DeviceId == id)
-            .Select(d => new DeviceOwnerRecord(id, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
+            .Select(d => new DeviceOwnerRecord(d.UserId, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
             .ToListAsync();
 
         if (owners.Count == 0)

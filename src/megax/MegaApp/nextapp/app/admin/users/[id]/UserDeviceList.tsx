@@ -28,6 +28,8 @@ import { UserDeviceRecord } from "@/lib/models/user.model";
 import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useConfirm } from "material-ui-confirm";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 function UserDeviceAdd({
   userId,
@@ -78,11 +80,10 @@ function UserDeviceAdd({
           renderInput={params => <TextField {...params} label="Device" />}
           renderOption={(attrs, o) => (
             <li {...attrs} key={o.id}>
-              {o.name}
-              {o.model ? " - " + o.model : ""}
+              {o.name} - {o.serialNumber ? o.serialNumber : "N/A"}
             </li>
           )}
-          getOptionLabel={o => `${o.name}${o.model ? " - " + o.model : ""}`}
+          getOptionLabel={o => `${o.name} - ${o.serialNumber}`}
         />
       </div>
 
@@ -114,6 +115,7 @@ declare type UserDeviceListProps = {
 export default function UserDeviceList({ userId }: UserDeviceListProps) {
   const [isAddVisible, setAddVisible] = useState(false);
   const appDispatch = useAppDispatch();
+  const pathname = usePathname();
   const confirm = useConfirm();
   const { devices, loading } = useAppSelector(s => s.userDevice);
 
@@ -163,7 +165,15 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
         <ComputerIcon />
       </ListItemIcon>
       <ListItemText
-        primary={`${d.name} - ${d.deviceType}`}
+        primary={
+          <Link
+            href={`/admin/devices/${d.id}`}
+            title="Open device"
+            className="text-blue-400"
+          >
+            {d.name} - {d.deviceType}
+          </Link>
+        }
         secondary={d.serialNumber}
       />
     </ListItem>

@@ -173,7 +173,7 @@ internal class UserService : IUserService
         var owner = await db.DeviceHistories
             .Where(d => d.DeviceId == deviceId && d.UserId == id)
             .Where(d => d.ReturnedAt == null)
-            .Select(x => new UserDeviceRecord(x.Id, x.Device.Name, x.Device.SerialNumber, x.Device.DeviceType.Name, x.TakenAt, x.ReturnedAt))
+            .Select(x => new UserDeviceRecord(x.DeviceId, x.Device.Name, x.Device.SerialNumber, x.Device.DeviceType.Name, x.TakenAt, x.ReturnedAt))
             .SingleOrDefaultAsync();
 
         return new Result<UserDeviceRecord>(owner);
@@ -185,7 +185,7 @@ internal class UserService : IUserService
         var deviceHistory = await db.DeviceHistories.Where(d => d.DeviceId == deviceId && d.UserId == id)
             .FirstOrDefaultAsync() ?? throw new BusinessRuleViolationException("Never fucking happen");
 
-        if (deviceHistory.ReturnedAt == null)
+        if (deviceHistory.ReturnedAt != null)
         {
             return Result<bool>.Fail(Result.DEVICE_ALREADY_IN_STOCK);
         }
@@ -202,7 +202,7 @@ internal class UserService : IUserService
         var devices = await db.DeviceHistories
             .OrderByDescending(x => x.Id)
             .Where(x => x.UserId == id)
-            .Select(x => new UserDeviceRecord(x.Id, x.Device.Name, x.Device.SerialNumber, x.Device.DeviceType.Name, x.TakenAt, x.ReturnedAt))
+            .Select(x => new UserDeviceRecord(x.DeviceId, x.Device.Name, x.Device.SerialNumber, x.Device.DeviceType.Name, x.TakenAt, x.ReturnedAt))
             .ToListAsync();
 
         var active = devices.Where(d => d.ReturnedAt == null).ToList();
