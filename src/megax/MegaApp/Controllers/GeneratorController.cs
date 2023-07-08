@@ -11,14 +11,17 @@ public class GeneratorController : ApplicationControllerBase
 {
     private readonly IUserGenerator userGenerator;
     private readonly IDeviceGenerator deviceGenerator;
+    private readonly ISupplierGenerator supplierGenerator;
 
     public GeneratorController(
         IUserGenerator userGenerator,
-        IDeviceGenerator deviceGenerator
+        IDeviceGenerator deviceGenerator,
+        ISupplierGenerator supplierGenerator
         )
     {
         this.userGenerator = userGenerator;
         this.deviceGenerator = deviceGenerator;
+        this.supplierGenerator = supplierGenerator;
     }
 
     [HttpPost("users")]
@@ -32,6 +35,13 @@ public class GeneratorController : ApplicationControllerBase
     public async Task<IActionResult> GenerateDevices([FromQuery] int count = 100)
     {
         await deviceGenerator.GenerateAsync(count);
+        return Ok(new { success = true });
+    }
+
+    [HttpPost("suppliers")]
+    public async Task<IActionResult> GenerateSuppliers([FromQuery] int count = 100)
+    {
+        await supplierGenerator.GenerateAsync(count);
         return Ok(new { success = true });
     }
 }

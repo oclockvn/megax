@@ -16,6 +16,7 @@ namespace MegaApp.Core.Db
         public DbSet<DeviceType> DeviceTypes { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeviceHistory> DeviceHistories { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
