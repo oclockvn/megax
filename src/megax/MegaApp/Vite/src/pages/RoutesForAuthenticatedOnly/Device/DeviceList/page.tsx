@@ -36,7 +36,6 @@ function DeviceListPage() {
 
   const appDispatch = useAppDispatch();
   const { loading, pagedDevices } = useAppSelector(state => state.deviceSlice);
-  console.log("pagedDevices: ", pagedDevices);
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
     pageSize: 100,
