@@ -28,7 +28,7 @@ public class SupplierGenerator : ISupplierGenerator
         .RuleFor(x => x.Name, r => r.Company.CompanyName())
         .RuleFor(x => x.Address, r => r.Address.FullAddress())
         .RuleFor(x => x.Phone, r => r.Phone.PhoneNumber())
-        .RuleFor(x => x.Website, r => r.Internet.DomainName());
+        .RuleFor(x => x.Website, r => "https://" + r.Internet.DomainName());
 
         var devices = faker.Generate(Math.Min(count, 1000));
         await db.Suppliers.AddRangeAsync(devices);

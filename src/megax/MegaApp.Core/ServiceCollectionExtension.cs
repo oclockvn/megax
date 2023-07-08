@@ -14,6 +14,7 @@ namespace MegaApp.Core
                 .AddScoped<IUserService, UserService>()
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<IDeviceService, DeviceService>()
+                .AddScoped<ISupplierService, SupplierService>()
                 ;
         }
     }
