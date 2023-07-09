@@ -3,7 +3,7 @@ import { User } from "../models/user.model";
 import { qs } from "../until";
 import api from "./api";
 
-export async function fetchUserList(filter: Partial<Filter>) {
+export async function fetchUserList(filter: Partial<Filter> | undefined) {
   const res = await api.get<PagedResult<User>>("/api/users?" + qs(filter));
   return res.data;
 }
