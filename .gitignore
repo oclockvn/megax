@@ -264,3 +264,5 @@ appsettings.Development.json
 LocalStorage/
 .vscode/
 .vscode
+
+nextapp/package-lock.json
