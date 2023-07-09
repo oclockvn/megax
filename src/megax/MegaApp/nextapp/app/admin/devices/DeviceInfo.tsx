@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
 import {
+  AutocompleteElement,
   DatePickerElement,
   FormContainer,
   SelectElement,
@@ -59,6 +60,7 @@ export default function DeviceInfo({
 
   const supplierOptions =
     pagedSuppliers?.items?.map(x => ({
+      key: x.id,
       id: x.id,
       label: x.name + (x.website ? " - " + x.website : ""),
     })) || [];
@@ -118,6 +120,14 @@ export default function DeviceInfo({
   };
 
   const { handleSubmit } = formContext;
+
+  const autocompleteProps = {
+    renderOption: (props: any, option: { id: number; label: string }) => (
+      <li {...props} key={option.id}>
+        {option.label}
+      </li>
+    ),
+  };
 
   return (
     <>
@@ -211,13 +221,12 @@ export default function DeviceInfo({
             </Grid>
 
             <div className="mt-4">
-              <SelectElement
-                required
-                fullWidth
+              <AutocompleteElement
                 label="Supplier"
-                variant="outlined"
                 name="supplierId"
+                matchId
                 options={supplierOptions}
+                autocompleteProps={autocompleteProps}
               />
             </div>
           </CardContent>
