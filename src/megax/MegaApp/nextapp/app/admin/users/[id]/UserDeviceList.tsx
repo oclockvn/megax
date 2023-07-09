@@ -27,9 +27,9 @@ import { UserDeviceRecord } from "@/lib/models/user.model";
 import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useConfirm } from "material-ui-confirm";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 import DeviceIconSelector from "@/components/admin/device/DeviceIconSelector";
+import Chip from "@mui/material/Chip";
 
 function UserDeviceAdd({
   userId,
@@ -115,7 +115,6 @@ declare type UserDeviceListProps = {
 export default function UserDeviceList({ userId }: UserDeviceListProps) {
   const [isAddVisible, setAddVisible] = useState(false);
   const appDispatch = useAppDispatch();
-  const pathname = usePathname();
   const confirm = useConfirm();
   const { devices, loading } = useAppSelector(s => s.userDevice);
 
@@ -149,16 +148,28 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
 
   const DeviceItem = (d: UserDeviceRecord) => (
     <ListItem
+      className={d.returnedAt ? "bg-slate-100" : ""}
       secondaryAction={
-        <Button
-          title="Return device to admin"
-          type="button"
-          variant="text"
-          size="small"
-          onClick={() => confirmReturn(d.id)}
-        >
-          Return
-        </Button>
+        d.returnedAt ? (
+          <div className="flex items-center">
+            <Chip
+              label="RETURNED"
+              size="small"
+              color="info"
+              className="text-xs"
+            />
+          </div>
+        ) : (
+          <Button
+            title="Return device to admin"
+            type="button"
+            variant="text"
+            size="small"
+            onClick={() => confirmReturn(d.id)}
+          >
+            Return
+          </Button>
+        )
       }
     >
       <ListItemIcon>
@@ -179,10 +190,12 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     </ListItem>
   );
 
+  const activeDeviceCount = devices?.filter(d => d.returnedAt == null)?.length;
+
   const Header = () => (
     <div className="flex items-center">
       <h4 className="mr-6">Devices</h4>
-      <Badge badgeContent={devices?.length} color="primary"></Badge>
+      <Badge badgeContent={activeDeviceCount} color="primary"></Badge>
     </div>
   );
 

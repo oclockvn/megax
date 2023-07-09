@@ -97,13 +97,7 @@ export const userDeviceSlice = createSlice({
           const device = state.devices.find(d => d.id === deviceId);
 
           if (device) {
-            // state.devices = [data,]
-            // device.qty -= 1;
-            // if (device.qty === 0) {
-            //   state.devices = state.devices.filter(
-            //     d => d.deviceId !== deviceId
-            //   );
-            // }
+            device.returnedAt = new Date();
           } else {
             throw new Error("something went wrong");
           }
