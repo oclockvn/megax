@@ -16,9 +16,9 @@ public interface IUserService
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
 
-    Task<Result<UserDeviceModel>> AssignDeviceAsync(int id, int deviceId);
+    Task<Result<UserDeviceRecord>> AssignDeviceAsync(int id, int deviceId);
     Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId);
-    Task<List<UserDeviceModel>> GetUserDevicesAsync(int id);
+    Task<List<UserDeviceRecord>> UserDevicesAsync(int id);
 }
 
 internal class UserService : IUserService
@@ -143,88 +143,74 @@ internal class UserService : IUserService
         return new PagedResult<UserModel>(items, filter.Page, total);
     }
 
-    public async Task<Result<UserDeviceModel>> AssignDeviceAsync(int id, int deviceId)
+    public async Task<Result<UserDeviceRecord>> AssignDeviceAsync(int id, int deviceId)
     {
         using var db = UseDb();
-        // current qty of this device
         var device = await db.Devices.Where(d => d.Id == deviceId)
-            .Select(x => new { x.Qty, x.Disabled })
+            .Select(x => new { x.Disabled, IsOccupied = x.Histories.Any(h => h.ReturnedAt == null) })
             .FirstOrDefaultAsync() ?? throw new BusinessRuleViolationException("Never fucking happen");
 
         if (device.Disabled)
         {
-            return Result<UserDeviceModel>.Fail(Result.DEVICE_IS_DISABLED);
+            return Result<UserDeviceRecord>.Fail(Result.DEVICE_IS_DISABLED);
         }
 
-        // qty borrowed by users
-        var borrowedQty = await db.UserDevices.Where(u => u.DeviceId == deviceId).SumAsync(x => x.Qty);
-        if (borrowedQty >= device.Qty)
+        if (device.IsOccupied)
         {
-            return Result<UserDeviceModel>.Fail(Result.DEVICE_OUT_OF_QTY);
+            return Result<UserDeviceRecord>.Fail(Result.DEVICE_IS_UNAVAILABLE);
         }
 
-        var userDevice = await db.UserDevices.FirstOrDefaultAsync(x => x.UserId == id && x.DeviceId == deviceId);
-        if (userDevice == null)
+        db.DeviceHistories.Add(new DeviceHistory
         {
-            userDevice = new UserDevice { UserId = id, DeviceId = deviceId, Qty = 0 };
-            db.UserDevices.Add(userDevice);
-        }
-
-        userDevice.Qty += 1;
-        userDevice.Histories.Add(new UserDeviceHistory
-        {
-            AssignAt = DateTimeOffset.Now, // set this if we want to have different date, just leave it for now
+            DeviceId = deviceId,
+            UserId = id,
             CreatedAt = DateTimeOffset.Now,
-            Qty = 1,
+            TakenAt = DateTimeOffset.Now,
         });
 
         await db.SaveChangesAsync();
 
-        var owner = await db.UserDevices
-            .Where(d => d.UserId == id && d.DeviceId == deviceId)
-            .Select(d => new UserDeviceModel(id, d.DeviceId, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
-            .SingleAsync();
+        var owner = await db.DeviceHistories
+            .Where(d => d.DeviceId == deviceId && d.UserId == id)
+            .Where(d => d.ReturnedAt == null)
+            .Select(x => new UserDeviceRecord(x.DeviceId, x.Device.Name, x.Device.SerialNumber, x.Device.DeviceType.Name, x.TakenAt, x.ReturnedAt))
+            .SingleOrDefaultAsync();
 
-        return new Result<UserDeviceModel>(owner);
+        return new Result<UserDeviceRecord>(owner);
     }
 
     public async Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId)
     {
         using var db = UseDb();
-        // current qty of this device
-        var deviceQty = await db.Devices.Where(d => d.Id == deviceId)
-            .Select(x => x.Qty)
-            .FirstOrDefaultAsync();
+        var deviceHistory = await db.DeviceHistories.Where(d => d.DeviceId == deviceId && d.UserId == id)
+            .FirstOrDefaultAsync() ?? throw new BusinessRuleViolationException("Never fucking happen");
 
-        var userDevice = await db.UserDevices.FirstOrDefaultAsync(x => x.UserId == id && x.DeviceId == deviceId);
-        if (userDevice == null)
+        if (deviceHistory.ReturnedAt != null)
         {
-            throw new EntityNotFoundException($"No device found by id {deviceId}");
+            return Result<bool>.Fail(Result.DEVICE_ALREADY_IN_STOCK);
         }
 
-        if (userDevice.Qty < 1)
-        {
-            throw new BusinessRuleViolationException("This shit never could happen");
-        }
-
-        userDevice.Qty -= 1;
-        userDevice.Histories.Add(new UserDeviceHistory
-        {
-            AssignAt = DateTimeOffset.Now, // set this if we want to have different date, just leave it for now
-            CreatedAt = DateTimeOffset.Now,
-            Qty = -1,
-        });
+        deviceHistory.ReturnedAt = DateTimeOffset.Now;
 
         await db.SaveChangesAsync();
         return new Result<bool>(true);
     }
 
-    public async Task<List<UserDeviceModel>> GetUserDevicesAsync(int id)
+    public async Task<List<UserDeviceRecord>> UserDevicesAsync(int id)
     {
         using var db = UseDb();
-        return await db.UserDevices.Where(d => d.UserId == id && d.Qty > 0)
+        var devices = await db.DeviceHistories
             .OrderByDescending(x => x.Id)
-            .Select(d => new UserDeviceModel(id, d.DeviceId, d.Device.Name, d.Device.Model, d.Device.DeviceType.Name, d.Qty))
+            .Where(x => x.UserId == id)
+            .Select(x => new UserDeviceRecord(x.DeviceId, x.Device.Name, x.Device.SerialNumber, x.Device.DeviceType.Name, x.TakenAt, x.ReturnedAt))
             .ToListAsync();
+
+        var active = devices.Where(d => d.ReturnedAt == null).ToList();
+        var returned = devices.Where(d => d.ReturnedAt != null).ToList();
+
+        active.AddRange(returned);
+
+        return active;
     }
+
 }

@@ -1,6 +1,7 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Extensions;
+using MegaApp.Core.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
@@ -37,11 +38,15 @@ internal class DeviceService : IDeviceService
                 Id = d.Id,
                 Name = d.Name,
                 Model = d.Model,
-                DeviceCode = d.DeviceCode,
-                Qty = d.Qty,
+                SerialNumber = d.SerialNumber,
                 DeviceTypeId = d.DeviceTypeId,
                 DeviceType = d.DeviceType.Name,
                 Disabled = d.Disabled,
+                Price = d.Price,
+                PurchasedAt = d.PurchasedAt,
+                SupplierId = d.SupplierId,
+                WarrantyToDate = d.WarrantyToDate,
+                Notes = d.Notes,
             })
             .FirstOrDefaultAsync();
     }
@@ -54,25 +59,46 @@ internal class DeviceService : IDeviceService
             .ToListAsync();
     }
 
+    private async Task<bool> SerialExistAsync(int id, string serial)
+    {
+        using var db = UseDb();
+        return await db.Devices.AnyAsync(d => d.Id != id && d.SerialNumber == serial);
+    }
+
     public async Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice req)
     {
         using var db = UseDb();
-        if (!string.IsNullOrWhiteSpace(req.DeviceCode))
+
+        if (!string.IsNullOrWhiteSpace(req.SerialNumber))
         {
-            var deviceExist = await db.Devices.Where(d => d.DeviceCode == req.DeviceCode).AnyAsync();
+            var deviceExist = await SerialExistAsync(0, req.SerialNumber);
             if (deviceExist)
             {
                 return Result<int>.Fail(Result.RECORD_DUPLICATED);
             }
+        }
+        else // generate a unique serial number for this device
+        {
+            req.SerialNumber = await GenerateDeviceSerialNumberAsync();
+
+        }
+
+        if (string.IsNullOrWhiteSpace(req.SerialNumber))
+        {
+            return Result<int>.Fail(Result.COULD_NOT_GENERATE_SERIAL_NUMBER);
         }
 
         var entity = db.Devices.Add(new()
         {
             Name = req.Name,
             Model = req.Model,
-            DeviceCode = req.DeviceCode,
+            SerialNumber = req.SerialNumber,
             DeviceTypeId = req.DeviceTypeId,
-            Qty = req.Qty,
+            Price = req.Price,
+            PurchasedAt = req.PurchasedAt,
+            SupplierId = req.SupplierId,
+            WarrantyToDate = req.WarrantyToDate,
+            Notes = req.Notes,
         }).Entity;
 
         await db.SaveChangesAsync();
@@ -90,10 +116,26 @@ internal class DeviceService : IDeviceService
             return Result<int>.Fail(Result.RECORD_DOES_NOT_EXIST);
         }
 
-        device.DeviceCode = req.DeviceCode;
+        if (string.IsNullOrWhiteSpace(req.SerialNumber))
+        {
+            req.SerialNumber = await GenerateDeviceSerialNumberAsync();
+        }
+
+        var serialExist = await SerialExistAsync(id, req.SerialNumber);
+        if (serialExist)
+        {
+            return Result<int>.Fail(Result.SERIAL_NUMBER_ALREADY_EXIST);
+        }
+
+        device.SerialNumber = req.SerialNumber;
         device.DeviceTypeId = req.DeviceTypeId;
         device.Model = req.Model;
         device.Name = req.Name;
+        device.SupplierId = req.SupplierId;
+        device.WarrantyToDate = req.WarrantyToDate;
+        device.PurchasedAt = req.PurchasedAt;
+        device.Price = req.Price;
+        device.Notes = req.Notes;
 
         await db.SaveChangesAsync();
 
@@ -107,7 +149,7 @@ internal class DeviceService : IDeviceService
 
         if (!string.IsNullOrEmpty(filter.Query))
         {
-            query = query.Where(d => d.Name.Contains(filter.Query) || d.Model.Contains(filter.Query));
+            query = query.Where(d => d.Name.Contains(filter.Query) || d.SerialNumber.Contains(filter.Query));
         }
 
         if (!string.IsNullOrWhiteSpace(filter?.SortBy))
@@ -117,10 +159,12 @@ internal class DeviceService : IDeviceService
             {
                 "name" => query.Sort(x => x.Name, isAsc),
                 "model" => query.Sort(x => x.Model, isAsc),
-                "devicecode" => query.Sort(x => x.DeviceCode, isAsc),
-                "qty" => query.Sort(x => x.Qty, isAsc),
+                "devicecode" => query.Sort(x => x.SerialNumber, isAsc),
+                "price" => query.Sort(x => x.Price, isAsc),
                 "devicetype" => query.Sort(x => x.DeviceTypeId, isAsc),
                 "disabled" => query.Sort(x => x.Disabled, isAsc),
+                "purchasedat" => query.Sort(x => x.PurchasedAt, isAsc),
+                "warrantytodate" => query.Sort(x => x.WarrantyToDate, isAsc),
                 _ => query.Sort(x => x.Id, isAsc)
             };
         }
@@ -138,11 +182,16 @@ internal class DeviceService : IDeviceService
             Id = d.Id,
             Name = d.Name,
             Model = d.Model,
-            DeviceCode = d.DeviceCode,
-            Qty = d.Qty,
+            SerialNumber = d.SerialNumber,
             DeviceTypeId = d.DeviceTypeId,
             DeviceType = d.DeviceType.Name,
             Disabled = d.Disabled,
+            PurchasedAt = d.PurchasedAt,
+            WarrantyToDate = d.WarrantyToDate,
+            SupplierId = d.SupplierId,
+            Supplier = d.Supplier.Name,
+            Price = d.Price,
+            Notes = d.Notes,
         })
         .ToListAsync();
 
@@ -159,7 +208,7 @@ internal class DeviceService : IDeviceService
             return Result<bool>.Fail(Result.RECORD_DOES_NOT_EXIST);
         }
 
-        var hasOwner = await db.UserDevices.AnyAsync(d => d.DeviceId == id && d.Qty > 0);
+        var hasOwner = await db.DeviceHistories.AnyAsync(d => d.DeviceId == id && d.ReturnedAt == null);
         if (hasOwner)
         {
             return Result<bool>.Fail(Result.DEVICE_IS_BEING_USED);
@@ -174,8 +223,45 @@ internal class DeviceService : IDeviceService
     public async Task<List<DeviceOwnerRecord>> GetDeviceOwnersAsync(int id)
     {
         using var db = UseDb();
-        return await db.UserDevices.Where(d => d.DeviceId == id)
-            .Select(d => new DeviceOwnerRecord(d.UserId, d.User.FullName, d.User.Email, d.Qty))
+        var owners = await db.DeviceHistories
+            .Where(d => d.DeviceId == id)
+            .Select(d => new DeviceOwnerRecord(d.UserId, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
             .ToListAsync();
+
+        if (owners.Count == 0)
+        {
+            return owners;
+        }
+
+        var activeOwner = owners.Where(x => x.ReturnedAt == null).SingleOrDefault();
+
+        if (activeOwner != null)
+        {
+            owners.Remove(activeOwner);
+            owners.Insert(0, activeOwner);
+        }
+
+        return owners;
+    }
+
+    private async Task<string> GenerateDeviceSerialNumberAsync()
+    {
+        var count = 1;
+        var serialNumber = "";
+
+        while (count <= 3)
+        {
+            serialNumber = StringHelper.GetRandomString("SBOX");
+            if (await SerialExistAsync(0, serialNumber))
+            {
+                count++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return serialNumber;
     }
 }

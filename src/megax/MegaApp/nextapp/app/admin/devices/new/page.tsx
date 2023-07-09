@@ -8,14 +8,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import { useAppDispatch } from "@/lib/store/state.hook";
 import Grid from "@mui/material/Grid";
 import {
-  fetchDeviceDetailThunk,
   fetchDeviceTypesThunk,
   reset as resetDevice,
 } from "@/lib/store/devices.state";
 import DeviceInfo from "../DeviceInfo";
+import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
 
 export default function NewDevicePage() {
   const pathname = usePathname();
@@ -24,6 +24,7 @@ export default function NewDevicePage() {
 
   useEffect(() => {
     appDispatch(fetchDeviceTypesThunk());
+    appDispatch(fetchSuppliersThunk());
 
     return () => {
       appDispatch(resetDevice());

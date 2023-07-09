@@ -80,4 +80,4 @@ public class UserModel
     }
 }
 
-public record UserDeviceModel(int UserId, int DeviceId, string Name, string Model, string DeviceType, int Qty);
+public record UserDeviceRecord(int Id, string Name, string SerialNumber, string DeviceType, DateTimeOffset TakenAt, DateTimeOffset? ReturnedAt);

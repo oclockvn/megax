@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
-import { User, UserDeviceModel } from "@/lib/models/user.model";
+import { User, UserDeviceRecord } from "@/lib/models/user.model";
 import { qs } from "../util";
 import { AxiosError } from "axios";
 
@@ -21,7 +21,7 @@ export async function updateUserDetail(user: User) {
 
 export async function assignDevice(id: number, deviceId: number) {
   try {
-    const res = await api.post<Result<UserDeviceModel>>(
+    const res = await api.post<Result<UserDeviceRecord>>(
       `/be/users/${id}/assign-device/${deviceId}`,
       {}
     );
@@ -35,12 +35,12 @@ export async function assignDevice(id: number, deviceId: number) {
     return {
       code: msg,
       success: false,
-    } as Result<UserDeviceModel>;
+    } as Result<UserDeviceRecord>;
   }
 }
 
 export async function getDevices(id: number) {
-  const res = await api.get<UserDeviceModel[]>(`/be/users/${id}/devices`);
+  const res = await api.get<UserDeviceRecord[]>(`/be/users/${id}/devices`);
   return res.data;
 }
 

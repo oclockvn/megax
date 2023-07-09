@@ -8,7 +8,6 @@ import CardHeader from "@mui/material/CardHeader";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
-import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -24,10 +23,13 @@ import {
 } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
-import { UserDeviceModel } from "@/lib/models/user.model";
+import { UserDeviceRecord } from "@/lib/models/user.model";
 import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useConfirm } from "material-ui-confirm";
+import Link from "next/link";
+import DeviceIconSelector from "@/components/admin/device/DeviceIconSelector";
+import Chip from "@mui/material/Chip";
 
 function UserDeviceAdd({
   userId,
@@ -78,11 +80,10 @@ function UserDeviceAdd({
           renderInput={params => <TextField {...params} label="Device" />}
           renderOption={(attrs, o) => (
             <li {...attrs} key={o.id}>
-              {o.name}
-              {o.model ? " - " + o.model : ""}
+              {o.name} - {o.serialNumber ? o.serialNumber : "N/A"}
             </li>
           )}
-          getOptionLabel={o => `${o.name}${o.model ? " - " + o.model : ""}`}
+          getOptionLabel={o => `${o.name} - ${o.serialNumber}`}
         />
       </div>
 
@@ -116,7 +117,6 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
   const appDispatch = useAppDispatch();
   const confirm = useConfirm();
   const { devices, loading } = useAppSelector(s => s.userDevice);
-  const count = devices.reduce((p, c) => p + c.qty, 0);
 
   const toggleAddDeviceVisibility = () => {
     setAddVisible(!isAddVisible);
@@ -146,42 +146,56 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     }
   }, [userId]);
 
-  const DeviceItem = (d: UserDeviceModel) => (
+  const DeviceItem = (d: UserDeviceRecord) => (
     <ListItem
+      className={d.returnedAt ? "bg-slate-100" : ""}
       secondaryAction={
-        <Button
-          title="Return device to admin"
-          type="button"
-          variant="text"
-          size="small"
-          onClick={() => confirmReturn(d.deviceId)}
-        >
-          Return
-        </Button>
+        d.returnedAt ? (
+          <div className="flex items-center">
+            <Chip
+              label="RETURNED"
+              size="small"
+              color="info"
+              className="text-xs"
+            />
+          </div>
+        ) : (
+          <Button
+            title="Return device to admin"
+            type="button"
+            variant="text"
+            size="small"
+            onClick={() => confirmReturn(d.id)}
+          >
+            Return
+          </Button>
+        )
       }
     >
       <ListItemIcon>
-        {d.qty > 1 ? (
-          <>
-            <Badge badgeContent={d.qty} color="primary">
-              <ComputerIcon />
-            </Badge>
-          </>
-        ) : (
-          <ComputerIcon />
-        )}
+        <DeviceIconSelector deviceType={d.deviceType} />
       </ListItemIcon>
       <ListItemText
-        primary={`${d.name}${d.model ? " - " + d.model : ""}`}
-        secondary={d.deviceType}
+        primary={
+          <Link
+            href={`/admin/devices/${d.id}`}
+            title="Open device"
+            className="text-blue-400"
+          >
+            {d.name} - {d.deviceType}
+          </Link>
+        }
+        secondary={d.serialNumber}
       />
     </ListItem>
   );
 
+  const activeDeviceCount = devices?.filter(d => d.returnedAt == null)?.length;
+
   const Header = () => (
     <div className="flex items-center">
       <h4 className="mr-6">Devices</h4>
-      <Badge badgeContent={count} color="primary"></Badge>
+      <Badge badgeContent={activeDeviceCount} color="primary"></Badge>
     </div>
   );
 
@@ -215,7 +229,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
           {devices?.length ? (
             <List>
               {devices.map(i => (
-                <React.Fragment key={i.deviceId}>
+                <React.Fragment key={i.id}>
                   <DeviceItem {...i} />
                   <Divider />
                 </React.Fragment>

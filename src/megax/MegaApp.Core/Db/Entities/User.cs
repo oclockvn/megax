@@ -27,8 +27,6 @@ public class User : ICreatedByEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
-
-    public List<UserDevice> Devices { get; set; } = new();
 }
 
 public static class UserQueryExtension

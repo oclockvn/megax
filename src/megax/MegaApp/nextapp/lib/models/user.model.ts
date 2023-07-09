@@ -8,11 +8,11 @@ export interface User {
   identityNumber: string;
 }
 
-export interface UserDeviceModel {
+export interface UserDeviceRecord {
   id: number;
-  deviceId: number;
   name: string;
-  model: string;
+  serialNumber: string;
   deviceType: string;
-  qty: number;
+  takenAt: Date;
+  returnedAt?: Date;
 }

@@ -3,6 +3,7 @@ import weatherStore from "./weather.state";
 import usersStore from "./users.state";
 import devicesStore from "./devices.state";
 import userDevicesStore from "./userDevice.state";
+import supplierStore from "./suppliers.state";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     users: usersStore,
     devices: devicesStore,
     userDevice: userDevicesStore,
+    suppliers: supplierStore,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

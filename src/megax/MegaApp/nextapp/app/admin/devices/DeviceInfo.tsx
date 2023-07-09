@@ -7,6 +7,8 @@ import Button from "@mui/material/Button";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
 import {
+  AutocompleteElement,
+  DatePickerElement,
   FormContainer,
   SelectElement,
   TextFieldElement,
@@ -43,6 +45,7 @@ export default function DeviceInfo({
   const { loading, loadingState, error, deviceTypes } = useAppSelector(
     s => s.devices
   );
+  const { pagedSuppliers } = useAppSelector(s => s.suppliers);
   const isUpdate = Number(device?.id) > 0;
 
   const handleClearError = () => {
@@ -53,6 +56,13 @@ export default function DeviceInfo({
     deviceTypes?.map(d => ({
       id: d.id,
       label: d.name,
+    })) || [];
+
+  const supplierOptions =
+    pagedSuppliers?.items?.map(x => ({
+      key: x.id,
+      id: x.id,
+      label: x.name + (x.website ? " - " + x.website : ""),
     })) || [];
 
   const formContext = useForm<Device>({
@@ -111,6 +121,14 @@ export default function DeviceInfo({
 
   const { handleSubmit } = formContext;
 
+  const autocompleteProps = {
+    renderOption: (props: any, option: { id: number; label: string }) => (
+      <li {...props} key={option.id}>
+        {option.label}
+      </li>
+    ),
+  };
+
   return (
     <>
       <FormContainer formContext={formContext}>
@@ -151,7 +169,15 @@ export default function DeviceInfo({
             </div>
 
             <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
-              <Grid item xs={6}>
+              <Grid item xs>
+                <TextFieldElement
+                  fullWidth
+                  label="Price"
+                  variant="outlined"
+                  name="price"
+                />
+              </Grid>
+              <Grid item xs>
                 <TextFieldElement
                   fullWidth
                   label="Model"
@@ -159,15 +185,50 @@ export default function DeviceInfo({
                   name="model"
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs>
                 <TextFieldElement
                   fullWidth
-                  label="Code"
+                  label="Serial Number"
                   variant="outlined"
-                  name="deviceCode"
+                  name="serialNumber"
                 />
               </Grid>
             </Grid>
+
+            <Grid container spacing={2}>
+              <Grid item>
+                <DatePickerElement
+                  label="Purchased At"
+                  name="purchasedAt"
+                  slotProps={{
+                    actionBar: {
+                      actions: ["today", "cancel", "accept"],
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <DatePickerElement
+                  label="Warranty To"
+                  name="warrantyToDate"
+                  slotProps={{
+                    actionBar: {
+                      actions: ["today", "cancel", "accept"],
+                    },
+                  }}
+                />
+              </Grid>
+            </Grid>
+
+            <div className="mt-4">
+              <AutocompleteElement
+                label="Supplier"
+                name="supplierId"
+                matchId
+                options={supplierOptions}
+                autocompleteProps={autocompleteProps}
+              />
+            </div>
           </CardContent>
 
           <CardActions className="bg-slate-100">

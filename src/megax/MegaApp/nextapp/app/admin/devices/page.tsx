@@ -16,6 +16,8 @@ import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckIcon from "@mui/icons-material/Check";
+import dateLib from "@/lib/datetime";
+import { formatMoney } from "@/lib/formatter";
 
 export default function DeviceListPage() {
   const pathname = usePathname();
@@ -36,9 +38,14 @@ export default function DeviceListPage() {
       headerName: "Device name",
       width: 400,
       renderCell: params => (
-        <Link href={`${pathname}/${params.id}`} className="text-blue-400">
-          {params.value}
-        </Link>
+        <div>
+          <Link href={`${pathname}/${params.id}`} className="text-blue-400">
+            {params.value}
+          </Link>
+          <div>
+            <small className="text-gray-400">#{params.row.serialNumber}</small>
+          </div>
+        </div>
       ),
     },
     {
@@ -52,16 +59,35 @@ export default function DeviceListPage() {
           <CheckIcon color="success" />
         ),
     },
-    { field: "model", headerName: "Model", width: 300 },
-    {
-      field: "deviceCode",
-      headerName: "Device code",
-      width: 150,
-    },
     {
       field: "deviceType",
       headerName: "Type",
       width: 200,
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      width: 200,
+      valueFormatter: params => formatMoney(params.value),
+    },
+    {
+      field: "purchasedAt",
+      headerName: "Purchased At",
+      width: 150,
+      valueFormatter: params => dateLib.formatDate(params.value, "dd/MM/yyyy"),
+    },
+    {
+      field: "warrantyToDate",
+      headerName: "Warranty To",
+      width: 150,
+      valueFormatter: params =>
+        params.value ? dateLib.formatDate(params.value, "dd/MM/yyyy") : "",
+    },
+    {
+      field: "supplier",
+      headerName: "Supplier",
+      width: 200,
+      sortable: false,
     },
   ];
 

@@ -76,7 +76,7 @@ public class UsersController : ApplicationControllerBase
     /// <returns></returns>
     [HttpPost("{id}/assign-device/{deviceId}")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<UserDeviceRecord>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AssignDevice(int id, int deviceId)
     {
@@ -91,10 +91,10 @@ public class UsersController : ApplicationControllerBase
     /// <returns></returns>
     [HttpGet("{id}/devices")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(List<UserDeviceModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<UserDeviceRecord>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserDevices(int id)
     {
-        var result = await userService.GetUserDevicesAsync(id);
+        var result = await userService.UserDevicesAsync(id);
         return Ok(result);
     }
 

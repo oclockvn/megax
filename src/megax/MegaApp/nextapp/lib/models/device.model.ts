@@ -2,7 +2,7 @@ export interface Device {
   id: number;
   name: string;
   model: string;
-  deviceCode: string;
+  serialNumber: string;
   deviceTypeId: number;
   disabled: boolean;
 }
@@ -12,9 +12,10 @@ export interface DeviceType {
   name: string;
 }
 
-export interface DeviceOwner {
-  userId: number;
+export interface DeviceOwnerRecord {
+  id: number;
   fullName: string;
   email: string;
-  qty: number;
+  takenAt: Date;
+  returnedAt?: Date;
 }

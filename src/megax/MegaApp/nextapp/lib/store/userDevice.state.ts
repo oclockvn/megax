@@ -1,15 +1,15 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { assignDevice, getDevices, returnDevice } from "../apis/user.api";
-import { UserDeviceModel } from "../models/user.model";
-import { DeviceOwner } from "../models/device.model";
+import { UserDeviceRecord } from "../models/user.model";
+import { DeviceOwnerRecord } from "../models/device.model";
 import { fetchDeviceOwners } from "../apis/devices.api";
 
 export interface UserDeviceState {
   loading: boolean;
   loadingState?: string;
   error?: string;
-  devices: UserDeviceModel[];
-  owners: DeviceOwner[];
+  devices: UserDeviceRecord[];
+  owners: DeviceOwnerRecord[];
 }
 
 const initialState: UserDeviceState = {
@@ -78,12 +78,7 @@ export const userDeviceSlice = createSlice({
           : `Couldn't add device. Error code: ${code}`;
 
         if (success) {
-          const exist = state.devices.find(d => d.deviceId === data.deviceId);
-          if (exist) {
-            exist.qty += 1;
-          } else {
-            state.devices = [data, ...state.devices];
-          }
+          state.devices = [data, ...state.devices];
         }
       })
       .addCase(getUserDevicesThunk.fulfilled, (state, action) => {
@@ -99,15 +94,10 @@ export const userDeviceSlice = createSlice({
 
         if (data) {
           const deviceId = action.meta.arg.deviceId;
-          const device = state.devices.find(d => d.deviceId === deviceId);
+          const device = state.devices.find(d => d.id === deviceId);
 
           if (device) {
-            device.qty -= 1;
-            if (device.qty === 0) {
-              state.devices = state.devices.filter(
-                d => d.deviceId !== deviceId
-              );
-            }
+            device.returnedAt = new Date();
           } else {
             throw new Error("something went wrong");
           }

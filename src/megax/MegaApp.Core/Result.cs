@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Runtime.CompilerServices;
-
 namespace MegaApp.Core
 {
     public record Result
@@ -24,6 +21,10 @@ namespace MegaApp.Core
         public static readonly string DEVICE_OUT_OF_QTY = "DEVICE_OUT_OF_QTY";
         public static readonly string DEVICE_IS_BEING_USED = "DEVICE_IS_BEING_USED";
         public static readonly string DEVICE_IS_DISABLED = "DEVICE_IS_DISABLED";
+        public static readonly string DEVICE_IS_UNAVAILABLE = "DEVICE_IS_UNAVAILABLE";
+        public static readonly string DEVICE_ALREADY_IN_STOCK = "DEVICE_ALREADY_IN_STOCK";
+        public static readonly string COULD_NOT_GENERATE_SERIAL_NUMBER = "COULD_NOT_GENERATE_SERIAL_NUMBER";
+        public static readonly string SERIAL_NUMBER_ALREADY_EXIST = "SERIAL_NUMBER_ALREADY_EXIST";
     }
 
     public record Result<T>(T Data) : Result
