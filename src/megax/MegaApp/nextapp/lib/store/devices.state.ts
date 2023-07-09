@@ -1,5 +1,10 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { EmptyPaged, Filter, PagedResult } from "../models/common.model";
+import {
+  EmptyPaged,
+  Filter,
+  PagedResult,
+  Result,
+} from "../models/common.model";
 import { Device, DeviceType } from "../models/device.model";
 import {
   addDevice,
@@ -47,7 +52,16 @@ export const updateDeviceDetailThunk = createAsyncThunk(
     thunkApi.dispatch(
       devicesSlice.actions.setLoadingState("Saving changes...")
     );
-    return await updateDevice(req);
+
+    try {
+      return await updateDevice(req);
+    } catch {
+      return Promise.resolve({
+        code: "SOMETHING_WENT_WRONG",
+        // data: null,
+        success: false,
+      } as Result<Device>);
+    }
   }
 );
 

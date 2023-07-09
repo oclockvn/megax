@@ -79,28 +79,13 @@ internal class DeviceService : IDeviceService
         }
         else // generate a unique serial number for this device
         {
-            var count = 1;
-            var serialExist = true;
+            req.SerialNumber = await GenerateDeviceSerialNumberAsync();
 
-            while (count <= 3)
-            {
-                req.SerialNumber = StringHelper.GetRandomString("SBOX");
-                serialExist = await SerialExistAsync(0, req.SerialNumber);
-                if (serialExist)
-                {
-                    count++;
-                }
-                else
-                {
-                    serialExist = false;
-                    break;
-                }
-            }
+        }
 
-            if (serialExist)
-            {
-                return Result<int>.Fail(Result.COULD_NOT_GENERATE_SERIAL_NUMBER);
-            }
+        if (string.IsNullOrWhiteSpace(req.SerialNumber))
+        {
+            return Result<int>.Fail(Result.COULD_NOT_GENERATE_SERIAL_NUMBER);
         }
 
         var entity = db.Devices.Add(new()
@@ -129,6 +114,17 @@ internal class DeviceService : IDeviceService
         if (device == null)
         {
             return Result<int>.Fail(Result.RECORD_DOES_NOT_EXIST);
+        }
+
+        if (string.IsNullOrWhiteSpace(req.SerialNumber))
+        {
+            req.SerialNumber = await GenerateDeviceSerialNumberAsync();
+        }
+
+        var serialExist = await SerialExistAsync(id, req.SerialNumber);
+        if (serialExist)
+        {
+            return Result<int>.Fail(Result.SERIAL_NUMBER_ALREADY_EXIST);
         }
 
         device.SerialNumber = req.SerialNumber;
@@ -246,5 +242,26 @@ internal class DeviceService : IDeviceService
         }
 
         return owners;
+    }
+
+    private async Task<string> GenerateDeviceSerialNumberAsync()
+    {
+        var count = 1;
+        var serialNumber = "";
+
+        while (count <= 3)
+        {
+            serialNumber = StringHelper.GetRandomString("SBOX");
+            if (await SerialExistAsync(0, serialNumber))
+            {
+                count++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return serialNumber;
     }
 }

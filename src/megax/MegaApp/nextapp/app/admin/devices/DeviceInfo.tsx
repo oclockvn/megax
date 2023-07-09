@@ -188,7 +188,7 @@ export default function DeviceInfo({
               <Grid item xs>
                 <TextFieldElement
                   fullWidth
-                  label="Code"
+                  label="Serial Number"
                   variant="outlined"
                   name="serialNumber"
                 />

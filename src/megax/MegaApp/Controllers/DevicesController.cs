@@ -87,7 +87,7 @@ public class DevicesController : ApplicationControllerBase
         var updateResult = await deviceService.UpdateDeviceAsync(id, req);
         if (!updateResult.Success)
         {
-            return BadRequest(updateResult);
+            return Ok(Result<DeviceModel>.Fail(updateResult.Code));
         }
 
         var device = await deviceService.GetDeviceAsync(id);
