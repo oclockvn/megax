@@ -1,26 +1,37 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import UserInfo from "./components/UserInfo";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { useEffect } from "react";
-import { clearUser, fetchUserDetailThunk } from "../../../../store/user.slice";
+import DeviceInfo from "./components/DeviceInfo";
+import {
+  clearDevice,
+  fetchDeviceDetailThunk,
+  fetchDeviceTypesThunk,
+} from "../../../../store/device.slice";
 
-function UserDetailPage() {
+function DeviceDetailPage() {
   const params = useParams();
   const id = params.id;
+  const navigate = useNavigate();
   const appDispatch = useAppDispatch();
-  const { user } = useAppSelector(state => state.userSlice);
+  const { device, error, deviceTypes } = useAppSelector(
+    state => state.deviceSlice
+  );
 
   useEffect(() => {
-    appDispatch(fetchUserDetailThunk(id));
+    appDispatch(fetchDeviceDetailThunk(id));
+    appDispatch(fetchDeviceTypesThunk());
     return () => {
-      appDispatch(clearUser());
+      appDispatch(clearDevice());
     };
   }, [id]);
+  const onDeviceDeleted = () => {
+    navigate("/devices");
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -28,18 +39,22 @@ function UserDetailPage() {
         <Breadcrumbs aria-label="breadcrumb">
           <NavLink
             color="inherit"
-            to={`/users`}
+            to={`/devices`}
             className="text-blue-500 flex items-center"
           >
             <ArrowBackIcon className="mr-2" />
-            Users
+            Devices
           </NavLink>
-          <div>{user?.fullName || "..."}</div>
+          <div>{device?.name || "..."}</div>
         </Breadcrumbs>
       </div>
       <Grid container spacing={2}>
         <Grid item xs={8}>
-          <UserInfo user={user} />
+          <DeviceInfo
+            device={device}
+            deviceTypes={deviceTypes}
+            onDeleted={onDeviceDeleted}
+          />
         </Grid>
         <Grid item xs={4}>
           Sidebar
@@ -49,4 +64,4 @@ function UserDetailPage() {
   );
 }
 
-export default UserDetailPage;
+export default DeviceDetailPage;

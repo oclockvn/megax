@@ -1,26 +1,37 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import UserInfo from "./components/UserInfo";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { useEffect } from "react";
-import { clearUser, fetchUserDetailThunk } from "../../../../store/user.slice";
+import {
+  clearDevice,
+  fetchDeviceTypesThunk,
+} from "../../../../store/device.slice";
+import DeviceInfo from "../DeviceDetail/components/DeviceInfo";
 
-function UserDetailPage() {
+function NewDevicePage() {
   const params = useParams();
   const id = params.id;
+  const navigate = useNavigate();
+
   const appDispatch = useAppDispatch();
-  const { user } = useAppSelector(state => state.userSlice);
+  const { device, error, deviceTypes } = useAppSelector(
+    state => state.deviceSlice
+  );
 
   useEffect(() => {
-    appDispatch(fetchUserDetailThunk(id));
+    appDispatch(fetchDeviceTypesThunk());
     return () => {
-      appDispatch(clearUser());
+      appDispatch(clearDevice());
     };
   }, [id]);
+
+  const redirectToPage = (id: number) => {
+    navigate(`/devices/${id}`);
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -28,18 +39,18 @@ function UserDetailPage() {
         <Breadcrumbs aria-label="breadcrumb">
           <NavLink
             color="inherit"
-            to={`/users`}
+            to={`/devices`}
             className="text-blue-500 flex items-center"
           >
             <ArrowBackIcon className="mr-2" />
-            Users
+            Devices
           </NavLink>
-          <div>{user?.fullName || "..."}</div>
+          <div>{device?.name || "New Device"}</div>
         </Breadcrumbs>
       </div>
       <Grid container spacing={2}>
         <Grid item xs={8}>
-          <UserInfo user={user} />
+          <DeviceInfo deviceTypes={deviceTypes} onAdded={redirectToPage} />
         </Grid>
         <Grid item xs={4}>
           Sidebar
@@ -49,4 +60,4 @@ function UserDetailPage() {
   );
 }
 
-export default UserDetailPage;
+export default NewDevicePage;
