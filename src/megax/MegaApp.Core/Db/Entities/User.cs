@@ -91,7 +91,7 @@ public class User : ICreatedByEntity
 
     [MaxLength(255)]
     public string BankBranch { get; set; }
-    public int BankId { get; set; }
+    public int? BankId { get; set; }
     public Bank Bank { get; set; }
 
     public DateTimeOffset ContractStart { get; set; }
@@ -100,7 +100,7 @@ public class User : ICreatedByEntity
     [MaxLength(255)]
     public string ContractType { get; set; }// official|contractor|fresher
 
-    public int TeamId { get; set; }
+    public int? TeamId { get; set; }
     public Team Team { get; set; }
 
     public List<Account> Accounts { get; set; } = new();
@@ -136,6 +136,8 @@ public class UserDocumentConfiguration : IEntityTypeConfiguration<UserDocument>
 
 public class Contact
 {
+    public int Id { get; set; }
+
     [MaxLength(255)]
     public string Name { get; set; }
     [MaxLength(255)]
