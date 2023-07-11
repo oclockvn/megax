@@ -32,10 +32,6 @@ api.interceptors.response.use(
 
 function handleRefreshToken(err: any) {
   const originalConfig = err.config;
-  console.log("> axios intercepter", {
-    status: err.response.status,
-    retried: originalConfig._retry,
-  });
 
   // if not 401 unauthorized -> skip it
   if (!err.response || err.response.status !== 401) {
@@ -52,23 +48,11 @@ function handleRefreshToken(err: any) {
   if (err.response.status === 401 && !originalConfig._retry) {
     originalConfig._retry = true;
 
-    window.location.href = "/expired";
-
-    // try {
-    //   const refreshTokenValue = storage.getRefreshToken();
-    //   if (refreshTokenValue) {
-    //     const tokenResult = await refreshToken(refreshTokenValue);
-    //     if (tokenResult && tokenResult.token) {
-    //       storage.setToken(tokenResult.token);
-    //       storage.setRefreshToken(tokenResult.refreshToken);
-
-    //       return client(originalConfig);
-    //     }
-    //   }
-    // } catch (_error) {
-    //   // exception when refresh token
-    //   return Promise.reject(_error);
-    // }
+    if (typeof window === "undefined") {
+      throw new Error("Token is expired");
+    } else {
+      window.location.href = "/expired";
+    }
   }
 
   return Promise.reject(err);
@@ -85,7 +69,6 @@ export function handleResponse(body: any) {
   for (const key of Object.keys(body)) {
     const value = body[key];
     if (isIsoDateString(value)) {
-      // console.log(`${body[key]} -> ${value}`);
       body[key] = dateLib.parseISO(value);
     } else if (typeof value === "object") {
       handleResponse(value);
