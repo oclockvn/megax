@@ -95,7 +95,7 @@ export default function UserListPage() {
   }, []);
 
   return (
-    <div className="p-4 min-h-[400px]">
+    <div className="p-4">
       <div className="mb-4">
         <CommonSearch handleSearch={onSearch} />
       </div>

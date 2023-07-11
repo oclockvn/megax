@@ -9,11 +9,11 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
+import { fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
-import UserInfo from "./UserInfo";
 import UserDeviceList from "./UserDeviceList";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
+import UserTabs from "./UserTabs";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -48,7 +48,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
         <Grid container spacing={2} className="p-4">
           <Grid item xs={8} md={6}>
-            <UserInfo user={user} />
+            <UserTabs user={user} />
           </Grid>
 
           <Grid item xs={4} md={3}>
