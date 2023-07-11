@@ -4,6 +4,7 @@ using MegaApp.Generator;
 using MegaApp.Infrastructure;
 using MegaApp.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services
     .AddCoreServices(dbOption =>
     {
         dbOption.UseSqlServer(connectionString)
+        .ConfigureWarnings(o => o.Ignore(SqlServerEventId.DecimalTypeKeyWarning))
 #if DEBUG
         .EnableDetailedErrors()
         .EnableSensitiveDataLogging()
