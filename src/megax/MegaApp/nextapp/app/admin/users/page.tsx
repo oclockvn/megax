@@ -121,7 +121,6 @@ export default function UserListPage() {
         sortingMode="server"
         onSortModelChange={onSorting}
         loading={loading}
-        className="min-h-[400px]"
       />
     </div>
   );
