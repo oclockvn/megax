@@ -5,6 +5,7 @@ import Tabs from "@mui/material/Tabs";
 import { useState } from "react";
 import UserInfo from "./UserInfo";
 import Card from "@mui/material/Card";
+import UserContactList from "./UserContactList";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -63,7 +64,7 @@ export default function UserTabs({ user }: UserTabsProps) {
         <UserInfo user={user} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Item Two
+        <UserContactList />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         Item Three
