@@ -17,6 +17,10 @@ namespace MegaApp.Core.Db
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeviceHistory> DeviceHistories { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Bank> Banks { get; set; }
+        public DbSet<UserDocument> UserDocuments { get; set; }
+        public DbSet<Team> Teams { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +32,8 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new DeviceConfiguration());
             modelBuilder.ApplyConfiguration(new DeviceTypeConfiguration());
             modelBuilder.ApplyConfiguration(new DeviceHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new BankConfiguration());
+            modelBuilder.ApplyConfiguration(new TeamConfiguration());
         }
     }
 }

@@ -132,7 +132,7 @@ export default function DeviceListPage() {
   }, []);
 
   return (
-    <div className="p-4 min-h-[400px]">
+    <div className="p-4">
       <Grid container className="mb-4" alignItems={"center"}>
         <Grid item xs={6}>
           <CommonSearch handleSearch={onSearch} />
@@ -171,7 +171,6 @@ export default function DeviceListPage() {
         sortingMode="server"
         onSortModelChange={onSorting}
         loading={loading}
-        className="min-h-[400px]"
       />
     </div>
   );
