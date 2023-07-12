@@ -13,18 +13,27 @@ import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Fragment, useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
-import { Device } from "../../../../lib/models/device.model";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../store/store.hook";
+import { Device } from "../../../../../lib/models/device.model";
 import Grid from "@mui/material/Grid";
 import Alert from "@mui/material/Alert";
-import { fetchDevicesThunk } from "../../../../store/device.slice";
+import { fetchDevicesThunk } from "../../../../../store/device.slice";
 import { toast } from "react-toastify";
 import {
   assignDeviceThunk,
   clearDeviceError,
-} from "../../../../store/userDevice.slice";
+} from "../../../../../store/userDevice.slice";
 
-function UserDeviceAdd({ userId }: UserDeviceLisProps) {
+function UserDeviceAdd({
+  userId,
+  onCancel,
+}: {
+  userId: number;
+  onCancel: () => void;
+}) {
   const appDispatch = useAppDispatch();
   const { pagedDevices } = useAppSelector(s => s.deviceSlice);
   const { deviceError, deviceLoading, deviceLoadingState } = useAppSelector(
@@ -34,7 +43,7 @@ function UserDeviceAdd({ userId }: UserDeviceLisProps) {
     appDispatch(fetchDevicesThunk());
   }, []);
 
-  const [value, setvalue] = useState<Device | null>();
+  const [value, setvalue] = useState<Device | null>(null);
   const handleAssignDevice = async () => {
     const result = await appDispatch(
       assignDeviceThunk({ userId, deviceId: Number(value?.id) })
@@ -81,7 +90,12 @@ function UserDeviceAdd({ userId }: UserDeviceLisProps) {
       </div>
 
       <div className="mt-2 flex gap-2">
-        <Button variant="text" className="flex-1" type="button">
+        <Button
+          variant="text"
+          className="flex-1"
+          type="button"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
         <Button
@@ -101,6 +115,11 @@ declare type UserDeviceLisProps = {
 };
 
 function UserDeviceList({ userId }: UserDeviceLisProps) {
+  const [isAddDeviceVisible, setIsAddDeviceVisible] = useState<boolean>(false);
+
+  const toggleAddDeviceVisibility = () => {
+    setIsAddDeviceVisible(!isAddDeviceVisible);
+  };
   const DeviceItem = () => (
     <ListItem
       secondaryAction={
@@ -131,13 +150,20 @@ function UserDeviceList({ userId }: UserDeviceLisProps) {
               variant="contained"
               size="small"
               className="bg-blue-500 text-white hover:!bg-blue-600"
+              onClick={toggleAddDeviceVisibility}
+              disabled={isAddDeviceVisible}
             >
               Add Device
             </Button>
           }
         />
         <CardContent className="px-0">
-          <UserDeviceAdd userId={userId} />
+          {isAddDeviceVisible && (
+            <UserDeviceAdd
+              userId={userId}
+              onCancel={toggleAddDeviceVisibility}
+            />
+          )}
 
           <List>
             {[1, 2, 3, 4].map(i => (

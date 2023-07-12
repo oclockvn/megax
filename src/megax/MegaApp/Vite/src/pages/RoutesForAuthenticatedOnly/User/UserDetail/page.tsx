@@ -8,7 +8,7 @@ import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { useEffect } from "react";
 import { clearUser, fetchUserDetailThunk } from "../../../../store/users.slice";
-import UserDeviceList from "../UserDeviceList/UserDeviceList";
+import UserDeviceList from "./components/UserDeviceList";
 
 function UserDetailPage() {
   const params = useParams();
