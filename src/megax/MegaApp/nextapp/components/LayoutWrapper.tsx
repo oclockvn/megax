@@ -11,7 +11,6 @@ export default function LayoutWrapper({
 }) {
   return (
     <>
-      {/* @ts-expect-error Server Component */}
       <ConfirmProvider defaultOptions={{}}>
         <Toaster />
         {children}

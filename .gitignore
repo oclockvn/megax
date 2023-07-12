@@ -266,3 +266,8 @@ LocalStorage/
 .vscode
 
 nextapp/package-lock.json
+wwwroot/ClientApp
+wwwroot/ClientApp/
+wwwroot/ClientApp/*
+
+.env.production
