@@ -55,15 +55,24 @@ export const fetchDeviceTypesThunk = createAsyncThunk(
   }
 );
 
+
 export const updateDeviceDetailThunk = createAsyncThunk(
-  "device/update-device",
-  async (device: Device, thunkApi) => {
-    thunkApi.dispatch(
-      deviceSlice.actions.setLoading({ loading: true, msg: "Saving change..." })
-    );
-    return await updateDeviceDetail(device);
+  "devices/update-detail",
+  async (req: Device, thunkApi) => {
+    thunkApi.dispatch(deviceSlice.actions.setLoadingState("Saving changes..."));
+
+    try {
+      return await updateDeviceDetail(req);
+    } catch {
+      return Promise.resolve({
+        code: "SOMETHING_WENT_WRONG",
+        // data: null,
+        success: false,
+      } as Result<Device>);
+    }
   }
 );
+
 export const addDeviceThunk = createAsyncThunk(
   "devices/add-device",
   async (device: Omit<Device, "id">, thunkApi) => {
@@ -146,7 +155,7 @@ export const deviceSlice = createSlice({
           ? undefined
           : `Counld't delete device. Error code: ${action.payload.code} `;
       })
-      .addCase(deleteDeviceThunk.rejected, state => {
+      .addCase(deleteDeviceThunk.rejected, (state, _) => {
         state.loading = false;
         state.loadingState = undefined;
         state.error = `Something went wrong`;

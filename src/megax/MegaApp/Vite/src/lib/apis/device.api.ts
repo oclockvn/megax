@@ -35,3 +35,5 @@ export async function deleteDevice(id: number) {
   return res.data;
 }
 
+
+

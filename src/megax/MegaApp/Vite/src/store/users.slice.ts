@@ -34,7 +34,7 @@ export const fetchUsersThunk = createAsyncThunk(
 );
 
 export const fetchUserDetailThunk = createAsyncThunk(
-  "user/user-detail",
+  "users/user-detail",
   async (id: number, thunkApi) => {
     thunkApi.dispatch(
       userSlice.actions.setLoading({ loading: true, msg: "Loading..." })
@@ -44,7 +44,7 @@ export const fetchUserDetailThunk = createAsyncThunk(
 );
 
 export const updateUserDetailThunk = createAsyncThunk(
-  "user/update-user",
+  "users/update-user",
   async (user: User, thunkApi) => {
     thunkApi.dispatch(
       userSlice.actions.setLoading({ loading: true, msg: "Saving change..." })
@@ -79,6 +79,7 @@ export const userSlice = createSlice({
     clearError: state => {
       state.error = undefined;
     },
+
     reset: state => initialState,
   },
   extraReducers(builder) {

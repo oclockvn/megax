@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import datetime from "../../../../lib/datetime";
 import { Filter, PageModel } from "../../../../lib/models/common.model";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
-import { fetchUsersThunk } from "../../../../store/user.slice";
+import { fetchUsersThunk } from "../../../../store/users.slice";
 import CustomPagination from "./components/CustomPagination";
 import SearchUser from "./components/SearchUser";
 

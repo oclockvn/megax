@@ -21,6 +21,7 @@ function DeviceDetailPage() {
   const { device, error, deviceTypes } = useAppSelector(
     state => state.deviceSlice
   );
+  console.log("device: ", device);
 
   useEffect(() => {
     appDispatch(fetchDeviceDetailThunk(id));

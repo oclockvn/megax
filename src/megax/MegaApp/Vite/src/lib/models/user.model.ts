@@ -17,3 +17,12 @@ export interface UsersSearch {
 export function EmptyUser(): User {
   return {} as User;
 }
+
+export interface UserDeviceRecord {
+  id: number;
+  name: string;
+  serialNumber: string;
+  deviceType: string;
+  takenAt: Date;
+  returnedAt?: Date;
+}

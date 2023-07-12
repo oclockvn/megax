@@ -21,7 +21,7 @@ import {
 import {
   clearError,
   updateUserDetailThunk,
-} from "../../../../../store/user.slice";
+} from "../../../../../store/users.slice";
 
 function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();

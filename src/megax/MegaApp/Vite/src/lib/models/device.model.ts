@@ -1,11 +1,10 @@
 export interface Device {
   id: number;
   name: string;
-  deviceCode: string;
   model: string;
-  qty: number;
+  serialNumber: string;
   deviceTypeId: number;
-  deviceType: number;
+  disabled: boolean;
 }
 
 export interface DeviceSearch {
@@ -20,4 +19,12 @@ export function EmptyDevice(): Device {
 export interface DeviceType {
   id: number;
   name: string;
+}
+
+export interface DeviceOwnerRecord {
+  id: number;
+  fullName: string;
+  email: string;
+  takenAt: Date;
+  returnedAt?: Date;
 }

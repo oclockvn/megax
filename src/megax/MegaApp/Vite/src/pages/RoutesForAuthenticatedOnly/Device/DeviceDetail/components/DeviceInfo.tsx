@@ -66,6 +66,7 @@ function DeviceInfo({
   };
 
   const onButtonSubmit = async (device: Device, redirect = false) => {
+    console.log("device: ", device);
     let id = 0;
     if (isUpdate) {
       const res = await appDispatch(updateDeviceDetailThunk(device)).unwrap();
@@ -94,7 +95,9 @@ function DeviceInfo({
     const id = Number(device?.id);
     const res = await appDispatch(deleteDeviceThunk(id)).unwrap();
     if (res.success) {
-      toast.success("Successfully deleted!");
+      console.log("res: ", res);
+      console.log("res.success: ", res.success);
+      // toast.success("Successfully deleted!");
       onDeleted && onDeleted();
     }
   };
@@ -153,8 +156,8 @@ function DeviceInfo({
               <Grid item xs={6}>
                 <TextFieldElement
                   fullWidth
-                  label="code"
-                  name="deviceCode"
+                  label="Serial Number"
+                  name="serialNumber"
                   required
                 />
               </Grid>

@@ -7,7 +7,8 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
 import { useEffect } from "react";
-import { clearUser, fetchUserDetailThunk } from "../../../../store/user.slice";
+import { clearUser, fetchUserDetailThunk } from "../../../../store/users.slice";
+import UserDeviceList from "../UserDeviceList/UserDeviceList";
 
 function UserDetailPage() {
   const params = useParams();
@@ -42,7 +43,7 @@ function UserDetailPage() {
           <UserInfo user={user} />
         </Grid>
         <Grid item xs={4}>
-          Sidebar
+          <UserDeviceList userId={user?.id || 0} />
         </Grid>
       </Grid>
     </Box>
