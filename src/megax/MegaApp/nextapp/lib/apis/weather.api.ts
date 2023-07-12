@@ -5,6 +5,6 @@ import { delay } from "../util";
 // import api from "@/lib/api"
 export async function fetchWeatherForecast() {
   await delay(2000);
-  const response = await api.get<WeatherForecast[]>("/be/weatherforecast");
+  const response = await api.get<WeatherForecast[]>("/api/weatherforecast");
   return response.data;
 }

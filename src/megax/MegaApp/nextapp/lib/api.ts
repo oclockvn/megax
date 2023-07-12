@@ -9,6 +9,7 @@ const api = axios.create({
   headers: {
     "Content-type": "application/json",
     Accept: "application/json",
+    "x-rewrite-me": 1,
   },
 });
 

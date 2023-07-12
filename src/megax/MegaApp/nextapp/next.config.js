@@ -26,7 +26,13 @@ if (isProd) {
     // },
     {
       // source: "/api/:path((?!auth/).*)", // skip auth path for authentication
-      source: "/be/:path*", // skip auth path for authentication
+      source: "/api/:path*", // skip auth path for authentication
+      has: [
+        {
+          type: "header",
+          key: "x-rewrite-me",
+        },
+      ],
       destination: apiUrl + "/api/:path*",
     },
   ];
