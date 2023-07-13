@@ -5,11 +5,11 @@ const apiUrl = process.env.BACKEND_URL;
 
 const nextConfig = {
   swcMinify: true,
-  // distDir: "dist",
+  distDir: "build",
 };
 
 if (isProd) {
-  // nextConfig.output = "export";
+  nextConfig.output = "export";
 } else {
   nextConfig.rewrites = async () => [
     {
