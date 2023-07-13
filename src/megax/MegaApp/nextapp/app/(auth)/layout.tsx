@@ -9,10 +9,10 @@ const roboto = Roboto({
   subsets: ["latin"],
 });
 
-// export const metadata = {
-//   title: "MegaApp - Sign In",
-//   description: "A Super App for A Company",
-// };
+export const metadata = {
+  title: "MegaApp - Sign In",
+  description: "A Super App for A Company",
+};
 
 export default function PortalLayout({
   children,
