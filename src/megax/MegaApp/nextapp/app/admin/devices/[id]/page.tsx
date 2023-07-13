@@ -64,5 +64,3 @@ export default function DevicePage({ params }: { params: { id: number } }) {
     </>
   );
 }
-
-export const dynamic = "force-dynamic";

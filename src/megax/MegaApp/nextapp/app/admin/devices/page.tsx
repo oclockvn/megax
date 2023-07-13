@@ -175,5 +175,3 @@ export default function DeviceListPage() {
     </div>
   );
 }
-
-export const dynamic = "force-dynamic";

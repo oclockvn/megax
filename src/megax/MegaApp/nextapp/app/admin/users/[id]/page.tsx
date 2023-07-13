@@ -63,5 +63,3 @@ export default function UserPage({ params }: { params: { id: number } }) {
     </>
   );
 }
-
-export const dynamic = "force-dynamic";

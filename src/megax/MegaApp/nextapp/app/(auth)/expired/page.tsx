@@ -23,5 +23,3 @@ export default function ExpiryPage() {
     </div>
   );
 }
-
-export const dynamic = "force-dynamic";

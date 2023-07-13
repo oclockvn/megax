@@ -65,5 +65,3 @@ export default function NewDevicePage() {
     </>
   );
 }
-
-export const dynamic = "force-dynamic";
