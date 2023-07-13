@@ -28,7 +28,7 @@ import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useConfirm } from "material-ui-confirm";
 import Link from "next/link";
-import DeviceIconSelector from "@/components/admin/device/DeviceIconSelector";
+import DeviceIconSelector from "@/components/admin/devices/DeviceIconSelector";
 import Chip from "@mui/material/Chip";
 
 function UserDeviceAdd({

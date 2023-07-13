@@ -5,6 +5,6 @@ import { Supplier } from "../models/supplier.model";
 
 export async function fetchSupplierList(filter: Partial<Filter> | undefined) {
   const query = filter ? qs(filter) : "";
-  const res = await api.get<PagedResult<Supplier>>("/be/suppliers?" + query);
+  const res = await api.get<PagedResult<Supplier>>("/api/suppliers?" + query);
   return res.data;
 }

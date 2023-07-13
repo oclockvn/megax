@@ -28,6 +28,7 @@ builder.Services
     })
     .AddGeneratorServices()
     .AddInfrastructureServices(builder.Configuration)
+    .AddNextJs(builder.Configuration)
     .AddSwaggerGen(o =>
     {
         o.SwaggerDoc("v1", new()
@@ -73,11 +74,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseCustomExceptionHandler();
 
+app.UseNextJsResouces();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
-app.MapFallbackToFile("index.html");
+// app.MapFallbackToFile("index.html");
 
 app.Run();

@@ -11,9 +11,9 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
-import UserDeviceList from "./UserDeviceList";
+import UserDeviceList from "@/components/admin/users/UserDeviceList";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
-import UserTabs from "./UserTabs";
+import UserTabs from "@/components/admin/users/UserTabs";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();

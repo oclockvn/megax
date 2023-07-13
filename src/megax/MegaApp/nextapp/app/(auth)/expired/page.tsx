@@ -1,6 +1,6 @@
 "use client";
 
-import { Typography } from "@mui/material";
+// import Typography from "@mui/material/Typography";
 import { useEffect } from "react";
 
 import { signOut } from "next-auth/react";
@@ -15,11 +15,11 @@ export default function ExpiryPage() {
 
   return (
     <div className="py-8">
-      <Typography itemType="h3">
+      <h3>
         Your session had been expired! Please re-login to use application.
         <br />
         Redirecting...
-      </Typography>
+      </h3>
     </div>
   );
 }

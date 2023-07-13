@@ -21,6 +21,7 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="NextjsStaticHosting.AspNetCore" Version="0.9.0-preview" />
   </ItemGroup>
 
   <ItemGroup>

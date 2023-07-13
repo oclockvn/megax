@@ -14,7 +14,7 @@ import {
   fetchDeviceTypesThunk,
   reset as resetDevice,
 } from "@/lib/store/devices.state";
-import DeviceInfo from "../DeviceInfo";
+import DeviceInfo from "@/components/admin/devices/DeviceInfo";
 import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
 
 export default function NewDevicePage() {
