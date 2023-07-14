@@ -6,8 +6,8 @@ export default function Home() {
   const { isAuthenticated, isLoading, user } = useAuth0();
   return (
     <>
-      Is authenticated: {isAuthenticated}
-      User: {user ? JSON.stringify(user) : ""}
+      Is authenticated: <div>{isAuthenticated ? "true" : "false"}</div>
+      User: <pre>{user ? JSON.stringify(user) : ""}</pre>
     </>
   );
 }
