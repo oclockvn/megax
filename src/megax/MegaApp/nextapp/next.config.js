@@ -5,7 +5,7 @@ const apiUrl = process.env.BACKEND_URL;
 
 const nextConfig = {
   swcMinify: true,
-  distDir: "../wwwroot/ClientApp",
+  // distDir: "../wwwroot/ClientApp",
 };
 
 if (isProd) {

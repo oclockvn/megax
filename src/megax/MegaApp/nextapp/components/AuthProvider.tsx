@@ -1,14 +1,22 @@
 "use client";
 
-import { Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
+import { auth0ClientId, auth0Domain, authUrl } from "@/lib/config";
+import { Auth0Provider } from "@auth0/auth0-react";
 
-export default function AuthProvider({
+export default function Auth0ProviderClient({
   children,
-  session,
 }: {
   children: React.ReactNode;
-  session?: Session | null;
 }) {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+  return (
+    <Auth0Provider
+      domain={auth0Domain}
+      clientId={auth0ClientId}
+      authorizationParams={{
+        redirect_uri: authUrl,
+      }}
+    >
+      {children}
+    </Auth0Provider>
+  );
 }

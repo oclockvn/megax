@@ -1,6 +1,6 @@
 import axios from "axios";
 import { authUrl } from "./config";
-import { getSession } from "next-auth/react";
+// import { getSession } from "next-auth/react";
 import dateLib from "./datetime";
 
 const api = axios.create({
@@ -14,8 +14,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async request => {
-  const session = await getSession();
-  const token = session ? (session as any)["authToken"] : null; // we inject token to session in jwt callback
+  // const session = await getSession();
+  const token = '';// session ? (session as any)["authToken"] : null; // we inject token to session in jwt callback
 
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;

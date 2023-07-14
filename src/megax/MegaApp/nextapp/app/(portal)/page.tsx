@@ -1,5 +1,13 @@
 "use client";
 
+import { useAuth0 } from "@auth0/auth0-react";
+
 export default function Home() {
-  return <h2>Dashboard</h2>;
+  const { isAuthenticated, isLoading, user } = useAuth0();
+  return (
+    <>
+      Is authenticated: {isAuthenticated}
+      User: {user ? JSON.stringify(user) : ""}
+    </>
+  );
 }

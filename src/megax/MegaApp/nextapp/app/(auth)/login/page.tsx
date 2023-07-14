@@ -1,16 +1,21 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+// import { signIn, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 import Button from "@mui/material/Button";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Typography } from "@mui/material";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function SignInPage() {
-  const { status } = useSession();
 
-  if (status === "authenticated") {
+  const { isLoading, isAuthenticated, error, user, loginWithRedirect, logout } =
+    useAuth0();
+
+  // const { status } = useSession();
+
+  if (isAuthenticated) {
     redirect("/");
   }
 
@@ -30,7 +35,7 @@ export default function SignInPage() {
           <Button
             variant="contained"
             className="!bg-blue-500 w-full"
-            onClick={() => signIn(provider)}
+            onClick={() => loginWithRedirect()}
           >
             <GoogleIcon className="mr-4" />
             Sign in using Google
