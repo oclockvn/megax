@@ -1,13 +1,11 @@
 // import React from 'react',
 import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
-import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -24,8 +22,20 @@ import { fetchDevicesThunk } from "../../../../../store/device.slice";
 import { toast } from "react-toastify";
 import {
   assignDeviceThunk,
-  clearDeviceError,
+  clearError,
+  getUserDevicesThunk,
+  returnDeviceThunk,
 } from "../../../../../store/userDevice.slice";
+import Badge from "@mui/material/Badge";
+import { useConfirm } from "material-ui-confirm";
+import Chip from "@mui/material/Chip";
+import DeviceIconSelector from "../../../Device/DeviceIconSelector";
+import { LinearProgress, Link } from "@mui/material";
+import { UserDeviceRecord } from "../../../../../lib/models/user.model";
+
+declare type UserDeviceListProps = {
+  userId: number;
+};
 
 function UserDeviceAdd({
   userId,
@@ -36,35 +46,38 @@ function UserDeviceAdd({
 }) {
   const appDispatch = useAppDispatch();
   const { pagedDevices } = useAppSelector(s => s.deviceSlice);
-  const { deviceError, deviceLoading, deviceLoadingState } = useAppSelector(
-    s => s.userDeviceSlice
-  );
+
+  const { error } = useAppSelector(s => s.userDeviceSlice);
+
   useEffect(() => {
     appDispatch(fetchDevicesThunk());
   }, []);
 
-  const [value, setvalue] = useState<Device | null>(null);
+  const [value, setValue] = useState<Device | null>(null);
+
   const handleAssignDevice = async () => {
     const result = await appDispatch(
       assignDeviceThunk({ userId, deviceId: Number(value?.id) })
     ).unwrap();
-    result?.data && toast.success("Successfully assign");
+    if (result?.data) {
+      toast.success("Successfully assign");
+    }
   };
 
   const handleCloseError = () => {
-    appDispatch(clearDeviceError());
+    appDispatch(clearError());
   };
 
   return (
     <div className="p-4 bg-slate-100">
-      {deviceError && (
+      {error && (
         <Grid sx={{ marginBottom: "1rem" }}>
           <Alert
             severity="error"
             className="border border-red-500"
             onClose={handleCloseError}
           >
-            {deviceError}
+            {error}
           </Alert>
         </Grid>
       )}
@@ -73,7 +86,7 @@ function UserDeviceAdd({
           options={pagedDevices.items}
           value={value}
           onChange={(_, d) => {
-            setvalue(d);
+            setValue(d);
           }}
           autoComplete
           renderInput={params => <TextField {...params} label="Device" />}
@@ -110,40 +123,95 @@ function UserDeviceAdd({
   );
 }
 
-declare type UserDeviceLisProps = {
-  userId: number;
-};
-
-function UserDeviceList({ userId }: UserDeviceLisProps) {
+function UserDeviceList({ userId }: UserDeviceListProps) {
+  const appDispatch = useAppDispatch();
+  const confirm = useConfirm();
+  const { devices, loading } = useAppSelector(s => s.userDeviceSlice);
   const [isAddDeviceVisible, setIsAddDeviceVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    userId > 0 && appDispatch(getUserDevicesThunk(userId));
+  }, [userId]);
 
   const toggleAddDeviceVisibility = () => {
     setIsAddDeviceVisible(!isAddDeviceVisible);
   };
-  const DeviceItem = () => (
+
+  const handleReturn = async (deviceId: number) => {
+    const result = await appDispatch(
+      returnDeviceThunk({ userId, deviceId })
+    ).unwrap();
+
+    result?.data === true && toast.success(`Successfully returned`);
+  };
+
+  const confirmReturn = (deviceId: number) => {
+    confirm({
+      description: "Return this device?",
+      dialogProps: { maxWidth: "xs" },
+    })
+      .then(() => handleReturn(deviceId))
+      .catch(() => {
+        /*ignore*/
+      });
+  };
+  const DeviceItem = (devices: UserDeviceRecord) => (
     <ListItem
+      className={devices.returnedAt ? "bg-slate-100" : ""}
       secondaryAction={
-        <Button
-          title="Return device to admin"
-          type="button"
-          variant="text"
-          size="small"
-        >
-          Return
-        </Button>
+        devices.returnedAt ? (
+          <div className="flex items-center">
+            <Chip
+              label="RETURNED"
+              size="small"
+              color="info"
+              className="text-xs"
+            />
+          </div>
+        ) : (
+          <Button
+            title="Return device to admin"
+            type="button"
+            variant="text"
+            size="small"
+            onClick={() => confirmReturn(devices.id)}
+          >
+            Return
+          </Button>
+        )
       }
     >
       <ListItemIcon>
-        <ComputerIcon />
+        <DeviceIconSelector deviceType={devices.deviceType} />
       </ListItemIcon>
-      <ListItemText primary="Device" secondary="Asus" />
+      <ListItemText
+        primary={
+          <Link
+            href={`/devices/${devices.id}`}
+            title="Open device"
+            className="text-blue-400"
+          >
+            {devices.name} - {devices.deviceType}
+          </Link>
+        }
+        secondary={devices.serialNumber}
+      />
     </ListItem>
+  );
+
+  const activeDeviceCount = devices?.filter(d => d.returnedAt == null)?.length;
+
+  const Header = () => (
+    <div className="flex items-center">
+      <h4 className="mr-6">Devices</h4>
+      <Badge badgeContent={activeDeviceCount} color="primary"></Badge>
+    </div>
   );
   return (
     <>
       <Card>
         <CardHeader
-          title={<h4>Devices</h4>}
+          title={<Header />}
           action={
             <Button
               type="button"
@@ -158,6 +226,7 @@ function UserDeviceList({ userId }: UserDeviceLisProps) {
           }
         />
         <CardContent className="px-0">
+          {loading && <LinearProgress />}
           {isAddDeviceVisible && (
             <UserDeviceAdd
               userId={userId}
@@ -165,16 +234,21 @@ function UserDeviceList({ userId }: UserDeviceLisProps) {
             />
           )}
 
-          <List>
-            {[1, 2, 3, 4].map(i => (
-              <Fragment key={i}>
-                <DeviceItem />
-                <Divider />
-              </Fragment>
-            ))}
-          </List>
+          {devices?.length ? (
+            <List>
+              {devices.map((item, index) => (
+                <Fragment key={item.id}>
+                  <DeviceItem {...item} />
+                  <Divider />
+                </Fragment>
+              ))}
+            </List>
+          ) : (
+            <div className="px-4">
+              <Alert severity="info">No Devices yet!</Alert>
+            </div>
+          )}
         </CardContent>
-        <CardActions></CardActions>
       </Card>
     </>
   );
