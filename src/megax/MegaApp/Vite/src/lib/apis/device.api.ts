@@ -1,5 +1,5 @@
 import { Filter, PagedResult, Result } from "../models/common.model";
-import { Device, DeviceType } from "../models/device.model";
+import { Device, DeviceOwnerRecord, DeviceType } from "../models/device.model";
 import { qs } from "../until";
 import api from "./api";
 
@@ -35,5 +35,9 @@ export async function deleteDevice(id: number) {
   return res.data;
 }
 
+export async function fetchDeviceOwners(id: number) {
+  const res = await api.get<DeviceOwnerRecord[]>(`/api/devices/${id}/owners`);
+  return res.data;
+}
 
 
