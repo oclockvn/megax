@@ -1,5 +1,6 @@
+import { AxiosError } from "axios";
 import { Filter, PagedResult, Result } from "../models/common.model";
-import { User } from "../models/user.model";
+import { User, UserDeviceRecord } from "../models/user.model";
 import { qs } from "../until";
 import api from "./api";
 
@@ -19,9 +20,47 @@ export async function updateUserDetail(user: User) {
 }
 
 export async function assignDevice(id: number, deviceId: number) {
-  const res = await api.post<Result<boolean>>(
-    `/api/users/${id}/assign-device/${deviceId}`,
-    {}
-  );
+  try {
+    const res = await api.post<Result<UserDeviceRecord>>(
+      `/api/users/${id}/assign-device/${deviceId}`,
+      {}
+    );
+    return res.data;
+  } catch (ex) {
+    const msg =
+      ex != null && ex instanceof AxiosError
+        ? ex.message
+        : "SOMETHING WENT WRONG";
+
+    return {
+      code: msg,
+      success: false,
+    } as Result<UserDeviceRecord>;
+  }
+}
+
+export async function getDevices(id: number) {
+  const res = await api.get<UserDeviceRecord[]>(`/api/users/${id}/devices`);
   return res.data;
+}
+
+export async function returnDevice(id: number, deviceId: number) {
+  try {
+    const res = await api.post<Result<boolean>>(
+      `/api/users/${id}/return-device/${deviceId}`,
+      {}
+    );
+    return res.data;
+  } catch (ex) {
+    const msg =
+      ex != null && ex instanceof AxiosError
+        ? ex.message
+        : "SOMETHING WENT WRONG";
+
+    return {
+      code: msg,
+      success: false,
+      data: false,
+    } as Result<boolean>;
+  }
 }
