@@ -12,10 +12,11 @@ import {
   fetchDeviceDetailThunk,
   fetchDeviceTypesThunk,
 } from "../../../../store/device.slice";
+import DeviceOwnerList from "./components/DeviceOwnerList";
 
 function DeviceDetailPage() {
   const params = useParams();
-  const id = params.id;
+  const id: any = params.id;
   const navigate = useNavigate();
   const appDispatch = useAppDispatch();
   const { device, error, deviceTypes } = useAppSelector(
@@ -58,7 +59,7 @@ function DeviceDetailPage() {
           />
         </Grid>
         <Grid item xs={4}>
-          Sidebar
+          {id > 0 && <DeviceOwnerList deviceId={id} />}
         </Grid>
       </Grid>
     </Box>
