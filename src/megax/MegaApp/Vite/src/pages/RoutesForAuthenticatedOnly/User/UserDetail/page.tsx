@@ -12,7 +12,7 @@ import UserDeviceList from "./components/UserDeviceList";
 
 function UserDetailPage() {
   const params = useParams();
-  const id = params.id;
+  const id: any = params.id;
   const appDispatch = useAppDispatch();
   const { user } = useAppSelector(state => state.userSlice);
 
@@ -24,7 +24,7 @@ function UserDetailPage() {
   }, [id]);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <div>
       <div role="presentation" className="bg-blue-200 py-2 px-6">
         <Breadcrumbs aria-label="breadcrumb">
           <NavLink
@@ -38,15 +38,20 @@ function UserDetailPage() {
           <div>{user?.fullName || "..."}</div>
         </Breadcrumbs>
       </div>
-      <Grid container spacing={2}>
-        <Grid item xs={8}>
+
+      <Grid container spacing={2} className="p-4">
+        <Grid item xs={6} md={6}>
           <UserInfo user={user} />
         </Grid>
-        <Grid item xs={4}>
+
+        <Grid item xs={3} md={3}>
+          Leave
+        </Grid>
+        <Grid item xs={3} sm={6} md={3}>
           <UserDeviceList userId={user?.id || 0} />
         </Grid>
       </Grid>
-    </Box>
+    </div>
   );
 }
 

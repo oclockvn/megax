@@ -11,27 +11,24 @@ import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Fragment, useEffect, useState } from "react";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../../../store/store.hook";
-import { Device } from "../../../../../lib/models/device.model";
+import { useAppDispatch, useAppSelector } from "@/store/store.hook";
+import { Device } from "@/lib/models/device.model";
 import Grid from "@mui/material/Grid";
 import Alert from "@mui/material/Alert";
-import { fetchDevicesThunk } from "../../../../../store/device.slice";
+import { fetchDevicesThunk } from "@/store/devices.slice";
 import { toast } from "react-toastify";
 import {
   assignDeviceThunk,
   clearError,
   getUserDevicesThunk,
   returnDeviceThunk,
-} from "../../../../../store/userDevice.slice";
+} from "@/store/userDevice.slice";
 import Badge from "@mui/material/Badge";
 import { useConfirm } from "material-ui-confirm";
 import Chip from "@mui/material/Chip";
 import DeviceIconSelector from "../../../Device/DeviceIconSelector";
 import { LinearProgress, Link } from "@mui/material";
-import { UserDeviceRecord } from "../../../../../lib/models/user.model";
+import { UserDeviceRecord } from "@/lib/models/user.model";
 
 declare type UserDeviceListProps = {
   userId: number;
@@ -90,15 +87,12 @@ function UserDeviceAdd({
           }}
           autoComplete
           renderInput={params => <TextField {...params} label="Device" />}
-          renderOption={(attribute, obj) => (
-            <li {...attribute} key={obj.id}>
-              {obj.name}
-              {obj.model ? " - " + obj.model : ""}
+          renderOption={(attrs, o) => (
+            <li {...attrs} key={o.id}>
+              {o.name} - {o.serialNumber ? o.serialNumber : "N/A"}
             </li>
           )}
-          getOptionLabel={obj =>
-            `${obj.name}${obj.model ? " - " + obj.model : ""}`
-          }
+          getOptionLabel={o => `${o.name} - ${o.serialNumber}`}
         />
       </div>
 
@@ -189,7 +183,7 @@ function UserDeviceList({ userId }: UserDeviceListProps) {
           <Link
             href={`/devices/${devices.id}`}
             title="Open device"
-            className="text-blue-400"
+            className="text-blue-400 mr-2"
           >
             {devices.name} - {devices.deviceType}
           </Link>
@@ -236,7 +230,7 @@ function UserDeviceList({ userId }: UserDeviceListProps) {
 
           {devices?.length ? (
             <List>
-              {devices.map((item, index) => (
+              {devices.map(item => (
                 <Fragment key={item.id}>
                   <DeviceItem {...item} />
                   <Divider />
