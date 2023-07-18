@@ -2,12 +2,17 @@ import { Button, Grid } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Filter, PageModel } from "../../../../lib/models/common.model";
-import { fetchDevicesThunk } from "../../../../store/device.slice";
-import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
+import { Filter, PageModel } from "@/lib/models/common.model";
+import { fetchDevicesThunk } from "@/store/devices.slice";
+import { useAppDispatch, useAppSelector } from "@/store/store.hook";
 import CustomPagination from "./components/CustomPagination";
 import SearchDevice from "./components/SearchDevice";
 import AddIcon from "@mui/icons-material/Add";
+import CheckIcon from "@mui/icons-material/Check";
+import BlockIcon from "@mui/icons-material/Block";
+import { formatMoney } from "@/lib/formatter";
+
+import dateLib from "@/lib/datetime";
 
 function DeviceListPage() {
   const columns: GridColDef[] = [
@@ -16,21 +21,59 @@ function DeviceListPage() {
       headerName: "Device Name",
       width: 300,
       renderCell: params => (
-        <NavLink to={`${params.id}`} className="text-blue-400">
-          {params.value}
-        </NavLink>
+        <div>
+          <NavLink to={`${params.id}`} className="text-blue-400">
+            {params.value}
+          </NavLink>
+          <div>
+            <small className="text-gray-400">#{params.row.serialNumber}</small>
+          </div>
+        </div>
       ),
     },
-    { field: "model", headerName: "Model", width: 300 },
     {
-      field: "deviceCode",
-      headerName: "Device Code",
-      width: 300,
+      field: "disabled",
+      headerName: "Status",
+      width: 100,
+      renderCell: params =>
+        params.value ? (
+          <BlockIcon color="error" />
+        ) : (
+          <CheckIcon color="success" />
+        ),
     },
     {
       field: "deviceType",
       headerName: "Device Type",
-      width: 300,
+      width: 200,
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      width: 200,
+      valueFormatter: params => formatMoney(params.value),
+    },
+    {
+      field: "purchasedAt",
+      headerName: "Purchased At",
+      width: 150,
+      valueFormatter: params =>
+        dateLib.formatDate(new Date(params.value), "dd/MM/yyyy"),
+    },
+    {
+      field: "warrantyToDate",
+      headerName: "Warranty To",
+      width: 150,
+      valueFormatter: params =>
+        params.value
+          ? dateLib.formatDate(new Date(params.value), "dd/MM/yyyy")
+          : "",
+    },
+    {
+      field: "supplier",
+      headerName: "Supplier",
+      width: 200,
+      sortable: false,
     },
   ];
 

@@ -8,13 +8,15 @@ import {
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import {
+  AutocompleteElement,
+  DatePickerElement,
   FormContainer,
   SelectElement,
   TextFieldElement,
   useForm,
 } from "react-hook-form-mui";
 import { toast } from "react-toastify";
-import { Device, DeviceType } from "../../../../../lib/models/device.model";
+import { Device, DeviceType } from "@/lib/models/device.model";
 import {
   clearError,
   updateDeviceDetailThunk,
@@ -22,11 +24,8 @@ import {
   deleteDeviceThunk,
   addDeviceThunk,
   setLoadingState,
-} from "../../../../../store/device.slice";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../../../store/store.hook";
+} from "@/store/devices.slice";
+import { useAppDispatch, useAppSelector } from "@/store/store.hook";
 import { useConfirm } from "material-ui-confirm";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -49,17 +48,35 @@ function DeviceInfo({
     state => state.deviceSlice
   );
 
+  const { pagedSuppliers } = useAppSelector(state => state.suppliersSlice);
+
   const deviceTypeOptions =
     deviceTypes?.map(type => ({
       id: type.id,
       label: type.name,
     })) || [];
 
+  const supplierOptions =
+    pagedSuppliers?.items?.map(x => ({
+      key: x.id,
+      id: x.id,
+      label: x.name + (x.website ? " - " + x.website : ""),
+    })) || [];
+
+  const autocompleteProps = {
+    renderOption: (props: any, option: { id: number; label: string }) => (
+      <li {...props} key={option.id}>
+        {option.label}
+      </li>
+    ),
+  };
+
   const formContext = useForm<Device>({
     values: device,
   });
 
   const isUpdate = Number(device?.id) > 0;
+  const disable = device?.disabled === true;
 
   const handleClearError = () => {
     appDispatch(clearError());
@@ -95,15 +112,14 @@ function DeviceInfo({
     const id = Number(device?.id);
     const res = await appDispatch(deleteDeviceThunk(id)).unwrap();
     if (res.success) {
-      console.log("res: ", res);
-      console.log("res.success: ", res.success);
-      // toast.success("Successfully deleted!");
+      toast.success("Successfully disabled!");
       onDeleted && onDeleted();
     }
   };
   const confirmDelete = () => {
     confirm({
-      description: "Delete this device?",
+      description: "Disable this device?",
+      dialogProps: { maxWidth: "xs" },
     })
       .then(handleDeleteDevice)
       .catch(() => {
@@ -145,7 +161,15 @@ function DeviceInfo({
               </Grid>
             </Grid>
             <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
+                <TextFieldElement
+                  fullWidth
+                  label="Price"
+                  name="price"
+                  required
+                />
+              </Grid>
+              <Grid item xs={4}>
                 <TextFieldElement
                   fullWidth
                   label="Model"
@@ -153,7 +177,7 @@ function DeviceInfo({
                   required
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <TextFieldElement
                   fullWidth
                   label="Serial Number"
@@ -162,6 +186,39 @@ function DeviceInfo({
                 />
               </Grid>
             </Grid>
+            <Grid container spacing={2}>
+              <Grid item>
+                <DatePickerElement
+                  label="Purchased At"
+                  name="purchasedAt"
+                  slotProps={{
+                    actionBar: {
+                      actions: ["today", "cancel", "accept"],
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <DatePickerElement
+                  label="Warranty To"
+                  name="warrantyToDate"
+                  slotProps={{
+                    actionBar: {
+                      actions: ["today", "cancel", "accept"],
+                    },
+                  }}
+                />
+              </Grid>
+            </Grid>
+            <div className="mt-4">
+              <AutocompleteElement
+                label="Supplier"
+                name="supplierId"
+                matchId
+                options={supplierOptions}
+                autocompleteProps={autocompleteProps}
+              />
+            </div>
           </CardContent>
 
           <CardActions className="bg-slate-100 flex justify-between">
@@ -186,17 +243,31 @@ function DeviceInfo({
                   {loading && <div className="ml-4">{loadingState}</div>}
                 </Grid>
                 <Grid item>
-                  <Button
-                    color="error"
-                    variant="outlined"
-                    type="button"
-                    className="bg-red-500 text-white hover:!bg-red-600"
-                    startIcon={<ClearIcon />}
-                    onClick={confirmDelete}
-                    disabled={loading}
-                  >
-                    Delete
-                  </Button>
+                  {disable ? (
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      type="button"
+                      className="bg-blue-500-500 text-white hover:!bg-blue-600"
+                      // startIcon={<ClearIcon />}
+                      // onClick={confirmDelete}
+                      disabled={loading}
+                    >
+                      Enable
+                    </Button>
+                  ) : (
+                    <Button
+                      color="error"
+                      variant="outlined"
+                      type="button"
+                      className="bg-red-500 text-white hover:!bg-red-600"
+                      startIcon={<ClearIcon />}
+                      onClick={confirmDelete}
+                      disabled={loading}
+                    >
+                      Disable
+                    </Button>
+                  )}
                 </Grid>
               </Grid>
             )}

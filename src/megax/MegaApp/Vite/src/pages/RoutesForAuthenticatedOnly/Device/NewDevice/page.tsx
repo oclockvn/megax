@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import {
   clearDevice,
   fetchDeviceTypesThunk,
-} from "../../../../store/device.slice";
+} from "../../../../store/devices.slice";
 import DeviceInfo from "../DeviceDetail/components/DeviceInfo";
 
 function NewDevicePage() {

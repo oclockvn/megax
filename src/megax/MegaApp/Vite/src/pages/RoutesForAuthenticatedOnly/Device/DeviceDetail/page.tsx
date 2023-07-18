@@ -4,15 +4,16 @@ import { useNavigate, useParams } from "react-router";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { NavLink } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../../store/store.hook";
+import { useAppDispatch, useAppSelector } from "@/store/store.hook";
 import { useEffect } from "react";
 import DeviceInfo from "./components/DeviceInfo";
 import {
   clearDevice,
   fetchDeviceDetailThunk,
   fetchDeviceTypesThunk,
-} from "../../../../store/device.slice";
+} from "@/store/devices.slice";
 import DeviceOwnerList from "./components/DeviceOwnerList";
+import { fetchSuppliersThunk } from "@/store/suppliers.slice";
 
 function DeviceDetailPage() {
   const params = useParams();
@@ -22,11 +23,10 @@ function DeviceDetailPage() {
   const { device, error, deviceTypes } = useAppSelector(
     state => state.deviceSlice
   );
-  console.log("device: ", device);
-
   useEffect(() => {
     appDispatch(fetchDeviceDetailThunk(id));
     appDispatch(fetchDeviceTypesThunk());
+    appDispatch(fetchSuppliersThunk());
     return () => {
       appDispatch(clearDevice());
     };
@@ -50,7 +50,7 @@ function DeviceDetailPage() {
           <div>{device?.name || "..."}</div>
         </Breadcrumbs>
       </div>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} className="p-4">
         <Grid item xs={8}>
           <DeviceInfo
             device={device}
