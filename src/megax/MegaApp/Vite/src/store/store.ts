@@ -3,8 +3,9 @@ import signinSlice from './signin.slice'
 import signupSlice from './signup.slice'
 import homeSlice from './home.slice'
 import userSlice from "./users.slice";
-import deviceSlice from "./device.slice";
+import deviceSlice from "./devices.slice";
 import userDeviceSlice from "./userDevice.slice";
+import suppliersSlice from "./suppliers.slice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     userSlice,
     deviceSlice,
     userDeviceSlice,
+    suppliersSlice,
   },
 });
 
