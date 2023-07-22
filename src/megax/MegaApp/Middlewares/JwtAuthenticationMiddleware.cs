@@ -53,7 +53,8 @@ namespace MegaApp.Middlewares
                         var token = authorization.ToString()["Bearer ".Length..].Trim();
                         var jwtHandler = new JwtSecurityTokenHandler();
 
-                        var scheme = (jwtHandler.CanReadToken(token) && jwtHandler.ReadJwtToken(token).Issuer.Equals(auth0Config.Issuer))
+                        // https://auth0.com/docs/secure/tokens/access-tokens/validate-access-tokens
+                        var scheme = (jwtHandler.CanReadToken(token) && jwtHandler.ReadJwtToken(token).Audiences.Any(au => au.Equals(auth0Config.Issuer)))
                             ? AUTH0_SCHEME : MEGAX_SCHEME;
 
                         return scheme;
