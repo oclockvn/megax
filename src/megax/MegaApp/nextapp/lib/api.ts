@@ -1,10 +1,10 @@
 import axios from "axios";
-import { authUrl } from "./config";
-// import { getSession } from "next-auth/react";
+import { frontendUrl } from "./config";
 import dateLib from "./datetime";
+import { getAccessToken } from "@/components/AuthProvider";
 
 const api = axios.create({
-  baseURL: authUrl,
+  baseURL: frontendUrl,
   withCredentials: true,
   headers: {
     "Content-type": "application/json",
@@ -14,8 +14,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async request => {
-  // const session = await getSession();
-  const token = '';// session ? (session as any)["authToken"] : null; // we inject token to session in jwt callback
+  const token = await getAccessToken();
 
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;
