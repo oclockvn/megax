@@ -4,6 +4,7 @@ using MegaApp.Services;
 using MegaApp.Core.Configs;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace MegaApp.Middlewares
 {
@@ -17,13 +18,13 @@ namespace MegaApp.Middlewares
             var jwtConfig = configation.GetSection("JwtConfig").Get<JwtConfig>();
             var auth0Config = configation.GetSection("Auth0").Get<Auth0Config>();
 
-            services.AddAuthentication(options =>
+            services
+            .AddAuthentication(options =>
             {
                 options.DefaultScheme = "MEGAX_OR_AUTH0";
-                // options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "MEGAX_OR_AUTH0";// JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "MEGAX_OR_AUTH0";
             })
-            .AddJwtBearer(MEGAX_SCHEME, options =>
+            .AddJwtBearer("MEGAX", options =>
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
@@ -38,12 +39,12 @@ namespace MegaApp.Middlewares
                     ClockSkew = TimeSpan.Zero,
                 };
             })
-            .AddJwtBearer(AUTH0_SCHEME, options =>
+            .AddJwtBearer("AUTH0", options =>
             {
                 options.Audience = auth0Config.Audience;
                 options.Authority = auth0Config.Authority;
             })
-            .AddPolicyScheme("MEGAX_OR_AUTH0", "MEGAX_OR_AUTH0", options =>
+            .AddPolicyScheme("MEGAX_OR_AUTH0", JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.ForwardDefaultSelector = context =>
                 {
@@ -53,18 +54,32 @@ namespace MegaApp.Middlewares
                         var token = authorization.ToString()["Bearer ".Length..].Trim();
                         var jwtHandler = new JwtSecurityTokenHandler();
 
-                        // https://auth0.com/docs/secure/tokens/access-tokens/validate-access-tokens
-                        var scheme = (jwtHandler.CanReadToken(token) && jwtHandler.ReadJwtToken(token).Audiences.Any(au => au.Equals(auth0Config.Issuer)))
-                            ? AUTH0_SCHEME : MEGAX_SCHEME;
+                        if (!jwtHandler.CanReadToken(token))
+                        {
+                            return MEGAX_SCHEME;
+                        }
 
-                        return scheme;
+                        var jwtToken = jwtHandler.ReadJwtToken(token);
+
+                        // https://auth0.com/docs/secure/tokens/access-tokens/validate-access-tokens
+                        if (string.Equals(jwtToken?.Issuer, auth0Config.Issuer, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return AUTH0_SCHEME;
+                        }
+
+                        // todo: fallback check as frontend doesn't have issuer, should remove
+                        if (jwtToken.Header.TryGetValue("iss", out var issuer) && string.Equals((string)issuer, auth0Config.Issuer, StringComparison.Ordinal))
+                        {
+                            return AUTH0_SCHEME;
+                        }
                     }
 
                     return MEGAX_SCHEME;
                 };
             });
 
-            // services.AddAuthorization();
+            // important, register Bearer scheme
+            services.AddAuthentication();
 
             return services;
         }
