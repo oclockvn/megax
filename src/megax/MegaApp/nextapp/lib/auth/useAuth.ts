@@ -1,6 +1,6 @@
-import { useSession } from "next-auth/react";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function useAuth() {
-  const auth = useSession();
-  return [auth.status === "authenticated", auth.data?.user?.name || ""];
+  const { user, isAuthenticated }  = useAuth0();
+  return [isAuthenticated, user?.email ];
 }

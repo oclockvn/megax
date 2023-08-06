@@ -3,7 +3,7 @@ import "../globals.css";
 import { Roboto } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import StateProvider from "@/lib/store/state.provider";
-import { getServerSession } from "next-auth";
+// import { getServerSession } from "next-auth";
 import DatePickerLocalizationProvider from "@/components/DatePickerLocalizationProvider";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
@@ -22,7 +22,7 @@ export default async function PortalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
+  // const session = await getServerSession();
 
   return (
     <html lang="en">
@@ -30,7 +30,7 @@ export default async function PortalLayout({
         <LayoutWrapper>
           <StateProvider>
             <DatePickerLocalizationProvider>
-              <AuthProvider session={session}>
+              <AuthProvider>
                 <Nav />
                 {children}
               </AuthProvider>

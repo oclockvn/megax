@@ -25,7 +25,7 @@ builder.Services
         .EnableSensitiveDataLogging()
 #endif
         ;
-    })
+    }, builder.Configuration)
     .AddGeneratorServices()
     .AddInfrastructureServices(builder.Configuration)
     .AddNextJs(builder.Configuration)

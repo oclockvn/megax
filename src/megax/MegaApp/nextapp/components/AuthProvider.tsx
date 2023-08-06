@@ -1,14 +1,47 @@
 "use client";
 
-import { Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
+import {
+  auth0Audience,
+  auth0ClientId,
+  auth0Domain,
+  auth0Issuer,
+  frontendUrl,
+} from "@/lib/config";
+import { Auth0Context, Auth0Provider } from "@auth0/auth0-react";
+import React from "react";
 
-export default function AuthProvider({
+export default function Auth0ProviderClient({
   children,
-  session,
 }: {
   children: React.ReactNode;
-  session?: Session | null;
 }) {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+  return (
+    <Auth0Provider
+      domain={auth0Domain || ""}
+      clientId={auth0ClientId || ""}
+      issuer={auth0Issuer}
+      authorizationParams={{
+        redirect_uri: `${frontendUrl}/callback`,
+        audience: auth0Audience,
+      }}
+    >
+      <Auth0Context.Consumer>
+      {({ getAccessTokenSilently }: any) => {
+        deferred.resolve(getAccessTokenSilently);
+        return <>{children}</>
+      }}
+    </Auth0Context.Consumer>
+    </Auth0Provider>
+  );
+}
+
+const deferred = (() => {
+  const props: Record<string,any> = {};
+  props.promise = new Promise((resolve) => props.resolve = resolve);
+  return props;
+})();
+
+export const getAccessToken = async () => {
+  const getToken = await deferred.promise;
+  return getToken();
 }

@@ -3,14 +3,14 @@
 // import Typography from "@mui/material/Typography";
 import { useEffect } from "react";
 
-import { signOut } from "next-auth/react";
+// import { signOut } from "next-auth/react";
 
 export default function ExpiryPage() {
   useEffect(() => {
-    const t = setTimeout(signOut, 2000);
-    return () => {
-      clearTimeout(t);
-    };
+    // const t = setTimeout(signOut, 2000);
+    // return () => {
+    //   clearTimeout(t);
+    // };
   }, []);
 
   return (

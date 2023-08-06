@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 
 const isProd = process.env.NODE_ENV === "production";
-const apiUrl = process.env.BACKEND_URL;
+const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const nextConfig = {
   swcMinify: true,
-  distDir: "../wwwroot/ClientApp",
+  // distDir: "../wwwroot/ClientApp",
 };
 
 if (isProd) {

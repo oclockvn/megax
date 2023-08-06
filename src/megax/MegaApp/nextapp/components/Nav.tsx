@@ -10,7 +10,7 @@ import {
   Button,
   // Skeleton,
 } from "@mui/material";
-import { signOut } from "next-auth/react";
+// import { signOut } from "next-auth/react";
 import Link from "next/link";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
@@ -99,7 +99,7 @@ export default function Nav() {
                     <MenuItem onClick={() => handleClose("/profile")}>
                       Profile
                     </MenuItem>
-                    <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+                    <MenuItem onClick={() => {}}>Logout</MenuItem>
                   </Menu>
                 </div>
               </div>
