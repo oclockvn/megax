@@ -1,6 +1,20 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import jwt_decode from "jwt-decode";
+import storage from "../storage";
 
 export default function useAuth() {
-  const { user, isAuthenticated }  = useAuth0();
-  return [isAuthenticated, user?.email ];
+  const token = storage.getToken();
+  if (token) {
+    const jwt = jwt_decode<Record<string, any>>(token);
+    if (jwt && typeof jwt === "object") {
+      if (!expired(Number(jwt["exp"]))) {
+        const name =
+          jwt["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+        return [true, name];
+      }
+    }
+  }
+
+  return [false, null];
 }
+
+const expired = (exp: number) => Date.now() >= exp * 1000;

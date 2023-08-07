@@ -25,6 +25,7 @@
     "axios": "^1.4.0",
     "date-fns": "^2.30.0",
     "eslint-config-next": "^13.4.9",
+    "jwt-decode": "^3.1.2",
     "material-ui-confirm": "^3.0.9",
     "next": "^13.4.9",
     "postcss": "8.4.23",

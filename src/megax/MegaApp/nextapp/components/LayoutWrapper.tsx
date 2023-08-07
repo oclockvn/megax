@@ -3,6 +3,7 @@
 import React from "react";
 import { ConfirmProvider } from "material-ui-confirm";
 import { Toaster } from "react-hot-toast";
+import NoSSR from "./NoSSR";
 
 export default function LayoutWrapper({
   children,
@@ -11,10 +12,12 @@ export default function LayoutWrapper({
 }) {
   return (
     <>
-      <ConfirmProvider defaultOptions={{}}>
-        <Toaster />
-        {children}
-      </ConfirmProvider>
+      <NoSSR>
+        <ConfirmProvider defaultOptions={{}}>
+          <Toaster />
+          {children}
+        </ConfirmProvider>
+      </NoSSR>
     </>
   );
 }

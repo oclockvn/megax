@@ -1,10 +1,9 @@
 import Nav from "@/components/Nav";
 import "../globals.css";
 import { Roboto } from "next/font/google";
-import AuthProvider from "@/components/AuthProvider";
+import AuthProvider from "@/components/providers/AuthProvider";
 import StateProvider from "@/lib/store/state.provider";
-// import { getServerSession } from "next-auth";
-import DatePickerLocalizationProvider from "@/components/DatePickerLocalizationProvider";
+import DatePickerLocalizationProvider from "@/components/providers/DatePickerLocalizationProvider";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
 const roboto = Roboto({
@@ -22,15 +21,13 @@ export default async function PortalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const session = await getServerSession();
-
   return (
     <html lang="en">
       <body className={roboto.className}>
         <LayoutWrapper>
           <StateProvider>
             <DatePickerLocalizationProvider>
-              <AuthProvider>
+              <AuthProvider useGuard>
                 <Nav />
                 {children}
               </AuthProvider>

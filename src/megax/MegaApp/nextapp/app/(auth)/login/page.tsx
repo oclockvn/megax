@@ -1,44 +1,42 @@
 "use client";
 
-// import { signIn, useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-
 import Button from "@mui/material/Button";
 import GoogleIcon from "@mui/icons-material/Google";
-import { Typography } from "@mui/material";
-import { useAuth0 } from "@auth0/auth0-react";
+import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
 
-import { GoogleLogin, useGoogleLogin , hasGrantedAnyScopeGoogle } from "@react-oauth/google";
+import {
+  useGoogleLogin,
+} from "@react-oauth/google";
+import storage from "@/lib/storage";
+import { googleSignIn } from "@/lib/apis/signin.api";
+import { useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
-  const { isLoading, isAuthenticated, error, user, loginWithRedirect, logout } =
-    useAuth0();
-    // const {} = use
+  const router = useRouter()
+  const [error, setEror] = useState("");
 
-    // hasGrantedAnyScopeGoogle()
-  // const { status } = useSession();
-  // const auth0Domain  = auth0Domain;
-
-  if (isAuthenticated) {
-    redirect("/");
-  }
-
-
-const googleLogin = useGoogleLogin({
-  flow: 'auth-code',
-  onSuccess: async (codeResponse) => {
-    const { code } =codeResponse;
+  const googleLogin = useGoogleLogin({
+    // flow: "auth-code",
+    flow: 'implicit',
+    onSuccess: async codeResponse => {
       console.log(codeResponse);
-      // const token = await googl
-      // const tokens = await axios.post(
-      //     'http://localhost:3001/auth/google', {
-      //         code: codeResponse.code,
-      //     });
+      // const { code } = codeResponse;
+      const resp = await googleSignIn(codeResponse.access_token);
+      if (resp.success) {
+        storage.setToken(resp.data.token);
+        storage.setRefreshToken(resp.data.refreshToken);
 
-      // console.log(tokens);
-  },
-  onError: errorResponse => console.log(errorResponse),
-});
+        router.replace("/");
+      }
+    },
+    onError: errorResponse =>
+      setEror(
+        errorResponse.error_description ||
+          "Unable to login using your google account"
+      ),
+  });
 
   return (
     <div
@@ -51,6 +49,8 @@ const googleLogin = useGoogleLogin({
         </Typography>
 
         <div className="mt-4">
+          {error?.length > 0 && <Alert severity="info">{error}</Alert>}
+
           <Button
             variant="contained"
             className="!bg-blue-500 w-full"

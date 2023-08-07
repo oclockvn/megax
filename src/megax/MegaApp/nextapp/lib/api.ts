@@ -1,7 +1,8 @@
 import axios from "axios";
 import { frontendUrl } from "./config";
 import dateLib from "./datetime";
-import { getAccessToken } from "@/components/AuthProvider";
+import storage from "./storage";
+// import { getAccessToken } from "@/components/providers/AuthProvider";
 
 const api = axios.create({
   baseURL: frontendUrl,
@@ -14,7 +15,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async request => {
-  const token = await getAccessToken();
+  const token = storage.getToken();
 
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;
