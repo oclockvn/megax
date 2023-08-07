@@ -8,10 +8,14 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { Typography } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
 
+import { GoogleLogin, useGoogleLogin , hasGrantedAnyScopeGoogle } from "@react-oauth/google";
+
 export default function SignInPage() {
   const { isLoading, isAuthenticated, error, user, loginWithRedirect, logout } =
     useAuth0();
+    // const {} = use
 
+    // hasGrantedAnyScopeGoogle()
   // const { status } = useSession();
   // const auth0Domain  = auth0Domain;
 
@@ -19,7 +23,22 @@ export default function SignInPage() {
     redirect("/");
   }
 
-  const provider = "google"; // currently we only support google
+
+const googleLogin = useGoogleLogin({
+  flow: 'auth-code',
+  onSuccess: async (codeResponse) => {
+    const { code } =codeResponse;
+      console.log(codeResponse);
+      // const token = await googl
+      // const tokens = await axios.post(
+      //     'http://localhost:3001/auth/google', {
+      //         code: codeResponse.code,
+      //     });
+
+      // console.log(tokens);
+  },
+  onError: errorResponse => console.log(errorResponse),
+});
 
   return (
     <div
@@ -35,7 +54,7 @@ export default function SignInPage() {
           <Button
             variant="contained"
             className="!bg-blue-500 w-full"
-            onClick={() => loginWithRedirect()}
+            onClick={() => googleLogin()}
           >
             <GoogleIcon className="mr-4" />
             Sign in using Google

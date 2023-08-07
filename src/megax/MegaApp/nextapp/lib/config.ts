@@ -6,3 +6,5 @@ export const auth0Domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN || "NEXT_PUBLIC_
 export const auth0ClientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || "NEXT_PUBLIC_AUTH0_CLIENT_ID";
 export const auth0Audience = process.env.NEXT_PUBLIC_AUTH0_AUDIENCE || "NEXT_PUBLIC_AUTH0_AUDIENCE";
 export const auth0Issuer = process.env.NEXT_PUBLIC_AUTH0_ISSUER || "NEXT_PUBLIC_AUTH0_ISSUER";
+
+export const googleClientId = process.env.GOOGLE_CLIENT_ID || "GOOGLE_CLIENT_ID"
