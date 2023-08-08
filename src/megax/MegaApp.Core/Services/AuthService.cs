@@ -40,14 +40,14 @@ internal class AuthService : IAuthService
         return Result<AccountValidationRecord>.Ok(new(account.Id, account.UserId));
     }
 
-    public async Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30)
+    public async Task<Guid> ReleaseRefreshTokenAsync(int accountId, string token, int expiryDay = 30)
     {
         using var db = UseDb();
         var entry = db.RefreshTokens.Add(new()
         {
             CreatedAt = DateTimeOffset.Now,
             ExpiresAt = DateTimeOffset.Now.AddDays(expiryDay),
-            AccountId = userId,
+            AccountId = accountId,
             Token = token, // each refresh token must be attached to a jwt
             IsActive = true,
         });

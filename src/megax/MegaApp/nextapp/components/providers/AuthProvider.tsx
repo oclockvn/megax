@@ -14,7 +14,6 @@ export default function AuthProvider({
   children: React.ReactNode;
   useGuard?: boolean;
 }) {
-  console.log('google client id', googleClientId);
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
       {useGuard ? <ProtectedRoute>{children}</ProtectedRoute> : children}
@@ -22,10 +21,13 @@ export default function AuthProvider({
   );
 }
 
+'use client';
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const AuthContext = createContext<{ isAuthenticated: boolean; name: string }>(
     { isAuthenticated: false, name: "" }
   );
+
   const [isAuthenticated, name] = useAuth();
   if (!isAuthenticated) {
     redirect("/login");

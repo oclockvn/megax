@@ -6,6 +6,7 @@ namespace MegaApp.Core.Dtos;
 public class UserModel
 {
     public int Id { get; set; }
+    public int AccountId { get; set; }
     public string Email { get; set; }
     public string FullName { get; set; }
     public DateTimeOffset? Dob { get; set; }
@@ -16,6 +17,11 @@ public class UserModel
     public UserModel()
     {
 
+    }
+
+    public UserModel(Db.Entities.User user, int accountId) : this(user)
+    {
+        AccountId = accountId;
     }
 
     public UserModel(Db.Entities.User user)

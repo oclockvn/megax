@@ -2,11 +2,15 @@ const getItem = (
   key: string,
   defaultValue: string | null = null
 ): string | null | undefined => {
+  if (typeof localStorage === 'undefined')
+    return defaultValue;
+
   return localStorage[key] || defaultValue;
 };
 
 const setItem = (key: string, value: string) => {
-  localStorage[key] = value;
+  if (typeof localStorage !== 'undefined')
+    localStorage[key] = value;
 };
 
 export default {
