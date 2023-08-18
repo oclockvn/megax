@@ -1,5 +1,7 @@
+declare type StorageKeys = 'token' | 'refresh-token';
+
 const getItem = (
-  key: string,
+  key: StorageKeys,
   defaultValue: string | null = null
 ): string | null | undefined => {
   if (typeof localStorage === 'undefined')
@@ -8,7 +10,7 @@ const getItem = (
   return localStorage[key] || defaultValue;
 };
 
-const setItem = (key: string, value: string) => {
+const setItem = (key: StorageKeys, value: string) => {
   if (typeof localStorage !== 'undefined')
     localStorage[key] = value;
 };
@@ -16,9 +18,4 @@ const setItem = (key: string, value: string) => {
 export default {
   get: getItem,
   set: setItem,
-  getToken: () => getItem("token"),
-  setToken: (token: string) => setItem("token", token),
-  getRefreshToken: () => getItem("refresh-token"),
-  setRefreshToken: (refreshToken: string) =>
-    setItem("refresh-token", refreshToken),
 };

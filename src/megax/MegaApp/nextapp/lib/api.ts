@@ -1,21 +1,19 @@
 import axios from "axios";
-import { frontendUrl } from "./config";
 import dateLib from "./datetime";
 import storage from "./storage";
-// import { getAccessToken } from "@/components/providers/AuthProvider";
 
 const api = axios.create({
-  baseURL: frontendUrl,
+  baseURL: process.env.NEXT_PUBLIC_FRONTEND_URL,
   withCredentials: true,
   headers: {
     "Content-type": "application/json",
-    Accept: "application/json",
+    "Accept": "application/json",
     "x-rewrite-me": 1,
   },
 });
 
 api.interceptors.request.use(async request => {
-  const token = storage.getToken();
+  const token = storage.get('token');
 
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;

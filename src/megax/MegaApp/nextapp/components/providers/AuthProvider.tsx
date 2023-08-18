@@ -1,11 +1,13 @@
 "use client";
 
-import { googleClientId } from "@/lib/config";
-import React, { createContext, useContext } from "react";
+import React, { createContext } from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import useAuth from "@/lib/auth/useAuth";
 import { redirect } from "next/navigation";
-import NoSSR from "../NoSSR";
+
+const googleAuthOption = {
+  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+}
 
 export default function AuthProvider({
   children,
@@ -15,13 +17,13 @@ export default function AuthProvider({
   useGuard?: boolean;
 }) {
   return (
-    <GoogleOAuthProvider clientId={googleClientId}>
+    <GoogleOAuthProvider {...googleAuthOption}>
       {useGuard ? <ProtectedRoute>{children}</ProtectedRoute> : children}
     </GoogleOAuthProvider>
   );
 }
 
-'use client';
+// 'use client';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const AuthContext = createContext<{ isAuthenticated: boolean; name: string }>(

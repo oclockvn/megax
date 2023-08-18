@@ -2,7 +2,7 @@ import jwt_decode from "jwt-decode";
 import storage from "../storage";
 
 export default function useAuth() {
-  const token = storage.getToken();
+  const token = storage.get('token');
   if (token) {
     const jwt = jwt_decode<Record<string, any>>(token);
     if (jwt && typeof jwt === "object") {
