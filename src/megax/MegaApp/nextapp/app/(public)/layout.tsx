@@ -1,12 +1,8 @@
 import Nav from "@/components/Nav";
-import { Roboto } from "next/font/google";
 import AuthProvider from "@/components/providers/AuthProvider";
 import "../globals.css";
-
-const roboto = Roboto({
-  weight: ["100", "300", "400", "700"],
-  subsets: ["latin"],
-});
+import MuiThemeProvider from "@/components/providers/MuiThemeProvider";
+import { quicksand } from "@/styles/fonts";
 
 export const metadata = {
   title: "MegaApp",
@@ -20,11 +16,13 @@ export default function PortalLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
-        <AuthProvider>
-          <Nav />
-          <div className="container mx-auto">{children}</div>
-        </AuthProvider>
+      <body className={quicksand.variable}>
+        <MuiThemeProvider>
+          <AuthProvider>
+            <Nav />
+            <div className="container mx-auto">{children}</div>
+          </AuthProvider>
+        </MuiThemeProvider>
       </body>
     </html>
   );

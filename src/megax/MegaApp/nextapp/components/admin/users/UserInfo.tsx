@@ -66,7 +66,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
     <>
       <FormContainer values={user} onSuccess={handleFormSubmit}>
         <Card>
-          <CardHeader title={<h4>User details</h4>} />
+          <CardHeader title={<h4 className="uppercase !text-[1.2rem] font-semibold">User details</h4>} />
           <CardContent>
             {error && (
               <div className="mb-5">
@@ -159,7 +159,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               />
             </div>
 
-            <h4 className="mb-4 mt-6 text-2xl">Contract details</h4>
+            <h4 className="mb-4 mt-6 uppercase !text-[1.2rem] font-semibold">Contract details</h4>
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
                 <DatePickerElement label="Start date" name="contractStart" />
@@ -177,7 +177,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Grid>
             </Grid>
 
-            <h4 className="mb-4 mt-6 text-2xl">Personal</h4>
+            <h4 className="mb-4 mt-6 uppercase !text-[1.2rem] font-semibold">Personal</h4>
             <Grid container spacing={2} className="mb-4">
               <Grid item xs={12} md={6}>
                 <TextFieldElement

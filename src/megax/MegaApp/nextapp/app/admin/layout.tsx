@@ -1,15 +1,11 @@
 import Nav from "@/components/Nav";
 import "../globals.css";
-import { Roboto } from "next/font/google";
 import AuthProvider from "@/components/providers/AuthProvider";
 import StateProvider from "@/lib/store/state.provider";
 import DatePickerLocalizationProvider from "@/components/providers/DatePickerLocalizationProvider";
 import LayoutWrapper from "@/components/LayoutWrapper";
-
-const roboto = Roboto({
-  weight: ["100", "300", "400", "700"],
-  subsets: ["latin"],
-});
+import { quicksand } from "@/styles/fonts";
+import MuiThemeProvider from "@/components/providers/MuiThemeProvider";
 
 export const metadata = {
   title: "MegaApp - Admin",
@@ -23,17 +19,19 @@ export default async function PortalLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
-        <LayoutWrapper>
-          <StateProvider>
-            <DatePickerLocalizationProvider>
-              <AuthProvider useGuard>
-                <Nav />
-                {children}
-              </AuthProvider>
-            </DatePickerLocalizationProvider>
-          </StateProvider>
-        </LayoutWrapper>
+      <body className={quicksand.variable}>
+        <MuiThemeProvider>
+          <LayoutWrapper>
+            <StateProvider>
+              <DatePickerLocalizationProvider>
+                <AuthProvider useGuard>
+                  <Nav />
+                  {children}
+                </AuthProvider>
+              </DatePickerLocalizationProvider>
+            </StateProvider>
+          </LayoutWrapper>
+        </MuiThemeProvider>
       </body>
     </html>
   );
