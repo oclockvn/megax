@@ -15,7 +15,13 @@ const setItem = (key: StorageKeys, value: string) => {
     localStorage[key] = value;
 };
 
+const deleteItem = (key: StorageKeys) => {
+  if (typeof localStorage !== 'undefined')
+    localStorage.removeItem(key);
+}
+
 export default {
   get: getItem,
   set: setItem,
+  delete: deleteItem,
 };
