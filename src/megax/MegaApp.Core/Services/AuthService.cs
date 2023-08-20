@@ -10,7 +10,7 @@ public interface IAuthService
 {
     Task<Result<AccountValidationRecord>> IsValidAccountAsync(string username, string password);
     Task<Result<bool>> IsRefreshTokenValid(int accountId, Guid refreshToken, string token);
-    Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30);
+    Task<Guid> ReleaseRefreshTokenAsync(int accountId, string token, int expiryDay = 30);
     Task RevokeRefreshTokenAsync(Guid refreshToken);
 }
 
