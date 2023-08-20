@@ -6,67 +6,59 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
-import { User } from "@/lib/models/user.model";
+import { User, userSchema } from "@/lib/models/user.model";
 import {
   DatePickerElement,
   FormContainer,
   SelectElement,
   TextFieldElement,
+  useForm,
 } from "react-hook-form-mui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { clearError, updateUserDetailThunk } from "@/lib/store/users.state";
-import toast from "react-hot-toast";
+import { clearError } from "@/lib/store/users.state";
 import Alert from "@mui/material/Alert";
-import Typography from "@mui/material/Typography";
+
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
   const { loading, loadingState, error } = useAppSelector(s => s.users);
 
   const handleFormSubmit = async (u: User) => {
-    const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
-    result.success && toast.success("User updated successfully");
+    // const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
+    // result.success && toast.success("User updated successfully");
+    console.log(u);
   };
 
   const handleClearError = () => {
     appDispatch(clearError());
   };
 
-  const contractTypes = [
-    {
-      id: 1,
-      label: "Office",
-    },
-    {
-      id: 2,
-      label: "Remote",
-    },
-    {
-      id: 3,
-      label: "Hybrid",
-    },
-  ];
+  const contractTypes = ["Office", "Remote", "Hybrid"].map(x => ({
+    id: x.toLowerCase(),
+    label: x,
+  }));
+  const genders = ["Male", "Female", "Secret"].map(x => ({
+    id: x.toLowerCase(),
+    label: x,
+  }));
 
-  const genders = [
-    {
-      id: 1,
-      label: "Male",
-    },
-    {
-      id: 2,
-      label: "Female",
-    },
-    {
-      id: 3,
-      label: "Secret",
-    },
-  ];
+  const form = useForm<User>({
+    resolver: yupResolver(userSchema),
+    values: user,
+  });
 
   return (
     <>
-      <FormContainer values={user} onSuccess={handleFormSubmit}>
+      <FormContainer formContext={form} onSuccess={handleFormSubmit}>
         <Card>
-          <CardHeader title={<h4 className="uppercase !text-[1.2rem] font-semibold">User details</h4>} />
+          <CardHeader
+            title={
+              <h4 className="uppercase !text-[1.2rem] font-semibold">
+                User details
+              </h4>
+            }
+          />
           <CardContent>
             {error && (
               <div className="mb-5">
@@ -124,13 +116,19 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               <Grid item xs={12} md={4}>
                 <TextFieldElement
                   fullWidth
+                  required
                   label="Identity number"
                   variant="outlined"
                   name="identityNumber"
                 />
               </Grid>
               <Grid item xs={12} md={4}>
-                <DatePickerElement name="dob" label="Birthdate" />
+                <DatePickerElement
+                  className="w-full"
+                  name="dob"
+                  required
+                  label="Birthdate"
+                />
               </Grid>
               <Grid item xs={12} md={4}>
                 <TextFieldElement
@@ -159,17 +157,30 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               />
             </div>
 
-            <h4 className="mb-4 mt-6 uppercase !text-[1.2rem] font-semibold">Contract details</h4>
+            <h4 className="mb-4 mt-6 uppercase !text-[1.2rem] font-semibold">
+              Contract details
+            </h4>
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
-                <DatePickerElement label="Start date" name="contractStart" />
+                <DatePickerElement
+                  required
+                  label="Start date"
+                  name="contractStart"
+                  className="w-full"
+                />
               </Grid>
               <Grid item xs={12} md={4}>
-                <DatePickerElement label="End date" name="contractEnd" />
+                <DatePickerElement
+                  label="End date"
+                  name="contractEnd"
+                  className="w-full"
+                />
               </Grid>
               <Grid item xs={12} md={4}>
                 <SelectElement
                   fullWidth
+                  required
+                  className="w-full"
                   label="Contract type"
                   name="contractType"
                   options={contractTypes}
@@ -177,7 +188,9 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Grid>
             </Grid>
 
-            <h4 className="mb-4 mt-6 uppercase !text-[1.2rem] font-semibold">Personal</h4>
+            <h4 className="mb-4 mt-6 uppercase !text-[1.2rem] font-semibold">
+              Personal
+            </h4>
             <Grid container spacing={2} className="mb-4">
               <Grid item xs={12} md={6}>
                 <TextFieldElement
@@ -201,7 +214,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <TextFieldElement fullWidth name="Religion" label="Religion" />
+                <TextFieldElement fullWidth name="religion" label="Religion" />
               </Grid>
             </Grid>
           </CardContent>

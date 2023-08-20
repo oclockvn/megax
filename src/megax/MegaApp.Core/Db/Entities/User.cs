@@ -52,7 +52,7 @@ public class User : ICreatedByEntity
     public string BirthPlace { get; set; }
 
     [MaxLength(255)]
-    public string Notion { get; set; }
+    public string Nation { get; set; }
 
     [MaxLength(255)]
     public string Religion { get; set; }
