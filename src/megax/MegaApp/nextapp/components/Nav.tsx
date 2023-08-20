@@ -16,8 +16,9 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/lib/auth/useAuth";
+import dynamic from "next/dynamic";
 
-export default function Nav() {
+function Nav() {
   const [isAuthenticated, username] = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -117,3 +118,5 @@ export default function Nav() {
     </>
   );
 }
+
+export default dynamic(() => Promise.resolve(Nav), { ssr: false });

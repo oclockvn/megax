@@ -4,8 +4,9 @@
 import React, { createContext } from "react";
 import useAuth from "@/lib/auth/useAuth";
 import { redirect } from "next/navigation";
+import dynamic from "next/dynamic";
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const AuthContext = createContext<{ isAuthenticated: boolean; name: string }>(
     { isAuthenticated: false, name: "" }
   );
@@ -21,3 +22,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     </AuthContext.Provider>
   );
 };
+
+export default dynamic(() => Promise.resolve(ProtectedRoute), {
+  ssr: false,
+});
