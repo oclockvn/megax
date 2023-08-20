@@ -21,12 +21,12 @@ export default function SignInPage() {
     // flow: "auth-code",
     flow: 'implicit',
     onSuccess: async codeResponse => {
-      console.log(codeResponse);
+      // console.log(codeResponse);
       // const { code } = codeResponse;
       const resp = await googleSignIn(codeResponse.access_token);
       if (resp.success) {
-        storage.setToken(resp.data.token);
-        storage.setRefreshToken(resp.data.refreshToken);
+        storage.set('token', resp.data.token);
+        storage.set('refresh-token', resp.data.refreshToken);
 
         router.replace("/");
       }
