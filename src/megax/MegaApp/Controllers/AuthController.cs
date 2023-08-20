@@ -112,7 +112,7 @@ namespace MegaApp.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> GoogleSignIn(GoogleToken googleAuth)
         {
-            var (valid, claims) = await googleAuthenticateClient.ValidateAsync(googleAuth.IdToken);
+            var (valid, claims) = await googleAuthenticateClient.ValidateAccessTokenAsync(googleAuth.IdToken);
             if (!valid)
             {
                 return Unauthorized();
@@ -137,7 +137,7 @@ namespace MegaApp.Controllers
             }
 
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
-            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.AccountId, token.Token);
 
             return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken)));
         }

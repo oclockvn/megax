@@ -9,19 +9,25 @@ namespace MegaApp.Infrastructure.GoogleClient
     }
 
     public record GoogleClaim(string Name, string Email);
+    public record GoogleUserInfo(string Name, string Email, string Username);
 
     public interface IGoogleAuthenticateClient
     {
         Task<(bool valid, GoogleClaim claim)> ValidateAsync(string idToken);
+        Task<(bool valid, GoogleClaim claim)> ValidateAccessTokenAsync(string accessToken);
     }
 
     internal class GoogleAuthenticateClient : IGoogleAuthenticateClient
     {
         private readonly GoogleClientOption googleClientOption;
+        private readonly IHttpClientFactory httpClientFactory;
 
-        public GoogleAuthenticateClient(IOptions<GoogleClientOption> options)
+        public GoogleAuthenticateClient(
+            IOptions<GoogleClientOption> options,
+            IHttpClientFactory httpClientFactory)
         {
             googleClientOption = options.Value;
+            this.httpClientFactory = httpClientFactory;
         }
 
         public async Task<(bool valid, GoogleClaim claim)> ValidateAsync(string idToken)
@@ -45,6 +51,26 @@ namespace MegaApp.Infrastructure.GoogleClient
             {
                 return (false, null);
             }
+        }
+
+        public async Task<(bool valid, GoogleClaim claim)> ValidateAccessTokenAsync(string accessToken)
+        {
+            using var httpClient = httpClientFactory.CreateClient();
+            var req = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/userinfo/v2/me");
+            req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            var resp = await httpClient.SendAsync(req);
+
+            if (resp.IsSuccessStatusCode)
+            {
+                var json = await resp.Content.ReadAsStringAsync();
+                var userInfo = System.Text.Json.JsonSerializer.Deserialize<GoogleUserInfo>(json, new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
+                return (true, new GoogleClaim(userInfo.Name, userInfo.Email));
+            }
+
+            return (false, null);
         }
     }
 }

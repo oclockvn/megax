@@ -10,6 +10,7 @@ namespace MegaApp.Infrastructure
         {
             services.Configure<GoogleClientOption>(configuration.GetSection("GoogleClient"));
 
+            services.AddHttpClient();
             return services
                 .AddScoped<IGoogleAuthenticateClient, GoogleAuthenticateClient>()
             ;

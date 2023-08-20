@@ -1,25 +1,42 @@
 "use client";
 
-// import { signIn, useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-
 import Button from "@mui/material/Button";
 import GoogleIcon from "@mui/icons-material/Google";
-import { Typography } from "@mui/material";
-import { useAuth0 } from "@auth0/auth0-react";
+import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
+
+import {
+  useGoogleLogin,
+} from "@react-oauth/google";
+import storage from "@/lib/storage";
+import { googleSignIn } from "@/lib/apis/signin.api";
+import { useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
-  const { isLoading, isAuthenticated, error, user, loginWithRedirect, logout } =
-    useAuth0();
+  const router = useRouter()
+  const [error, setEror] = useState("");
 
-  // const { status } = useSession();
-  // const auth0Domain  = auth0Domain;
+  const googleLogin = useGoogleLogin({
+    // flow: "auth-code",
+    flow: 'implicit',
+    onSuccess: async codeResponse => {
+      // console.log(codeResponse);
+      // const { code } = codeResponse;
+      const resp = await googleSignIn(codeResponse.access_token);
+      if (resp.success) {
+        storage.set('token', resp.data.token);
+        storage.set('refresh-token', resp.data.refreshToken);
 
-  if (isAuthenticated) {
-    redirect("/");
-  }
-
-  const provider = "google"; // currently we only support google
+        router.replace("/");
+      }
+    },
+    onError: errorResponse =>
+      setEror(
+        errorResponse.error_description ||
+          "Unable to login using your google account"
+      ),
+  });
 
   return (
     <div
@@ -32,10 +49,12 @@ export default function SignInPage() {
         </Typography>
 
         <div className="mt-4">
+          {error?.length > 0 && <Alert severity="info">{error}</Alert>}
+
           <Button
             variant="contained"
             className="!bg-blue-500 w-full"
-            onClick={() => loginWithRedirect()}
+            onClick={() => googleLogin()}
           >
             <GoogleIcon className="mr-4" />
             Sign in using Google

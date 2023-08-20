@@ -1,6 +1,6 @@
 import Nav from "@/components/Nav";
 import { Roboto } from "next/font/google";
-import AuthProvider from "@/components/AuthProvider";
+import AuthProvider from "@/components/providers/AuthProvider";
 import "../globals.css";
 
 const roboto = Roboto({

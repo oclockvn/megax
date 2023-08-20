@@ -35,8 +35,8 @@ internal class UserService : IUserService
     public async Task<UserModel> GetUserAsync(int id)
     {
         using var db = UseDb();
-        return await db.Users.Where(u => u.Id == id)
-            .Select(u => new UserModel(u))
+        return await db.Accounts.Where(a => a.UserId == id)
+            .Select(a => new UserModel(a.User, a.Id))
             .FirstOrDefaultAsync();
     }
 
@@ -107,8 +107,8 @@ internal class UserService : IUserService
             throw new ArgumentNullException(nameof(username));
 
         using var db = UseDb();
-        var user = await db.Users.Where(u => u.Accounts.Any(a => a.Username == username))
-            .Select(u => new UserModel(u))
+        var user = await db.Accounts.Where(a => a.Username == username)
+            .Select(a => new UserModel(a.User, a.Id))
             .FirstOrDefaultAsync();
 
         return user;

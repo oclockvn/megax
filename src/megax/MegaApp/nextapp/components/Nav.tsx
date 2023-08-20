@@ -16,8 +16,11 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/lib/auth/useAuth";
+import dynamic from "next/dynamic";
+// import { googleLogout } from "@react-oauth/google";
+import storage from "@/lib/storage";
 
-export default function Nav() {
+function Nav() {
   const [isAuthenticated, username] = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -33,6 +36,13 @@ export default function Nav() {
       router.push(redirectUrl);
     }
   };
+
+  const handleLogout = () => {
+    storage.delete('token');
+    storage.delete('refresh-token');
+
+    router.push('/login');
+  }
 
   const toolbarBg = isAuthenticated ? "" : "bg-white";
   const logoColor = isAuthenticated ? "text-white" : "text-blue-500";
@@ -99,7 +109,7 @@ export default function Nav() {
                     <MenuItem onClick={() => handleClose("/profile")}>
                       Profile
                     </MenuItem>
-                    <MenuItem onClick={() => {}}>Logout</MenuItem>
+                    <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
                   </Menu>
                 </div>
               </div>
@@ -117,3 +127,5 @@ export default function Nav() {
     </>
   );
 }
+
+export default dynamic(() => Promise.resolve(Nav), { ssr: false });
