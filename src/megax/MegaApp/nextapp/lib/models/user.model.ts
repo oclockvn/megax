@@ -40,7 +40,7 @@ export const userSchema = yup.object({
   religion: yup.string().nullable().default(null),
   taxNumber: yup.string().nullable().default(null),
   insuranceNumber: yup.string().nullable().default(null),
-  married: yup.boolean().nullable().default(null),
+  married: yup.boolean().default(false),
   academicLevel: yup.string().nullable().default(null),
   university: yup.string().nullable().default(null),
   major: yup.string().nullable().default(null),
@@ -54,13 +54,11 @@ export const userSchema = yup.object({
   contractStart: yup.date().required().label('Contract start'),
   contractEnd: yup
     .date()
-    .default(null)
+    .required()
     .min(
       yup.ref("contractStart"),
       "Contract end must be greater than contract start"
-    )
-    .nullable()
-    .default(null),
+    ),
   contractType: yup
     .string()
     .oneOf(["official", "contractor", "fresher"])

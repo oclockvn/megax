@@ -12,29 +12,36 @@ import {
   FormContainer,
   SelectElement,
   TextFieldElement,
+  SwitchElement,
   useForm,
 } from "react-hook-form-mui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { clearError } from "@/lib/store/users.state";
+import { clearError, updateUserDetailThunk } from "@/lib/store/users.state";
 import Alert from "@mui/material/Alert";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import toast from "react-hot-toast";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
   const { loading, loadingState, error } = useAppSelector(s => s.users);
 
   const handleFormSubmit = async (u: User) => {
-    // const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
-    // result.success && toast.success("User updated successfully");
-    console.log(u);
+    const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
+    result.success
+      ? toast.success("User updated successfully")
+      : toast.error("Something went wrong. Check details and retry.");
+
+    if (result.success) {
+      handleClearError();
+    }
   };
 
   const handleClearError = () => {
     appDispatch(clearError());
   };
 
-  const contractTypes = ["Office", "Remote", "Hybrid"].map(x => ({
+  const contractTypes = ["Official", "Contractor", "Fresher"].map(x => ({
     id: x.toLowerCase(),
     label: x,
   }));
@@ -67,6 +74,16 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 </Alert>
               </div>
             )}
+
+            <div className="mb-4">
+              <TextFieldElement
+                fullWidth
+                required
+                label="Employee ID"
+                name="code"
+                variant="outlined"
+              />
+            </div>
 
             <div className="mb-4">
               <Grid container spacing={2}>
@@ -171,6 +188,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Grid>
               <Grid item xs={12} md={4}>
                 <DatePickerElement
+                  required
                   label="End date"
                   name="contractEnd"
                   className="w-full"
@@ -217,6 +235,16 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 <TextFieldElement fullWidth name="religion" label="Religion" />
               </Grid>
             </Grid>
+
+            <div className="mb-5">
+              <SwitchElement label="Is married?" name="married" />
+            </div>
+
+            {error && (
+              <Alert severity="error" onClose={handleClearError}>
+                {error}
+              </Alert>
+            )}
           </CardContent>
 
           <CardActions className="bg-slate-100">

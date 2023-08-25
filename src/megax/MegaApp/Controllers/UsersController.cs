@@ -50,13 +50,13 @@ public class UsersController : ApplicationControllerBase
     /// Update user
     /// </summary>
     /// <param name="id">The user id</param>
-    /// <param name="req"><see cref="UserModel.UpdateUser" /></param>
+    /// <param name="req"><see cref="UserUpdateModel" /></param>
     /// <returns></returns>
     [HttpPost("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<UserModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateUser(int id, UserModel.UpdateUser req)
+    public async Task<IActionResult> UpdateUser(int id, UserUpdateModel req)
     {
         var updateResult = await userService.UpdateUserDetailAsync(id, req);
         if (!updateResult.Success)
