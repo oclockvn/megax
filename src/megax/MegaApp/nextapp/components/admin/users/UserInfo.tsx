@@ -14,6 +14,7 @@ import {
   TextFieldElement,
   SwitchElement,
   useForm,
+  AutocompleteElement,
 } from "react-hook-form-mui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { clearError, updateUserDetailThunk } from "@/lib/store/users.state";
@@ -22,6 +23,7 @@ import Alert from "@mui/material/Alert";
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import datetime from "@/lib/datetime";
+import nationalities from "@/lib/constants/nationalities";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
@@ -150,10 +152,17 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 />
               </Grid>
               <Grid item xs={12} md={4}>
-                <TextFieldElement
-                  fullWidth
-                  label="Nationality"
+                <AutocompleteElement
                   name="nationality"
+                  label="Nationality"
+                  options={nationalities}
+                  autocompleteProps={{
+                    renderOption(attrs, o) {
+                      return (
+                        <li {...attrs} key={o}>{o}</li>
+                      );
+                    },
+                  }}
                 />
               </Grid>
             </Grid>
@@ -196,28 +205,34 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                   format="dd/MM/yyyy"
                   name="contractEnd"
                   className="w-full"
-                  maxDate={new Date(9999,11,31)}
+                  maxDate={new Date(9999, 11, 31)}
                   slotProps={{
                     shortcuts: {
                       items: [
                         {
-                          label: '1 Year',
+                          label: "1 Year",
                           getValue: () => {
-                            return datetime.addYears(form.getValues('contractStart'), 1);
+                            return datetime.addYears(
+                              form.getValues("contractStart"),
+                              1
+                            );
                           },
                         },
                         {
-                          label: '2 Years',
+                          label: "2 Years",
                           getValue: () => {
-                            return datetime.addYears(form.getValues('contractStart'), 2);
+                            return datetime.addYears(
+                              form.getValues("contractStart"),
+                              2
+                            );
                           },
                         },
                         {
-                          label: 'Permanent Contract',
+                          label: "Permanent Contract",
                           getValue: () => {
-                            return new Date('9999-12-31');
+                            return new Date(9999,11,31);
                           },
-                        }
+                        },
                       ],
                     },
                   }}
