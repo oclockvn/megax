@@ -43,6 +43,11 @@ public class UsersController : ApplicationControllerBase
     public async Task<IActionResult> GetUser(int id)
     {
         var user = await userService.GetUserAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
         return Ok(user);
     }
 
