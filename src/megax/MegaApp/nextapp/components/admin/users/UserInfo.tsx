@@ -325,6 +325,26 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               <SwitchElement label="Is married?" name="married" />
             </div>
 
+            <h4 className="my-4 uppercase !text-[1.2rem] font-semibold">
+              Bank Account
+            </h4>
+            <Grid container spacing={2} className="mb-4">
+              <Grid item xs={12} md={4}>
+                <SelectElement
+                  fullWidth
+                  label="Bank"
+                  name="bankId"
+                  options={[{id: 1, label: 'Bank 1'}, { id: 2, label: 'Bank 2'}]}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextFieldElement fullWidth label="Account number" name="bankAccountNumber" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextFieldElement fullWidth label="Bank branch" name="bankBranch" />
+              </Grid>
+            </Grid>
+
             {error && (
               <Alert severity="error" onClose={handleClearError}>
                 {error}

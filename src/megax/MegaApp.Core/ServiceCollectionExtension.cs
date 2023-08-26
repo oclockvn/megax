@@ -22,6 +22,7 @@ public static class ServiceCollectionExtension
             .AddScoped<IAuthService, AuthService>()
             .AddScoped<IDeviceService, DeviceService>()
             .AddScoped<ISupplierService, SupplierService>()
+            .AddScoped<IBankService, BankService>()
             .AddSettings(configuration)
             ;
     }
