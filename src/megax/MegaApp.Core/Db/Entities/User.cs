@@ -9,9 +9,11 @@ public class User : ICreatedByEntity
     public int Id { get; set; }
 
     [MaxLength(100)]
+    [Required]
     public string Code { get; set; }
 
     [MaxLength(100)]
+    [Required]
     public string Email { get; set; }
 
     [MaxLength(100)]
@@ -111,50 +113,6 @@ public class User : ICreatedByEntity
     public int? CreatedBy { get; set; }
 }
 
-public class UserDocument
-{
-    public int Id { get; set; }
-
-    [MaxLength(255)]
-    public string DocumentType { get; set; } // CMND|CCCD
-    public DateTimeOffset? IssueDate { get; set; }
-    [MaxLength(255)]
-    public string DocumentNumber { get; set; }
-    [MaxLength(255)]
-    public string IssuePlace { get; set; }
-    [MaxLength(255)]
-    public string IssueBy { get; set; }
-}
-
-public class UserDocumentConfiguration : IEntityTypeConfiguration<UserDocument>
-{
-    public void Configure(EntityTypeBuilder<UserDocument> builder)
-    {
-        builder.HasIndex(x => x.DocumentNumber).IsUnique();
-    }
-}
-
-public class Contact
-{
-    public int Id { get; set; }
-
-    [MaxLength(255)]
-    public string Name { get; set; }
-    [MaxLength(255)]
-    public string Phone { get; set; }
-    [MaxLength(255)]
-    public string Email { get; set; }
-    [MaxLength(255)]
-    public string Address { get; set; }
-    public DateTimeOffset? Dob { get; set; }
-    [MaxLength(255)]
-    public string Relationship { get; set; }//wife|child|relative
-    public bool IsPrimaryContact { get; set; }
-
-    public int UserId { get; set; }
-    public User User { get; set; }
-}
-
 public static class UserQueryExtension
 {
     public static IQueryable<User> Filter(this IQueryable<User> query, string q)
@@ -168,8 +126,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("sysdatetimeoffset()");
 
-        builder.HasIndex(x => x.Email)
-            .IsUnique();
+        builder.HasIndex(x => x.Email).IsUnique();
+        builder.HasIndex(x => x.Code).IsUnique();
 
         builder.HasMany(u => u.Accounts)
             .WithOne(a => a.User)
