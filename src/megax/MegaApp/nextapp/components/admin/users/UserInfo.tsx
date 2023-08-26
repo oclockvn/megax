@@ -21,6 +21,7 @@ import Alert from "@mui/material/Alert";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
+import datetime from "@/lib/datetime";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
@@ -141,6 +142,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Grid>
               <Grid item xs={12} md={4}>
                 <DatePickerElement
+                  format="dd/MM/yyyy"
                   className="w-full"
                   name="dob"
                   required
@@ -181,6 +183,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               <Grid item xs={12} md={4}>
                 <DatePickerElement
                   required
+                  format="dd/MM/yyyy"
                   label="Start date"
                   name="contractStart"
                   className="w-full"
@@ -190,8 +193,34 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 <DatePickerElement
                   required
                   label="End date"
+                  format="dd/MM/yyyy"
                   name="contractEnd"
                   className="w-full"
+                  maxDate={new Date(9999,11,31)}
+                  slotProps={{
+                    shortcuts: {
+                      items: [
+                        {
+                          label: '1 Year',
+                          getValue: () => {
+                            return datetime.addYears(form.getValues('contractStart'), 1);
+                          },
+                        },
+                        {
+                          label: '2 Years',
+                          getValue: () => {
+                            return datetime.addYears(form.getValues('contractStart'), 2);
+                          },
+                        },
+                        {
+                          label: 'Permanent Contract',
+                          getValue: () => {
+                            return new Date('9999-12-31');
+                          },
+                        }
+                      ],
+                    },
+                  }}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -236,7 +265,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Grid>
             </Grid>
 
-            <div className="mb-5">
+            <div>
               <SwitchElement label="Is married?" name="married" />
             </div>
 

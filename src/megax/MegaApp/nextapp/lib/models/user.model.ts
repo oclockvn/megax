@@ -54,6 +54,7 @@ export const userSchema = yup.object({
   contractStart: yup.date().required().label('Contract start'),
   contractEnd: yup
     .date()
+    .label('Contract end')
     .required()
     .min(
       yup.ref("contractStart"),

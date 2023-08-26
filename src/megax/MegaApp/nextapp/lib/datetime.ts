@@ -21,6 +21,7 @@ import {
   addMonths,
   startOfYear,
   endOfYear,
+  addYears,
 } from "date-fns";
 
 const startOfDay = (date: Date): Date => {
@@ -109,6 +110,7 @@ export default {
   addMonths,
   startOfYear,
   endOfYear,
+  addYears,
 };
 
 // export function handleDates(body: any) {
