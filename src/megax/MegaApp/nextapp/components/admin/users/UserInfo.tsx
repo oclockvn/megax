@@ -48,7 +48,27 @@ export default function UserInfo({ user }: { user: User | undefined }) {
     id: x.toLowerCase(),
     label: x,
   }));
+
   const genders = ["Male", "Female", "Secret"].map(x => ({
+    id: x.toLowerCase(),
+    label: x,
+  }));
+
+  const workingTypes = ["Remote", "Office", "Hybrid"].map(x => ({
+    id: x.toLowerCase(),
+    label: x,
+  }));
+
+  const roles = [
+    "Developer",
+    "QA",
+    "Leader",
+    "Tech Lead",
+    "Designer",
+    "Admin",
+    "HR",
+    "BOD",
+  ].map(x => ({
     id: x.toLowerCase(),
     label: x,
   }));
@@ -159,7 +179,9 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                   autocompleteProps={{
                     renderOption(attrs, o) {
                       return (
-                        <li {...attrs} key={o}>{o}</li>
+                        <li {...attrs} key={o}>
+                          {o}
+                        </li>
                       );
                     },
                   }}
@@ -188,7 +210,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
             <h4 className="mb-4 mt-6 uppercase !text-[1.2rem] font-semibold">
               Contract details
             </h4>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} className="mb-4">
               <Grid item xs={12} md={4}>
                 <DatePickerElement
                   required
@@ -230,7 +252,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                         {
                           label: "Permanent Contract",
                           getValue: () => {
-                            return new Date(9999,11,31);
+                            return new Date(9999, 11, 31);
                           },
                         },
                       ],
@@ -246,6 +268,25 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                   label="Contract type"
                   name="contractType"
                   options={contractTypes}
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <SelectElement
+                  fullWidth
+                  label="Working type"
+                  name="workingType"
+                  options={workingTypes}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <SelectElement
+                  fullWidth
+                  name="role"
+                  label="Role"
+                  options={roles}
                 />
               </Grid>
             </Grid>

@@ -105,7 +105,7 @@ internal class UserService : IUserService
         user.PermanentResidence = req.PermanentResidence;
         user.Dob = req.Dob;
         user.IdentityNumber = req.IdentityNumber;
-        // user.Role = req.Role;
+        user.Role = req.Role;
         user.WorkingType = req.WorkingType;
         user.Gender = req.Gender;
         user.PersonalEmail = req.PersonalEmail;
