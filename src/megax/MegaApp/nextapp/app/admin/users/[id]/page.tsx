@@ -14,6 +14,7 @@ import Grid from "@mui/material/Grid";
 import UserDeviceList from "@/components/admin/users/UserDeviceList";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import UserTabs from "@/components/admin/users/UserTabs";
+import { fetchBanksThunk } from "@/lib/store/banks.state";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
   useEffect(() => {
     appDispatch(fetchUserDetailThunk(params.id));
     appDispatch(fetchDevicesThunk());
+    appDispatch(fetchBanksThunk({ pageSize: 1000 }))
 
     // return () => {
     //   appDispatch(clearUser());

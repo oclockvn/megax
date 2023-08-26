@@ -28,6 +28,8 @@ import nationalities from "@/lib/constants/nationalities";
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
   const { loading, loadingState, error } = useAppSelector(s => s.users);
+  const { pagedBanks: { items } }  = useAppSelector(s => s.banks)
+  const banks = items.map(i => ({ id: i.id, label: i.code ? `${i.code} - ${i.name}` : i.name}));
 
   const handleFormSubmit = async (u: User) => {
     const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
@@ -328,19 +330,30 @@ export default function UserInfo({ user }: { user: User | undefined }) {
             <h4 className="my-4 uppercase !text-[1.2rem] font-semibold">
               Bank Account
             </h4>
+
+            <div className="mb-4">
+              <AutocompleteElement
+                name="bankId"
+                label="Bank"
+                matchId
+                options={banks}
+                autocompleteProps={{
+                  renderOption(attrs, o) {
+                    return (
+                      <li {...attrs} key={o.id}>
+                        {o.label}
+                      </li>
+                    );
+                  },
+                }}
+              />
+            </div>
+
             <Grid container spacing={2} className="mb-4">
-              <Grid item xs={12} md={4}>
-                <SelectElement
-                  fullWidth
-                  label="Bank"
-                  name="bankId"
-                  options={[{id: 1, label: 'Bank 1'}, { id: 2, label: 'Bank 2'}]}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={6}>
                 <TextFieldElement fullWidth label="Account number" name="bankAccountNumber" />
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={6}>
                 <TextFieldElement fullWidth label="Bank branch" name="bankBranch" />
               </Grid>
             </Grid>

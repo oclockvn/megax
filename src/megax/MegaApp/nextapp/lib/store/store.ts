@@ -4,6 +4,7 @@ import usersStore from "./users.state";
 import devicesStore from "./devices.state";
 import userDevicesStore from "./userDevice.state";
 import supplierStore from "./suppliers.state";
+import bankStore from "./banks.state";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     devices: devicesStore,
     userDevice: userDevicesStore,
     suppliers: supplierStore,
+    banks: bankStore,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
