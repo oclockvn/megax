@@ -90,6 +90,11 @@ internal class UserService : IUserService
             return Result<int>.Fail(Result.USER_DOES_NOT_EXIST);
         }
 
+        if (await db.Users.AnyAsync(u => u.Id != id && u.Code == req.Code))
+        {
+            return Result<int>.Fail(Result.USER_CODE_ALREADY_EXIST);
+        }
+
         // user.Id = req.Id;
         user.Code = req.Code;
         // user.Email = req.Email;

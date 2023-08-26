@@ -9,7 +9,6 @@ public class User : ICreatedByEntity
     public int Id { get; set; }
 
     [MaxLength(100)]
-    [Required]
     public string Code { get; set; }
 
     [MaxLength(100)]

@@ -25,6 +25,7 @@ namespace MegaApp.Core
         public static readonly string DEVICE_ALREADY_IN_STOCK = "DEVICE_ALREADY_IN_STOCK";
         public static readonly string COULD_NOT_GENERATE_SERIAL_NUMBER = "COULD_NOT_GENERATE_SERIAL_NUMBER";
         public static readonly string SERIAL_NUMBER_ALREADY_EXIST = "SERIAL_NUMBER_ALREADY_EXIST";
+        public static readonly string USER_CODE_ALREADY_EXIST = "USER_CODE_ALREADY_EXIST";
     }
 
     public record Result<T>(T Data) : Result
