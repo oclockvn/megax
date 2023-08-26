@@ -29,6 +29,9 @@ public class User : ICreatedByEntity
     [MaxLength(255)]
     public string PermanentResidence { get; set; }
 
+    [MaxLength(255)]
+    public string Nationality { get; set; }
+
     public DateTimeOffset? Dob { get; set; }
 
     [MaxLength(100)]

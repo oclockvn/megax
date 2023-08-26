@@ -14,6 +14,7 @@ public class UserModel
     public string Phone { get; set; }
     public string Address { get; set; }
     public string PermanentResidence { get; set; }
+    public string Nationality { get; set; }
     public DateTimeOffset? Dob { get; set; }
     public string IdentityNumber { get; set; }
     public string Role { get; set; }
@@ -71,6 +72,7 @@ public class UserModel
         Phone = user.Phone;
         Address = user.Address;
         PermanentResidence = user.PermanentResidence;
+        Nationality = user.Nationality;
         Dob = user.Dob;
         IdentityNumber = user.IdentityNumber;
         Role = user.Role;

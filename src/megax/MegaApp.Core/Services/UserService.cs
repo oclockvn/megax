@@ -103,6 +103,7 @@ internal class UserService : IUserService
         user.Phone = req.Phone;
         user.Address = req.Address;
         user.PermanentResidence = req.PermanentResidence;
+        user.Nationality = req.Nationality;
         user.Dob = req.Dob;
         user.IdentityNumber = req.IdentityNumber;
         user.Role = req.Role;
