@@ -28,8 +28,13 @@ import nationalities from "@/lib/constants/nationalities";
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
   const { loading, loadingState, error } = useAppSelector(s => s.users);
-  const { pagedBanks: { items } }  = useAppSelector(s => s.banks)
-  const banks = items.map(i => ({ id: i.id, label: i.code ? `${i.code} - ${i.name}` : i.name}));
+  const {
+    pagedBanks: { items },
+  } = useAppSelector(s => s.banks);
+  const banks = items.map(i => ({
+    id: i.id,
+    label: i.code ? `${i.code} - ${i.name}` : i.name,
+  }));
 
   const handleFormSubmit = async (u: User) => {
     const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
@@ -155,7 +160,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
             </Grid>
 
             <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={6}>
                 <TextFieldElement
                   fullWidth
                   required
@@ -164,16 +169,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                   name="identityNumber"
                 />
               </Grid>
-              <Grid item xs={12} md={4}>
-                <DatePickerElement
-                  format="dd/MM/yyyy"
-                  className="w-full"
-                  name="dob"
-                  required
-                  label="Birthdate"
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={6}>
                 <AutocompleteElement
                   name="nationality"
                   label="Nationality"
@@ -187,6 +183,42 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                       );
                     },
                   }}
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
+              <Grid item xs={12} md={4}>
+                <DatePickerElement
+                  format="dd/MM/yyyy"
+                  className="w-full"
+                  name="dob"
+                  required
+                  label="Birthdate"
+                />
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <TextFieldElement
+                  fullWidth
+                  name="birthPlace"
+                  label="Birth place"
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ marginBottom: "1rem" }}>
+              <Grid item xs={12} md={6}>
+                <TextFieldElement
+                  fullWidth
+                  name="taxNumber"
+                  label="Tax number"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextFieldElement
+                  fullWidth
+                  name="insuranceNumber"
+                  label="Insurance number"
                 />
               </Grid>
             </Grid>
@@ -323,6 +355,10 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Grid>
             </Grid>
 
+            <div className="mb-4">
+              <TextFieldElement fullWidth name="hometown" label="Hometown" />
+            </div>
+
             <div>
               <SwitchElement label="Is married?" name="married" />
             </div>
@@ -351,10 +387,41 @@ export default function UserInfo({ user }: { user: User | undefined }) {
 
             <Grid container spacing={2} className="mb-4">
               <Grid item xs={12} md={6}>
-                <TextFieldElement fullWidth label="Account number" name="bankAccountNumber" />
+                <TextFieldElement
+                  fullWidth
+                  label="Account number"
+                  name="bankAccountNumber"
+                />
               </Grid>
               <Grid item xs={12} md={6}>
-                <TextFieldElement fullWidth label="Bank branch" name="bankBranch" />
+                <TextFieldElement
+                  fullWidth
+                  label="Bank branch"
+                  name="bankBranch"
+                />
+              </Grid>
+            </Grid>
+
+            <h4 className="my-4 uppercase !text-[1.2rem] font-semibold">
+              Academic
+            </h4>
+            <div className="mb-4">
+              <TextFieldElement
+                fullWidth
+                name="university"
+                label="University"
+              />
+            </div>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextFieldElement
+                  fullWidth
+                  name="academicLevel"
+                  label="Academic level"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextFieldElement fullWidth name="major" label="Major" />
               </Grid>
             </Grid>
 
