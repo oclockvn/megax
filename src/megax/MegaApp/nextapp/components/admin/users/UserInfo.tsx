@@ -435,7 +435,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
           <CardActions className="bg-slate-100">
             <Button
               color="primary"
-              variant="text"
+              variant="outlined"
               type="submit"
               disabled={loading}
             >
