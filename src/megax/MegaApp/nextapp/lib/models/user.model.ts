@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { contactSchema } from "./contact.model";
 
 export interface UserDeviceRecord {
   id: number;
@@ -67,6 +68,7 @@ export const userSchema = yup.object({
     .required()
     .default("official"),
   teamId: yup.number().nullable().default(null),
+  contacts: yup.array().of(contactSchema).nullable().default([])
 });
 
 export type User = yup.InferType<typeof userSchema>;

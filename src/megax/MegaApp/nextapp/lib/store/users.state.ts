@@ -4,6 +4,7 @@ import {
   fetchUserDetail,
   fetchUserList,
   updateUserDetail,
+  creteUpdateContact,
 } from "../apis/user.api";
 import {
   EmptyPaged,
@@ -11,6 +12,7 @@ import {
   PagedResult,
   Result,
 } from "../models/common.model";
+import { Contact } from "../models/contact.model";
 
 export interface UsersState {
   pagedUsers: PagedResult<User>;
@@ -61,6 +63,29 @@ export const updateUserDetailThunk = createAsyncThunk(
   }
 );
 
+export const createUpdateContactThunk = createAsyncThunk(
+  "users/create-udpate-contact",
+  async (req: { id: number; contact: Partial<Contact | null> }, thunkApi) => {
+    thunkApi.dispatch(
+      userSlice.actions.setLoading({ loading: true, msg: "Saving changes..." })
+    );
+    try {
+      const result = await creteUpdateContact(req.id, req.contact);
+      if (result.success) {
+        thunkApi.dispatch(userSlice.actions.updateContacts(result.data));
+      }
+
+      return result;
+    } catch {
+      return Promise.resolve<Result<Contact | null>>({
+        code: "Failed",
+        data: null,
+        success: false,
+      });
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "users",
   initialState,
@@ -80,6 +105,26 @@ export const userSlice = createSlice({
       state.error = undefined;
     },
     reset: state => initialState,
+    updateContacts: (state, action: PayloadAction<Contact>) => {
+      if (state.user) {
+        const { payload: contact } = action;
+        const updating = state.user.contacts?.some(c => c.id === contact.id);
+        if (updating) {
+          state.user.contacts = state.user.contacts?.map(c =>
+            c.id === contact.id
+              ? { ...c, ...contact }
+              : {
+                  ...c,
+                  isPrimaryContact: contact.isPrimaryContact
+                    ? false
+                    : c.isPrimaryContact,
+                }
+          ) || [];
+        } else {
+          state.user.contacts = [contact, ...(state.user.contacts || [])];
+        }
+      }
+    },
   },
   extraReducers(builder) {
     builder

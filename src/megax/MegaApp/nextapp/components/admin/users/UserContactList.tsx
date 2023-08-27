@@ -13,88 +13,22 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import { useConfirm } from "material-ui-confirm";
 import { Contact } from "@/lib/models/contact.model";
-import { useEffect, useRef, useState } from "react";
-import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import { useState } from "react";
 import Button from "@mui/material/Button";
 import UserContactForm from "./UserContactForm";
-import { Result } from "@/lib/models/common.model";
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import { createUpdateContactThunk, setLoading } from "@/lib/store/users.state";
+import { toast } from "react-hot-toast";
+import Chip from "@mui/material/Chip";
 
 export default function UserContactList() {
   const confirmation = useConfirm();
+  const { user, loading } = useAppSelector(u => u.users);
+  const appDispatch = useAppDispatch();
+
   const [showDrawer, setShowDrawer] = useState(false);
   const [contact, setContact] = useState<Partial<Contact> | null>(null);
-
-  const rows = JSON.parse(`[{
-    "id": 1,
-    "name": "Marion Gaish",
-    "phone": "613-272-7051",
-    "email": "mgaish0@ycombinator.com",
-    "dob": "Female",
-    "address": "Room 1497"
-  }, {
-    "id": 2,
-    "name": "Jason Cornwall",
-    "phone": "650-484-6304",
-    "email": "jcornwall1@exblog.jp",
-    "dob": "Male",
-    "address": "Room 551"
-  }, {
-    "id": 3,
-    "name": "Vilhelmina Barnshaw",
-    "phone": "303-449-8846",
-    "email": "vbarnshaw2@sina.com.cn",
-    "dob": "Female",
-    "address": "9th Floor"
-  }, {
-    "id": 4,
-    "name": "Kinny Seedull",
-    "phone": "773-288-0759",
-    "email": "kseedull3@qq.com",
-    "dob": "Male",
-    "address": "Suite 82"
-  }, {
-    "id": 5,
-    "name": "Myrle Keniwell",
-    "phone": "134-627-4461",
-    "email": "mkeniwell4@ebay.com",
-    "dob": "Female",
-    "address": "Apt 750"
-  }, {
-    "id": 6,
-    "name": "Damiano Hartus",
-    "phone": "564-825-2248",
-    "email": "dhartus5@wired.com",
-    "dob": "Male",
-    "address": "Apt 716"
-  }, {
-    "id": 7,
-    "name": "Thayne Kagan",
-    "phone": "485-534-9425",
-    "email": "tkagan6@psu.edu",
-    "dob": "Male",
-    "address": "Room 312"
-  }, {
-    "id": 8,
-    "name": "Berte Castello",
-    "phone": "323-421-7418",
-    "email": "bcastello7@tripod.com",
-    "dob": "Female",
-    "address": "9th Floor"
-  }, {
-    "id": 9,
-    "name": "Verile Fallowes",
-    "phone": "635-683-8210",
-    "email": "vfallowes8@indiegogo.com",
-    "dob": "Female",
-    "address": "Apt 79"
-  }, {
-    "id": 10,
-    "name": "Yovonnda Kenneway",
-    "phone": "948-423-5409",
-    "email": "ykenneway9@yelp.com",
-    "dob": "Female",
-    "address": "10th Floor"
-  }]`);
+  const contacts = user?.contacts || [];
 
   const handleDeleteContact = (contact: Contact) => {
     confirmation({
@@ -115,16 +49,23 @@ export default function UserContactList() {
   const handleOpenContact = (contact: Partial<Contact>) => {
     setContact(contact);
     setShowDrawer(true);
+    appDispatch(setLoading({ loading: false }));
   };
 
-  const handleSave = (contact: Partial<Contact>) => {
-    const result: Result<Contact> = {
-      code: "",
-      data: contact as Contact,
-      success: true,
-    };
+  const handleSave = (contact: Partial<Contact | null>) => {
+    const resp = appDispatch(
+      createUpdateContactThunk({ id: user?.id || 0, contact })
+    ).unwrap();
 
-    return Promise.resolve(result);
+    resp.then(result => {
+      result.success
+        ? toast.success("Contact saved successfully")
+        : toast.error("Something went wrong");
+
+      if (result.success) {
+        setShowDrawer(false);
+      }
+    });
   };
 
   return (
@@ -150,23 +91,34 @@ export default function UserContactList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row: any) => (
+            {contacts.map(contact => (
               <TableRow
-                key={row.id}
+                key={contact.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell scope="row">
-                  <Button variant="text" onClick={() => handleOpenContact(row)}>
-                    {row.name}
+                  <Button
+                    variant="text"
+                    onClick={() => handleOpenContact(contact)}
+                  >
+                    {contact.name}
                   </Button>
+                  {contact.isPrimaryContact && (
+                    <Chip
+                      label="Primary"
+                      variant="filled"
+                      size="small"
+                      color="primary"
+                    />
+                  )}
                 </TableCell>
-                <TableCell>{row.phone}</TableCell>
-                <TableCell>Relationship</TableCell>
+                <TableCell>{contact.phone}</TableCell>
+                <TableCell>{contact.relationship}</TableCell>
                 <TableCell align="right">
                   <IconButton
                     size="small"
                     color="error"
-                    onClick={() => handleDeleteContact(row)}
+                    onClick={() => handleDeleteContact(contact)}
                   >
                     <CloseIcon fontSize="inherit" />
                   </IconButton>
@@ -183,6 +135,7 @@ export default function UserContactList() {
             contact={contact!}
             handleClose={() => setShowDrawer(false)}
             handleSave={contact => handleSave(contact)}
+            loading={loading}
           />
         )}
       </Drawer>

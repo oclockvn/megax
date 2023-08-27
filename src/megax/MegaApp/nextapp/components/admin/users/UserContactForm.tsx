@@ -8,24 +8,20 @@ import {
 } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
 import { Contact } from "@/lib/models/contact.model";
-import { Result } from "@/lib/models/common.model";
 import Grid from "@mui/material/Grid";
 
 type UserContactFormProps = {
   contact: Partial<Contact>;
-  handleSave: (contact: Partial<Contact>) => Promise<Result<Contact>>;
+  handleSave: (contact: Partial<Contact>) => void;
   handleClose: () => void;
+  loading?: boolean;
 };
 
 export default function UserContactForm(props: UserContactFormProps) {
-  const { contact, handleSave, handleClose } = props;
+  const { contact, handleSave, handleClose, loading } = props;
 
   const handleSubmit = (contact: Partial<Contact>) => {
-    handleSave(contact).then(result => {
-      if (result.success) {
-        handleClose();
-      }
-    });
+    handleSave(contact);
   };
 
   return (
@@ -87,13 +83,14 @@ export default function UserContactForm(props: UserContactFormProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outlined" className="px-6" type="submit">
-              Save Changes
+            <Button variant="outlined" className="px-6" type="submit" disabled={loading}>
+              {loading ? 'Processing...' : 'Save Changes'}
             </Button>
             <Button
               variant="text"
               className="px-6"
               onClick={() => handleClose()}
+              disabled={loading}
             >
               Close
             </Button>

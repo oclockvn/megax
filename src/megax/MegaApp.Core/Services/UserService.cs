@@ -20,6 +20,8 @@ public interface IUserService
     Task<Result<UserDeviceRecord>> AssignDeviceAsync(int id, int deviceId);
     Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId);
     Task<List<UserDeviceRecord>> UserDevicesAsync(int id);
+
+    Task<Result<ContactModel>> CreateUpdateContactAsync(int userId, ContactModel req);
 }
 
 internal class UserService : IUserService
@@ -278,4 +280,53 @@ internal class UserService : IUserService
         return active;
     }
 
+    public async Task<Result<ContactModel>> CreateUpdateContactAsync(int userId, ContactModel req)
+    {
+        using var db = UseDb();
+        Contact contact;
+        if (req.Id > 0)
+        {
+            contact = await db.Contacts.FirstOrDefaultAsync(c => c.Id == req.Id);
+            if (contact == null)
+            {
+                throw new EntityNotFoundException($"Contact {req.Id} could not be found");
+            }
+
+            contact.IsPrimaryContact = req.IsPrimaryContact;
+            contact.Name = req.Name;
+            contact.Email = req.Email;
+            contact.Phone = req.Phone;
+            contact.Relationship = req.Relationship;
+            contact.Dob = req.Dob;
+            contact.Address = req.Address;
+        }
+        else
+        {
+            contact = db.Contacts.Add(new Contact
+            {
+                IsPrimaryContact = req.IsPrimaryContact,
+                Name = req.Name,
+                Email = req.Email,
+                Phone = req.Phone,
+                Address = req.Address,
+                Dob = req.Dob,
+                Id = 0,
+                Relationship = req.Relationship,
+                UserId = userId,
+            }).Entity;
+        }
+
+        await db.SaveChangesAsync();
+
+        var hasOtherPrimaryContact = await db.Contacts.Where(c => c.Id != contact.Id && c.IsPrimaryContact).AnyAsync();
+        if (hasOtherPrimaryContact)
+        {
+            // remove primary from other contacts of this user
+            await db.Contacts
+                .Where(c => c.UserId == userId && c.Id != contact.Id && c.IsPrimaryContact)
+                .ExecuteUpdateAsync(c => c.SetProperty(c => c.IsPrimaryContact, false));
+        }
+
+        return new Result<ContactModel>(new ContactModel(contact));
+    }
 }

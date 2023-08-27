@@ -23,4 +23,21 @@ public record ContactModel
     [MaxLength(255)]
     public string Relationship { get; set; }//wife|child|relative
     public bool IsPrimaryContact { get; set; }
+
+    public ContactModel()
+    {
+
+    }
+
+    public ContactModel(Core.Db.Entities.Contact contact)
+    {
+        Id = contact.Id;
+        Name = contact.Name;
+        Phone = contact.Phone;
+        Email = contact.Email;
+        Address = contact.Address;
+        Dob = contact.Dob;
+        Relationship = contact.Relationship;
+        IsPrimaryContact = contact.IsPrimaryContact;
+    }
 }
