@@ -35,8 +35,8 @@ internal class UserService : IUserService
     public async Task<UserModel> GetUserAsync(int id)
     {
         using var db = UseDb();
-        return await db.Accounts.Where(a => a.UserId == id)
-            .Select(a => new UserModel(a.User, a.Id))
+        return await db.Users.Where(u => u.Id == id)
+            .Select(u => new UserModel(u))
             .FirstOrDefaultAsync();
     }
 
@@ -144,7 +144,7 @@ internal class UserService : IUserService
 
         using var db = UseDb();
         var user = await db.Accounts.Where(a => a.Username == username)
-            .Select(a => new UserModel(a.User, a.Id))
+            .Select(a => new UserModel(a.User))
             .FirstOrDefaultAsync();
 
         return user;

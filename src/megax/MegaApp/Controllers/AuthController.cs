@@ -93,7 +93,7 @@ namespace MegaApp.Controllers
 
             var user = await userService.GetUserAsync(accountResult.Data.UserId);
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
-            var refreshToken = await authService.ReleaseRefreshTokenAsync(accountResult.Data.Id, token.Token);
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
             signInResult = signInResult with { Data = new SignInResponse(token.Token, token.ExpiryTime, refreshToken) };
 
@@ -137,7 +137,7 @@ namespace MegaApp.Controllers
             }
 
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
-            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.AccountId, token.Token);
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
             return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken)));
         }
