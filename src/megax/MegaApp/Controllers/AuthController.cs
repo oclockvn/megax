@@ -91,7 +91,7 @@ namespace MegaApp.Controllers
                 return Ok(signInResult);
             }
 
-            var user = await userService.GetUserAsync(accountResult.Data.UserId);
+            var user = await userService.GetUserSlimAsync(accountResult.Data.UserId);
             var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
             var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
 
@@ -120,6 +120,11 @@ namespace MegaApp.Controllers
 
             // try to get user by email
             var user = await userService.GetUserAsync(claims.Email);
+
+            int id;
+            string fullName;
+            string email;
+
             if (user == null)
             {
                 // create new user for the first time
@@ -133,11 +138,20 @@ namespace MegaApp.Controllers
                     OAuthType = Core.Enums.OAuthType.Google,
                 });
 
-                user = await userService.GetUserAsync(userResult.Data);
+                var userSlim = await userService.GetUserSlimAsync(userResult.Data);
+                id = userSlim.Id;
+                fullName = userSlim.FullName;
+                email = userSlim.Email;
+            }
+            else
+            {
+                id = user.Id;
+                fullName = user.FullName;
+                email = user.Email;
             }
 
-            var token = tokenService.GenerateToken(new(user.Id, user.FullName, user.Email));
-            var refreshToken = await authService.ReleaseRefreshTokenAsync(user.Id, token.Token);
+            var token = tokenService.GenerateToken(new(id, fullName, email));
+            var refreshToken = await authService.ReleaseRefreshTokenAsync(id, token.Token);
 
             return Ok(new Result<SignInResponse>(new SignInResponse(token.Token, token.ExpiryTime, refreshToken)));
         }

@@ -9,6 +9,7 @@ namespace MegaApp.Core.Services;
 
 public interface IUserService
 {
+    Task<UserModel.Slim> GetUserSlimAsync(int id);
     Task<UserModel> GetUserAsync(int id);
     Task<UserModel> GetUserAsync(string username);
     Task<PagedResult<UserModel>> GetUsersAsync(Filter filter);
@@ -36,7 +37,35 @@ internal class UserService : IUserService
     {
         using var db = UseDb();
         return await db.Users.Where(u => u.Id == id)
-            .Select(u => new UserModel(u) { AccountId = u.Accounts.Select(a => a.Id).FirstOrDefault() })
+            .Select(u => new UserModel(u)
+            {
+                AccountId = u.Accounts.Select(a => a.Id).FirstOrDefault(),
+                Contacts = u.Contacts.Select(c => new ContactModel
+                {
+                    Id = c.Id,
+                    Address = c.Address,
+                    Dob = c.Dob,
+                    Name = c.Name,
+                    Email = c.Email,
+                    IsPrimaryContact = c.IsPrimaryContact,
+                    Phone = c.Phone,
+                    Relationship = c.Relationship
+                }).ToList()
+            })
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<UserModel.Slim> GetUserSlimAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.Accounts.Where(a => a.UserId == id)
+            .Select(a => new UserModel.Slim
+            {
+                Id = a.UserId,
+                AccountId = a.Id,
+                Email = a.User.Email,
+                FullName = a.User.FullName,
+            })
             .FirstOrDefaultAsync();
     }
 

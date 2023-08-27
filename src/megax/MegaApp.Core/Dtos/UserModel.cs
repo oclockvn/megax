@@ -47,7 +47,7 @@ public class UserModel
 
     // public List<Account> Accounts { get; set; } = new();
     // public List<UserDocument> Documents { get; set; } = new();
-    // public List<Contact> Contacts { get; set; } = new();
+    public List<ContactModel> Contacts { get; set; } = new();
 
     // public DateTimeOffset CreatedAt { get; set; }
     // public int? CreatedBy { get; set; }
@@ -136,6 +136,14 @@ public class UserModel
 
         [Required]
         public string Password { get; set; }
+    }
+
+    public record Slim
+    {
+        public int Id { get; set; }
+        public int AccountId { get; set; }
+        public string Email { get; set; }
+        public string FullName { get; set; }
     }
 }
 
