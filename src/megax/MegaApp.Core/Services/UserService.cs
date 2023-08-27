@@ -36,7 +36,7 @@ internal class UserService : IUserService
     {
         using var db = UseDb();
         return await db.Users.Where(u => u.Id == id)
-            .Select(u => new UserModel(u))
+            .Select(u => new UserModel(u) { AccountId = u.Accounts.Select(a => a.Id).FirstOrDefault() })
             .FirstOrDefaultAsync();
     }
 

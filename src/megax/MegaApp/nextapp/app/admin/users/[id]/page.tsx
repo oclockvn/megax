@@ -15,6 +15,8 @@ import UserDeviceList from "@/components/admin/users/UserDeviceList";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import UserTabs from "@/components/admin/users/UserTabs";
 import { fetchBanksThunk } from "@/lib/store/banks.state";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -24,12 +26,14 @@ export default function UserPage({ params }: { params: { id: number } }) {
   useEffect(() => {
     appDispatch(fetchUserDetailThunk(params.id));
     appDispatch(fetchDevicesThunk());
-    appDispatch(fetchBanksThunk({ pageSize: 1000 }))
+    appDispatch(fetchBanksThunk({ pageSize: 1000 }));
 
     // return () => {
     //   appDispatch(clearUser());
     // };
   }, [params.id]);
+
+  const hasAccount = Number(user?.accountId) > 0;
 
   return (
     <>
@@ -50,6 +54,20 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
         <Grid container spacing={2} className="p-4">
           <Grid item xs={8} md={6}>
+            {!hasAccount && (
+              <Alert
+                severity="error"
+                className="mb-2"
+                variant="filled"
+                action={
+                  <Button color="inherit" size="small">
+                    Setup Account
+                  </Button>
+                }
+              >
+                This user doesn't have login account yet!
+              </Alert>
+            )}
             <UserTabs user={user} />
           </Grid>
 

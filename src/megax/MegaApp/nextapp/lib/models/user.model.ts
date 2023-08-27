@@ -11,6 +11,7 @@ export interface UserDeviceRecord {
 
 export const userSchema = yup.object({
   id: yup.number().nullable().default(null),
+  accountId: yup.number().nullable().default(null),
   code: yup.string().nullable().default(null),
   email: yup.string().required(),
   fullName: yup.string().required(),
