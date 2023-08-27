@@ -137,4 +137,20 @@ public class UsersController : ApplicationControllerBase
         var result = await userService.CreateUpdateContactAsync(id, req);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Delete a contact
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <param name="cid">The contact id</param>
+    /// <returns></returns>
+    [HttpDelete("{id}/contact/{cid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteContact(int id, int cid)
+    {
+        _ = id;
+        var result = await userService.DeleteContactAsync(cid);
+        return Ok(result);
+    }
 }

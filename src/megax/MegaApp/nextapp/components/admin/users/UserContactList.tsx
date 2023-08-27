@@ -17,7 +17,7 @@ import { useState } from "react";
 import Button from "@mui/material/Button";
 import UserContactForm from "./UserContactForm";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { createUpdateContactThunk, setLoading } from "@/lib/store/users.state";
+import { createUpdateContactThunk, deleteContactThunk, setLoading } from "@/lib/store/users.state";
 import { toast } from "react-hot-toast";
 import Chip from "@mui/material/Chip";
 
@@ -39,7 +39,7 @@ export default function UserContactList() {
       },
     })
       .then(() => {
-        console.log("Handle delete");
+        appDispatch(deleteContactThunk({ id: user!.id!, contactId: contact!.id! }))
       })
       .catch(() => {
         /* ignore */
@@ -51,6 +51,11 @@ export default function UserContactList() {
     setShowDrawer(true);
     appDispatch(setLoading({ loading: false }));
   };
+
+  const handleCloseDrawer = () => {
+    setShowDrawer(false);
+    appDispatch(setLoading({ loading: false }));
+  }
 
   const handleSave = (contact: Partial<Contact | null>) => {
     const resp = appDispatch(
@@ -133,9 +138,9 @@ export default function UserContactList() {
         {contact && (
           <UserContactForm
             contact={contact!}
-            handleClose={() => setShowDrawer(false)}
-            handleSave={contact => handleSave(contact)}
             loading={loading}
+            handleClose={handleCloseDrawer}
+            handleSave={handleSave}
           />
         )}
       </Drawer>

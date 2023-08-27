@@ -70,3 +70,8 @@ export async function creteUpdateContact(id: number, req: Partial<Contact | null
   const res = await api.post<Result<Contact>>(`api/users/${id}/contact`, req);
   return res.data;
 }
+
+export async function deleteContact(id: number, contactId: number) {
+  const res = await api.delete<Result<boolean>>(`api/users/${id}/contact/${contactId}`);
+  return res.data;
+}

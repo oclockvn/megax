@@ -22,6 +22,7 @@ public interface IUserService
     Task<List<UserDeviceRecord>> UserDevicesAsync(int id);
 
     Task<Result<ContactModel>> CreateUpdateContactAsync(int userId, ContactModel req);
+    Task<Result<bool>> DeleteContactAsync(int contactId);
 }
 
 internal class UserService : IUserService
@@ -318,8 +319,8 @@ internal class UserService : IUserService
 
         await db.SaveChangesAsync();
 
-        var hasOtherPrimaryContact = await db.Contacts.Where(c => c.Id != contact.Id && c.IsPrimaryContact).AnyAsync();
-        if (hasOtherPrimaryContact)
+        var switchPrimaryContact = contact.IsPrimaryContact && await db.Contacts.Where(c => c.Id != contact.Id && c.IsPrimaryContact).AnyAsync();
+        if (switchPrimaryContact)
         {
             // remove primary from other contacts of this user
             await db.Contacts
@@ -328,5 +329,13 @@ internal class UserService : IUserService
         }
 
         return new Result<ContactModel>(new ContactModel(contact));
+    }
+
+    public async Task<Result<bool>> DeleteContactAsync(int contactId)
+    {
+        using var db = UseDb();
+        await db.Contacts.Where(c => c.Id == contactId).ExecuteDeleteAsync();
+
+        return new Result<bool>(true);
     }
 }
