@@ -10,13 +10,14 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import Drawer from "@mui/material/Drawer";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import { useConfirm } from "material-ui-confirm";
 import { Contact } from "@/lib/models/contact.model";
 import { useEffect, useRef, useState } from "react";
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
 import UserContactForm from "./UserContactForm";
-import { Result } from "@/lib/models/common.model"
+import { Result } from "@/lib/models/common.model";
 
 export default function UserContactList() {
   const confirmation = useConfirm();
@@ -118,13 +119,13 @@ export default function UserContactList() {
 
   const handleSave = (contact: Contact) => {
     const result: Result<Contact> = {
-      code: '',
+      code: "",
       data: contact,
       success: true,
-    }
+    };
 
     return Promise.resolve(result);
-  }
+  };
 
   return (
     <>
@@ -135,7 +136,12 @@ export default function UserContactList() {
               <TableCell>Name</TableCell>
               <TableCell>Phone</TableCell>
               <TableCell>Relationship</TableCell>
-              <TableCell align="right" width={100}></TableCell>
+              <TableCell align="right" width={100}>
+                <Button variant="outlined" size="small" className="bg-blue-500 text-white hover:!bg-blue-600">
+                  <AddIcon fontSize="inherit" className="me-2" />
+                  Add
+                </Button>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -167,7 +173,13 @@ export default function UserContactList() {
       </TableContainer>
 
       <Drawer anchor="right" open={showDrawer}>
-        {contact && <UserContactForm contact={contact!} handleClose={() => setShowDrawer(false)} handleSave={contact => handleSave(contact)} />}
+        {contact && (
+          <UserContactForm
+            contact={contact!}
+            handleClose={() => setShowDrawer(false)}
+            handleSave={contact => handleSave(contact)}
+          />
+        )}
       </Drawer>
     </>
   );

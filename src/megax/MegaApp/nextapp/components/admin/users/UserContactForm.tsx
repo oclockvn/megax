@@ -41,11 +41,13 @@ export default function UserContactForm(props: UserContactFormProps) {
               name="isPrimaryContact"
               label="Is Primary contact?"
             />
-            <div className="text-xs text-blue-500">Changing this will also unset existing primary contact</div>
+            <div className="text-xs text-blue-500">
+              Changing this will also unset existing primary contact
+            </div>
           </div>
 
           <div className="mb-4 ">
-            <TextFieldElement fullWidth label="Name" name="name" />
+            <TextFieldElement fullWidth required label="Name" name="name" />
           </div>
 
           <div className="mb-4 ">
@@ -80,16 +82,20 @@ export default function UserContactForm(props: UserContactFormProps) {
           <div className="mb-4">
             <TextFieldElement fullWidth label="Address" name="address" />
           </div>
-        </FormContainer>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outlined" className="px-6" type="submit">
-            Save Changes
-          </Button>
-          <Button variant="text" className="px-6" onClick={() => handleClose()}>
-            Close
-          </Button>
-        </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outlined" className="px-6" type="submit">
+              Save Changes
+            </Button>
+            <Button
+              variant="text"
+              className="px-6"
+              onClick={() => handleClose()}
+            >
+              Close
+            </Button>
+          </div>
+        </FormContainer>
       </div>
     </>
   );
