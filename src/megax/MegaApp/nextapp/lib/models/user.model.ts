@@ -20,7 +20,7 @@ export const userSchema = yup.object({
   address: yup.string().nullable().default(null),
   permanentResidence: yup.string().nullable().default(null),
   dob: yup.date().required(), // Date | string | null;
-  identityNumber: yup.string().label('Identity').required(),
+  identityNumber: yup.string().label("Identity").required(),
   role: yup.string().nullable().default(null),
   workingType: yup
     .string()
@@ -52,10 +52,10 @@ export const userSchema = yup.object({
   bankAccountNumber: yup.string().nullable().default(null),
   bankBranch: yup.string().nullable().default(null),
   bankId: yup.number().nullable().default(null),
-  contractStart: yup.date().required().label('Contract start'),
+  contractStart: yup.date().required().label("Contract start"),
   contractEnd: yup
     .date()
-    .label('Contract end')
+    .label("Contract end")
     .required()
     .min(
       yup.ref("contractStart"),
@@ -70,48 +70,3 @@ export const userSchema = yup.object({
 });
 
 export type User = yup.InferType<typeof userSchema>;
-
-// export interface User {
-//   id: number;
-//   code: string;
-//   email: string;
-//   fullName: string;
-//   nickname: string;
-//   phone: string;
-//   address: string;
-//   permanentResidence: string;
-//   dob: Date;
-//   identityNumber: string;
-//   role: string;
-//   workingType: 'remote' | 'office' | 'hybrid'
-//   gender: 'male' | 'female' | 'secret';
-//   personalEmail: string;
-//   hometown: string;
-//   birthPlace: string;
-//   nation: string;
-//   religion: string;
-//   taxNumber: string;
-//   insuranceNumber: string;
-//   married: boolean;
-//   academicLevel: string;
-//   university: string;
-//   major: string;
-//   vehicleType: string;// bike|motobike|automobike
-//   vehicleBrand: string;
-//   vehicleColor: string;
-//   vehiclePlateNumber: string;
-//   bankAccountNumber: string;
-//   bankBranch: string;
-//   bankId: number | null;
-//   // bank: Bank;
-//   contractStart: Date;
-//   contractEnd: Date | null;
-//   contractType: 'official'|'contractor'|'fresher'
-//   teamId: number | null;
-//   // team: Team;
-//   // accounts: Account[];
-//   // documents: UserDocument[];
-//   // contacts: Contact[];
-//   // createdAt: Date | string;
-//   // createdBy: number | null;
-// }
