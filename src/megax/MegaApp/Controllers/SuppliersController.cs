@@ -13,9 +13,9 @@ public class SuppliersController : ApplicationControllerBase
     private readonly ISupplierService supplierService;
     private readonly IMemoryCache cache;
 
-    public SuppliersController(ISupplierService supllierService, IMemoryCache cache)
+    public SuppliersController(ISupplierService supplierService, IMemoryCache cache)
     {
-        this.supplierService = supllierService;
+        this.supplierService = supplierService;
         this.cache = cache;
     }
 

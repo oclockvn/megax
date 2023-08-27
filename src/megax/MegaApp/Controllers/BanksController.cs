@@ -13,9 +13,9 @@ public class BanksController : ApplicationControllerBase
     private readonly IBankService bankService;
     private readonly IMemoryCache cache;
 
-    public BanksController(IBankService supllierService, IMemoryCache cache)
+    public BanksController(IBankService bankService, IMemoryCache cache)
     {
-        this.bankService = supllierService;
+        this.bankService = bankService;
         this.cache = cache;
     }
 
