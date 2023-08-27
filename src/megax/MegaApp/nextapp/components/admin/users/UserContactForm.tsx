@@ -12,15 +12,15 @@ import { Result } from "@/lib/models/common.model";
 import Grid from "@mui/material/Grid";
 
 type UserContactFormProps = {
-  contact: Contact;
-  handleSave: (contact: Contact) => Promise<Result<Contact>>;
+  contact: Partial<Contact>;
+  handleSave: (contact: Partial<Contact>) => Promise<Result<Contact>>;
   handleClose: () => void;
 };
 
 export default function UserContactForm(props: UserContactFormProps) {
   const { contact, handleSave, handleClose } = props;
 
-  const handleSubmit = (contact: Contact) => {
+  const handleSubmit = (contact: Partial<Contact>) => {
     handleSave(contact).then(result => {
       if (result.success) {
         handleClose();
@@ -50,12 +50,25 @@ export default function UserContactForm(props: UserContactFormProps) {
             <TextFieldElement fullWidth required label="Name" name="name" />
           </div>
 
-          <div className="mb-4 ">
-            <TextFieldElement
-              fullWidth
-              label="Relationship"
-              name="relationship"
-            />
+          <div className="mb-4">
+            <Grid container spacing={2}>
+              <Grid item md={6}>
+                <DatePickerElement
+                  label="Birthdate"
+                  name="dob"
+                  format="dd/MM/yyyy"
+                  maxDate={new Date()}
+                  minDate={new Date(1950, 0, 1)}
+                />
+              </Grid>
+              <Grid item md={6}>
+                <TextFieldElement
+                  fullWidth
+                  label="Relationship"
+                  name="relationship"
+                />
+              </Grid>
+            </Grid>
           </div>
 
           <div className="mb-4">
@@ -67,16 +80,6 @@ export default function UserContactForm(props: UserContactFormProps) {
                 <TextFieldElement fullWidth label="Email" name="email" />
               </Grid>
             </Grid>
-          </div>
-
-          <div className="mb-4">
-            <DatePickerElement
-              label="Birthdate"
-              name="dob"
-              format="dd/MM/yyyy"
-              maxDate={new Date()}
-              minDate={new Date(1950, 0, 1)}
-            />
           </div>
 
           <div className="mb-4">

@@ -22,7 +22,7 @@ import { Result } from "@/lib/models/common.model";
 export default function UserContactList() {
   const confirmation = useConfirm();
   const [showDrawer, setShowDrawer] = useState(false);
-  const [contact, setContact] = useState<Contact | null>(null);
+  const [contact, setContact] = useState<Partial<Contact> | null>(null);
 
   const rows = JSON.parse(`[{
     "id": 1,
@@ -112,15 +112,15 @@ export default function UserContactList() {
       });
   };
 
-  const handleOpenContact = (contact: Contact) => {
+  const handleOpenContact = (contact: Partial<Contact>) => {
     setContact(contact);
     setShowDrawer(true);
   };
 
-  const handleSave = (contact: Contact) => {
+  const handleSave = (contact: Partial<Contact>) => {
     const result: Result<Contact> = {
       code: "",
-      data: contact,
+      data: contact as Contact,
       success: true,
     };
 
@@ -137,7 +137,12 @@ export default function UserContactList() {
               <TableCell>Phone</TableCell>
               <TableCell>Relationship</TableCell>
               <TableCell align="right" width={100}>
-                <Button variant="outlined" size="small" className="bg-blue-500 text-white hover:!bg-blue-600">
+                <Button
+                  variant="outlined"
+                  size="small"
+                  className="bg-blue-500 text-white hover:!bg-blue-600"
+                  onClick={() => handleOpenContact({})}
+                >
                   <AddIcon fontSize="inherit" className="me-2" />
                   Add
                 </Button>
