@@ -1,4 +1,5 @@
 ﻿using MegaApp.Core.Db;
+using MegaApp.Core.Exceptions;
 using MegaApp.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ public interface IAuthService
 {
     Task<Result<AccountValidationRecord>> IsValidAccountAsync(string username, string password);
     Task<Result<bool>> IsRefreshTokenValid(int accountId, Guid refreshToken, string token);
-    Task<Guid> ReleaseRefreshTokenAsync(int accountId, string token, int expiryDay = 30);
+    Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30);
     Task RevokeRefreshTokenAsync(Guid refreshToken);
 }
 
@@ -40,9 +41,15 @@ internal class AuthService : IAuthService
         return Result<AccountValidationRecord>.Ok(new(account.Id, account.UserId));
     }
 
-    public async Task<Guid> ReleaseRefreshTokenAsync(int accountId, string token, int expiryDay = 30)
+    public async Task<Guid> ReleaseRefreshTokenAsync(int userId, string token, int expiryDay = 30)
     {
         using var db = UseDb();
+        var accountId = await db.Accounts.Where(a => a.UserId == userId).Select(a => a.Id).FirstOrDefaultAsync();
+        if (accountId == 0)
+        {
+            throw new BusinessRuleViolationException("No account associate to this user yet");
+        }
+
         var entry = db.RefreshTokens.Add(new()
         {
             CreatedAt = DateTimeOffset.Now,

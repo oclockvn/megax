@@ -1,21 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 
-namespace MegaApp.Core.Db.Entities;
+namespace MegaApp.Core.Dtos;
 
-public class User : ICreatedByEntity
+public class UserUpdateModel : IValidatableObject
 {
     public int Id { get; set; }
 
     [MaxLength(100)]
+    [Required]
     public string Code { get; set; }
 
     [MaxLength(100)]
     [Required]
+    [DataType(DataType.EmailAddress)]
     public string Email { get; set; }
 
     [MaxLength(100)]
+    [Required]
     public string FullName { get; set; }
 
     [MaxLength(255)]
@@ -47,6 +48,7 @@ public class User : ICreatedByEntity
     public string Gender { get; set; }
 
     [MaxLength(255)]
+    [DataType(DataType.EmailAddress)]
     public string PersonalEmail { get; set; }
 
     [MaxLength(255)]
@@ -96,7 +98,7 @@ public class User : ICreatedByEntity
     [MaxLength(255)]
     public string BankBranch { get; set; }
     public int? BankId { get; set; }
-    public Bank Bank { get; set; }
+    // public Bank Bank { get; set; }
 
     public DateTimeOffset ContractStart { get; set; }
     public DateTimeOffset ContractEnd { get; set; }
@@ -105,46 +107,21 @@ public class User : ICreatedByEntity
     public string ContractType { get; set; }// official|contractor|fresher
 
     public int? TeamId { get; set; }
-    public Team Team { get; set; }
 
-    public List<Account> Accounts { get; set; } = new();
-    public List<UserDocument> Documents { get; set; } = new();
-    public List<Contact> Contacts { get; set; } = new();
-
-    public DateTimeOffset CreatedAt { get; set; }
-    public int? CreatedBy { get; set; }
-}
-
-public static class UserQueryExtension
-{
-    public static IQueryable<User> Filter(this IQueryable<User> query, string q)
-        => string.IsNullOrWhiteSpace(q) ? query : query.Where(x => x.Email.Contains(q) || x.FullName.Contains(q));
-}
-
-public class UserConfiguration : IEntityTypeConfiguration<User>
-{
-    public void Configure(EntityTypeBuilder<User> builder)
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        builder.Property(x => x.CreatedAt)
-            .HasDefaultValueSql("sysdatetimeoffset()");
-
-        builder.HasIndex(x => x.Email).IsUnique();
-        builder.HasIndex(x => x.Code).IsUnique();
-
-        builder.HasMany(u => u.Accounts)
-            .WithOne(a => a.User)
-            .HasForeignKey(a => a.UserId);
-
-        builder.HasMany(x => x.Contacts)
-            .WithOne(c => c.User)
-            .HasForeignKey(c => c.UserId);
-
-        builder.HasOne(x => x.Bank)
-            .WithMany()
-            .HasForeignKey(x => x.BankId);
-
-        builder.HasOne(x => x.Team)
-            .WithMany(t => t.Members)
-            .HasForeignKey(x => x.TeamId);
+        if (ContractEnd <= ContractStart)
+        {
+            yield return new ValidationResult("Contract end date must be greater than contract start date");
+        }
     }
+
+    // public Team Team { get; set; }
+
+    // public List<Account> Accounts { get; set; } = new();
+    // public List<UserDocument> Documents { get; set; } = new();
+    // public List<Contact> Contacts { get; set; } = new();
+
+    // public DateTimeOffset CreatedAt { get; set; }
+    // public int? CreatedBy { get; set; }
 }

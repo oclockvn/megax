@@ -12,6 +12,7 @@
     "@auth0/auth0-react": "^2.2.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@hookform/resolvers": "^3.2.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.1",
     "@mui/x-data-grid": "^6.7.0",
@@ -36,6 +37,7 @@
     "react-hot-toast": "^2.4.1",
     "react-redux": "^8.0.7",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "yup": "^1.2.0"
   }
 }

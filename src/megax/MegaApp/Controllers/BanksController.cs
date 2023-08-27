@@ -8,40 +8,40 @@ namespace MegaApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SuppliersController : ApplicationControllerBase
+public class BanksController : ApplicationControllerBase
 {
-    private readonly ISupplierService supplierService;
+    private readonly IBankService bankService;
     private readonly IMemoryCache cache;
 
-    public SuppliersController(ISupplierService supplierService, IMemoryCache cache)
+    public BanksController(IBankService bankService, IMemoryCache cache)
     {
-        this.supplierService = supplierService;
+        this.bankService = bankService;
         this.cache = cache;
     }
 
     /// <summary>
-    /// Get paged suppliers, by default take first 100 items
+    /// Get paged banks, by default take first 100 items
     /// </summary>
     /// <param name="filter">The filter, <see cref="Filter" /></param>
     /// <param name="resetCache">Clear cache if true</param>
     /// <returns></returns>
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(List<SupplierModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSuppliers([FromQuery] Filter filter, [FromQuery] bool? resetCache)
+    [ProducesResponseType(typeof(PagedResult<BankModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetBanks([FromQuery] Filter filter, [FromQuery] bool? resetCache)
     {
-        var cacheKey = nameof(SupplierModel);
+        var cacheKey = nameof(BankModel);
         if (resetCache == true)
         {
             cache.Remove(cacheKey);
         }
 
-        var suppliers = await cache.GetOrCreateAsync(cacheKey, async (entry) =>
+        var banks = await cache.GetOrCreateAsync(cacheKey, async (entry) =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-            return await supplierService.GetSuppliersAsync(filter);
+            return await bankService.GetBanksAsync(filter);
         });
 
-        return Ok(suppliers);
+        return Ok(banks);
     }
 }

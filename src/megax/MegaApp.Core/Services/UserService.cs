@@ -14,7 +14,7 @@ public interface IUserService
     Task<PagedResult<UserModel>> GetUsersAsync(Filter filter);
 
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
-    Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req);
+    Task<Result<int>> UpdateUserDetailAsync(int id, UserUpdateModel req);
 
     Task<Result<UserDeviceRecord>> AssignDeviceAsync(int id, int deviceId);
     Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId);
@@ -35,8 +35,8 @@ internal class UserService : IUserService
     public async Task<UserModel> GetUserAsync(int id)
     {
         using var db = UseDb();
-        return await db.Accounts.Where(a => a.UserId == id)
-            .Select(a => new UserModel(a.User, a.Id))
+        return await db.Users.Where(u => u.Id == id)
+            .Select(u => new UserModel(u) { AccountId = u.Accounts.Select(a => a.Id).FirstOrDefault() })
             .FirstOrDefaultAsync();
     }
 
@@ -80,7 +80,7 @@ internal class UserService : IUserService
         return Result<int>.Ok(entity.Id);
     }
 
-    public async Task<Result<int>> UpdateUserDetailAsync(int id, UserModel.UpdateUser req)
+    public async Task<Result<int>> UpdateUserDetailAsync(int id, UserUpdateModel req)
     {
         using var db = UseDb();
         var user = await db.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
@@ -90,11 +90,47 @@ internal class UserService : IUserService
             return Result<int>.Fail(Result.USER_DOES_NOT_EXIST);
         }
 
+        if (await db.Users.AnyAsync(u => u.Id != id && u.Code == req.Code))
+        {
+            return Result<int>.Fail(Result.USER_CODE_ALREADY_EXIST);
+        }
+
+        // user.Id = req.Id;
+        user.Code = req.Code;
+        // user.Email = req.Email;
         user.FullName = req.FullName;
-        user.Dob = req.Dob;
-        user.Address = req.Address;
+        user.Nickname = req.Nickname;
         user.Phone = req.Phone;
+        user.Address = req.Address;
+        user.PermanentResidence = req.PermanentResidence;
+        user.Nationality = req.Nationality;
+        user.Dob = req.Dob;
         user.IdentityNumber = req.IdentityNumber;
+        user.Role = req.Role;
+        user.WorkingType = req.WorkingType;
+        user.Gender = req.Gender;
+        user.PersonalEmail = req.PersonalEmail;
+        user.Hometown = req.Hometown;
+        user.BirthPlace = req.BirthPlace;
+        user.Nation = req.Nation;
+        user.Religion = req.Religion;
+        user.TaxNumber = req.TaxNumber;
+        user.InsuranceNumber = req.InsuranceNumber;
+        user.Married = req.Married;
+        user.AcademicLevel = req.AcademicLevel;
+        user.University = req.University;
+        user.Major = req.Major;
+        // user.VehicleType = req.VehicleType;
+        // user.VehicleBrand = req.VehicleBrand;
+        // user.VehicleColor = req.VehicleColor;
+        // user.VehiclePlateNumber = req.VehiclePlateNumber;
+        user.BankAccountNumber = req.BankAccountNumber;
+        user.BankBranch = req.BankBranch;
+        user.BankId = req.BankId;
+        user.ContractStart = req.ContractStart;
+        user.ContractEnd = req.ContractEnd;
+        user.ContractType = req.ContractType;
+        // user.TeamId = req.TeamId;
 
         await db.SaveChangesAsync();
 
@@ -108,7 +144,7 @@ internal class UserService : IUserService
 
         using var db = UseDb();
         var user = await db.Accounts.Where(a => a.Username == username)
-            .Select(a => new UserModel(a.User, a.Id))
+            .Select(a => new UserModel(a.User))
             .FirstOrDefaultAsync();
 
         return user;

@@ -200,6 +200,7 @@ export default function DeviceInfo({
                 <DatePickerElement
                   label="Purchased At"
                   name="purchasedAt"
+                  required
                   slotProps={{
                     actionBar: {
                       actions: ["today", "cancel", "accept"],

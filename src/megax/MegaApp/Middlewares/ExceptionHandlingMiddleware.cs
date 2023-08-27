@@ -25,7 +25,7 @@ public static class ExceptionHandlingExtension
                 {
                     code = "INTERNAL_SERVER_ERROR",
                     msg = exceptionContext.Error.Message,
-                    isSuccess = false,
+                    success = false,
                 });
             });
         });
