@@ -8,13 +8,20 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
-
+import Drawer from "@mui/material/Drawer";
 import CloseIcon from "@mui/icons-material/Close";
 import { useConfirm } from "material-ui-confirm";
 import { Contact } from "@/lib/models/contact.model";
+import { useEffect, useRef, useState } from "react";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import Button from "@mui/material/Button";
+import UserContactForm from "./UserContactForm";
+import { Result } from "@/lib/models/common.model"
 
 export default function UserContactList() {
   const confirmation = useConfirm();
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [contact, setContact] = useState<Contact | null>(null);
 
   const rows = JSON.parse(`[{
     "id": 1,
@@ -93,12 +100,31 @@ export default function UserContactList() {
       title: "Are you sure?",
       description: `${contact.name} is about to be deleted?`,
       dialogProps: {
-        maxWidth: 'xs'
-      }
-    }).then(() => {
-      console.log('Handle delete');
-    }).catch(() => { /* ignore */ });
+        maxWidth: "xs",
+      },
+    })
+      .then(() => {
+        console.log("Handle delete");
+      })
+      .catch(() => {
+        /* ignore */
+      });
   };
+
+  const handleOpenContact = (contact: Contact) => {
+    setContact(contact);
+    setShowDrawer(true);
+  };
+
+  const handleSave = (contact: Contact) => {
+    const result: Result<Contact> = {
+      code: '',
+      data: contact,
+      success: true,
+    }
+
+    return Promise.resolve(result);
+  }
 
   return (
     <>
@@ -118,11 +144,19 @@ export default function UserContactList() {
                 key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell scope="row">{row.name}</TableCell>
+                <TableCell scope="row">
+                  <Button variant="text" onClick={() => handleOpenContact(row)}>
+                    {row.name}
+                  </Button>
+                </TableCell>
                 <TableCell>{row.phone}</TableCell>
                 <TableCell>Relationship</TableCell>
                 <TableCell align="right">
-                  <IconButton size="small" color="error" onClick={() => handleDeleteContact(row)}>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => handleDeleteContact(row)}
+                  >
                     <CloseIcon fontSize="inherit" />
                   </IconButton>
                 </TableCell>
@@ -131,6 +165,10 @@ export default function UserContactList() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Drawer anchor="right" open={showDrawer}>
+        {contact && <UserContactForm contact={contact!} handleClose={() => setShowDrawer(false)} handleSave={contact => handleSave(contact)} />}
+      </Drawer>
     </>
   );
 }
