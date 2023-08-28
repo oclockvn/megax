@@ -65,7 +65,7 @@ export const updateUserDetailThunk = createAsyncThunk(
 );
 
 export const createUpdateContactThunk = createAsyncThunk(
-  "users/create-udpate-contact",
+  "users/create-update-contact",
   async (req: { id: number; contact: Partial<Contact | null> }, thunkApi) => {
     thunkApi.dispatch(
       userSlice.actions.setLoading({ loading: true, msg: "Saving changes..." })
