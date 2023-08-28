@@ -17,9 +17,13 @@ import { useState } from "react";
 import Button from "@mui/material/Button";
 import UserDocumentForm from "./UserDocumentForm";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import {/* createUpdateDocumentThunk, deleteDocumentThunk,*/ setLoading } from "@/lib/store/users.state";
+import {
+  createUpdateDocumentThunk,
+  deleteDocumentThunk,
+  setLoading,
+} from "@/lib/store/users.state";
 import { toast } from "react-hot-toast";
-import Chip from "@mui/material/Chip";
+import datetime from "@/lib/datetime";
 
 export default function UserDocumentList() {
   const confirmation = useConfirm();
@@ -28,44 +32,7 @@ export default function UserDocumentList() {
 
   const [showDrawer, setShowDrawer] = useState(false);
   const [document, setDocument] = useState<Partial<UserDocument> | null>(null);
-  // const documents = user?.documents || []
-  const documents = JSON.parse(`[{
-    "id": 1,
-    "documentType": "CMND",
-    "issueDate": "14/01/2023",
-    "documentNumber": "60-577-0792",
-    "issuePlace": "Oborniki Śląskie",
-    "issueBy": "Mackinac Island Airport"
-  }, {
-    "id": 2,
-    "documentType": "CMND",
-    "issueDate": "19/07/2023",
-    "documentNumber": "14-036-4255",
-    "issuePlace": "Woshui",
-    "issueBy": "Camocim Airport"
-  }, {
-    "id": 3,
-    "documentType": "CCCD",
-    "issueDate": "05/08/2023",
-    "documentNumber": "16-912-5132",
-    "issuePlace": "Siteía",
-    "issueBy": "Morafenobe Airport"
-  }, {
-    "id": 4,
-    "documentType": "CCCD",
-    "issueDate": "29/07/2023",
-    "documentNumber": "48-327-4776",
-    "issuePlace": "Banjar Petak",
-    "issueBy": "Biggs Army Air Field (Fort Bliss)"
-  }, {
-    "id": 5,
-    "documentType": "CCCD",
-    "issueDate": "27/05/2023",
-    "documentNumber": "89-893-9258",
-    "issuePlace": "Batambak",
-    "issueBy": "Narvik Framnes Airport"
-  }]
-  `);
+  const documents = user?.documents || [];
 
   const handleDeleteDocument = (document: UserDocument) => {
     confirmation({
@@ -76,7 +43,15 @@ export default function UserDocumentList() {
       },
     })
       .then(() => {
-        // appDispatch(deleteDocumentThunk({ id: user!.id!, contactId: document!.id! }))
+        const result = appDispatch(
+          deleteDocumentThunk({ id: user!.id!, documentId: document!.id! })
+        ).unwrap();
+
+        result.then(res => {
+          res.success
+            ? toast.success("Document deleted successfully")
+            : toast.error(`Something went wrong but I'm too lazy to check`);
+        });
       })
       .catch(() => {
         /* ignore */
@@ -92,22 +67,22 @@ export default function UserDocumentList() {
   const handleCloseDrawer = () => {
     setShowDrawer(false);
     appDispatch(setLoading({ loading: false }));
-  }
+  };
 
   const handleSave = (document: Partial<UserDocument | null>) => {
-    // const resp = appDispatch(
-    //   createUpdateDocumentThunk({ id: user?.id || 0, document })
-    // ).unwrap();
+    const resp = appDispatch(
+      createUpdateDocumentThunk({ id: user?.id || 0, document })
+    ).unwrap();
 
-    // resp.then(result => {
-    //   result.success
-    //     ? toast.success("Document saved successfully")
-    //     : toast.error("Something went wrong");
+    resp.then(result => {
+      result.success
+        ? toast.success("Document saved successfully")
+        : toast.error("Something went wrong");
 
-    //   if (result.success) {
-    //     handleCloseDrawer();
-    //   }
-    // });
+      if (result.success) {
+        handleCloseDrawer();
+      }
+    });
   };
 
   return (
@@ -133,7 +108,7 @@ export default function UserDocumentList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {documents.map((document: any) => (
+            {documents.map(document => (
               <TableRow
                 key={document.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -147,7 +122,10 @@ export default function UserDocumentList() {
                   </Button>
                 </TableCell>
                 <TableCell>{document.documentType}</TableCell>
-                <TableCell>Issue date</TableCell>
+                <TableCell>
+                  {document.issueDate &&
+                    datetime.formatDate(document.issueDate, "dd/MM/yyyy")}
+                </TableCell>
                 <TableCell align="right">
                   <IconButton
                     size="small"

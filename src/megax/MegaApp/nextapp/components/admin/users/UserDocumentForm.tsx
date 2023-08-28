@@ -24,6 +24,17 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
     handleSave(contact);
   };
 
+  const documentTypes = [
+    "CMND",
+    "CCCD",
+    "Identity Card",
+    "CV",
+    "Application",
+  ].map(x => ({
+    id: x.toLowerCase().replace(/\W/, _ => "_"),
+    label: x,
+  }));
+
   return (
     <>
       <div className="p-4 w-[500px]">
@@ -32,26 +43,22 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
         </h4>
 
         <FormContainer values={document} onSuccess={handleSubmit}>
+          <div className="mb-4">
+            <SelectElement
+              fullWidth
+              required
+              label="Document type"
+              name="documentType"
+              options={documentTypes}
+            />
+          </div>
+
           <div className="mb-4 ">
-            <Grid container spacing={2}>
-              <Grid item md={4}>
-                <SelectElement
-                  fullWidth
-                  required
-                  label="Document type"
-                  name="documentType"
-                  options={[]}
-                />
-              </Grid>
-              <Grid item md={8}>
-                <TextFieldElement
-                  fullWidth
-                  required
-                  label="Document number"
-                  name="documentNumber"
-                />
-              </Grid>
-            </Grid>
+            <TextFieldElement
+              fullWidth
+              label="Document number"
+              name="documentNumber"
+            />
           </div>
 
           <div className="mb-4">

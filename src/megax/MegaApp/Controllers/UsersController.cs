@@ -153,4 +153,40 @@ public class UsersController : ApplicationControllerBase
         var result = await userService.DeleteContactAsync(cid);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Create or update user document
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <param name="req"><see cref="DocumentModel"/></param>
+    /// <returns></returns>
+    [HttpPost("{id}/document")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<DocumentModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateUpdateDocument(int id, DocumentModel req)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await userService.CreateUpdateDocumentAsync(id, req);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Delete a document
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <param name="docid">The document id</param>
+    /// <returns></returns>
+    [HttpDelete("{id}/document/{docid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteDocument(int id, int docid)
+    {
+        _ = id;
+        var result = await userService.DeleteDocumentAsync(docid);
+        return Ok(result);
+    }
 }

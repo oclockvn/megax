@@ -4,6 +4,7 @@ import { User, UserDeviceRecord } from "@/lib/models/user.model";
 import { qs } from "../util";
 import { AxiosError } from "axios";
 import { Contact } from "../models/contact.model";
+import { Document as UserDocument } from "../models/document.model";
 
 export async function fetchUserList(filter: Partial<Filter>) {
   const res = await api.get<PagedResult<User>>("api/users?" + qs(filter));
@@ -73,5 +74,15 @@ export async function creteUpdateContact(id: number, req: Partial<Contact | null
 
 export async function deleteContact(id: number, contactId: number) {
   const res = await api.delete<Result<boolean>>(`api/users/${id}/contact/${contactId}`);
+  return res.data;
+}
+
+export async function creteUpdateDocument(id: number, req: Partial<UserDocument | null>) {
+  const res = await api.post<Result<UserDocument>>(`api/users/${id}/document`, req);
+  return res.data;
+}
+
+export async function deleteDocument(id: number, documentId: number) {
+  const res = await api.delete<Result<boolean>>(`api/users/${id}/document/${documentId}`);
   return res.data;
 }

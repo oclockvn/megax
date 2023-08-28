@@ -46,7 +46,7 @@ public class UserModel
     // public Team Team { get; set; }
 
     // public List<Account> Accounts { get; set; } = new();
-    // public List<UserDocument> Documents { get; set; } = new();
+    public List<DocumentModel> Documents { get; set; } = new();
     public List<ContactModel> Contacts { get; set; } = new();
 
     // public DateTimeOffset CreatedAt { get; set; }

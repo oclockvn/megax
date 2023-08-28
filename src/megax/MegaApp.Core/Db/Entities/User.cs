@@ -139,6 +139,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne(c => c.User)
             .HasForeignKey(c => c.UserId);
 
+        builder.HasMany(x => x.Documents)
+            .WithOne(c => c.User)
+            .HasForeignKey(c => c.UserId);
+
         builder.HasOne(x => x.Bank)
             .WithMany()
             .HasForeignKey(x => x.BankId);

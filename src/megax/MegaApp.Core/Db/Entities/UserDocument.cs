@@ -10,13 +10,22 @@ public class UserDocument
 
     [MaxLength(255)]
     public string DocumentType { get; set; } // CMND|CCCD
+
+    /// <summary>
+    /// nullable, few documents don't have issue date
+    /// </summary>
+    /// <value></value>
     public DateTimeOffset? IssueDate { get; set; }
+
     [MaxLength(255)]
     public string DocumentNumber { get; set; }
     [MaxLength(255)]
     public string IssuePlace { get; set; }
     [MaxLength(255)]
     public string IssueBy { get; set; }
+
+    public int UserId { get; set; }
+    public User User { get; set; }
 }
 
 public class UserDocumentConfiguration : IEntityTypeConfiguration<UserDocument>

@@ -23,6 +23,9 @@ public interface IUserService
 
     Task<Result<ContactModel>> CreateUpdateContactAsync(int userId, ContactModel req);
     Task<Result<bool>> DeleteContactAsync(int contactId);
+
+    Task<Result<DocumentModel>> CreateUpdateDocumentAsync(int userId, DocumentModel req);
+    Task<Result<bool>> DeleteDocumentAsync(int documentId);
 }
 
 internal class UserService : IUserService
@@ -53,6 +56,15 @@ internal class UserService : IUserService
                     IsPrimaryContact = c.IsPrimaryContact,
                     Phone = c.Phone,
                     Relationship = c.Relationship
+                }).ToList(),
+                Documents = u.Documents.Select(d => new DocumentModel
+                {
+                    Id = d.Id,
+                    DocumentNumber = d.DocumentNumber,
+                    DocumentType = d.DocumentType,
+                    IssueBy = d.IssueBy,
+                    IssueDate = d.IssueDate,
+                    IssuePlace = d.IssuePlace,
                 }).ToList()
             })
             .FirstOrDefaultAsync();
@@ -337,6 +349,54 @@ internal class UserService : IUserService
     {
         using var db = UseDb();
         await db.Contacts.Where(c => c.Id == contactId).ExecuteDeleteAsync();
+
+        return new Result<bool>(true);
+    }
+
+    public async Task<Result<DocumentModel>> CreateUpdateDocumentAsync(int userId, DocumentModel req)
+    {
+        using var db = UseDb();
+        UserDocument document;
+        if (req.Id > 0)
+        {
+            document = await db.UserDocuments.FirstOrDefaultAsync(c => c.Id == req.Id);
+            if (document == null)
+            {
+                throw new EntityNotFoundException($"Document {req.Id} could not be found");
+            }
+
+            document.DocumentNumber = req.DocumentNumber;
+            document.DocumentType = req.DocumentType;
+            document.IssueDate = req.IssueDate;
+            document.IssuePlace = req.IssuePlace;
+            document.IssueBy = req.IssueBy;
+        }
+        else
+        {
+            document = db.UserDocuments.Add(new UserDocument
+            {
+                Id = 0,
+                DocumentNumber = req.DocumentNumber,
+                DocumentType = req.DocumentType,
+                IssueDate = req.IssueDate,
+                IssuePlace = req.IssuePlace,
+                IssueBy = req.IssueBy,
+                UserId = userId,
+            }).Entity;
+        }
+
+        // todo: upload file
+        await db.SaveChangesAsync();
+
+        return new Result<DocumentModel>(new DocumentModel(document));
+    }
+
+    public async Task<Result<bool>> DeleteDocumentAsync(int documentId)
+    {
+        using var db = UseDb();
+        await db.UserDocuments.Where(d => d.Id == documentId).ExecuteDeleteAsync();
+
+        // todo: remove file
 
         return new Result<bool>(true);
     }

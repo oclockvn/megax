@@ -17,7 +17,11 @@ import { useState } from "react";
 import Button from "@mui/material/Button";
 import UserContactForm from "./UserContactForm";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { createUpdateContactThunk, deleteContactThunk, setLoading } from "@/lib/store/users.state";
+import {
+  createUpdateContactThunk,
+  deleteContactThunk,
+  setLoading,
+} from "@/lib/store/users.state";
 import { toast } from "react-hot-toast";
 import Chip from "@mui/material/Chip";
 
@@ -39,7 +43,15 @@ export default function UserContactList() {
       },
     })
       .then(() => {
-        appDispatch(deleteContactThunk({ id: user!.id!, contactId: contact!.id! }))
+        const result = appDispatch(
+          deleteContactThunk({ id: user!.id!, contactId: contact!.id! })
+        ).unwrap();
+
+        result.then(res => {
+          res.success
+            ? toast.success("Contact deleted successfully")
+            : toast.error(`Something went wrong but I'm too lazy to check`);
+        });
       })
       .catch(() => {
         /* ignore */
@@ -59,7 +71,7 @@ export default function UserContactList() {
   const handleCloseDrawer = () => {
     setShowDrawer(false);
     appDispatch(setLoading({ loading: false }));
-  }
+  };
 
   const handleSave = (contact: Partial<Contact | null>) => {
     const resp = appDispatch(

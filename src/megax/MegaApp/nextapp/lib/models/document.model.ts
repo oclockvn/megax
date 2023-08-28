@@ -15,7 +15,7 @@ import * as yup from "yup";
 export const documentSchema = yup.object({
   id: yup.number().nullable().default(0),
   documentType: yup.string().label("Document type").required(), // CMND|CCCD
-  issueDate: yup.date().label("Issue date").required(),
+  issueDate: yup.date().label("Issue date").nullable().default(null),
   documentNumber: yup.string().label("Document number").required(),
   issuePlace: yup.string().label("Issue place").required(),
   issueBy: yup.string().label("Issued by").required(),
