@@ -47,6 +47,10 @@ export default function UserContactList() {
   };
 
   const handleOpenContact = (contact: Partial<Contact>) => {
+    if (contacts.length === 0) {
+      contact.isPrimaryContact = true;
+    }
+
     setContact(contact);
     setShowDrawer(true);
     appDispatch(setLoading({ loading: false }));

@@ -303,9 +303,11 @@ internal class UserService : IUserService
         }
         else
         {
+            // if this is the very first contact of the user, set it to primary anyway
+            var shouldBePrimary = req.IsPrimaryContact || await db.Contacts.AnyAsync(c => c.UserId == userId);
             contact = db.Contacts.Add(new Contact
             {
-                IsPrimaryContact = req.IsPrimaryContact,
+                IsPrimaryContact = shouldBePrimary,
                 Name = req.Name,
                 Email = req.Email,
                 Phone = req.Phone,
