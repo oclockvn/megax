@@ -13,9 +13,9 @@ export interface UserDeviceRecord {
 export const userSchema = yup.object({
   id: yup.number().nullable().default(null),
   accountId: yup.number().nullable().default(null),
-  code: yup.string().nullable().default(null),
+  code: yup.string().label('Employee ID').required().default(null),
   email: yup.string().required(),
-  fullName: yup.string().required(),
+  fullName: yup.string().label('Full name').required(),
   nickname: yup.string().nullable().default(null),
   phone: yup.string().nullable().default(null),
   address: yup.string().nullable().default(null),
@@ -64,6 +64,7 @@ export const userSchema = yup.object({
     ),
   contractType: yup
     .string()
+    .label('Contract type')
     .oneOf(["official", "contractor", "fresher"])
     .required()
     .default("official"),

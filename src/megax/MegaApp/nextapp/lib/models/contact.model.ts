@@ -14,7 +14,7 @@ import * as yup from "yup";
 
 export const contactSchema = yup.object({
   id: yup.number().nullable().default(0),
-  userId: yup.number().required(),
+  userId: yup.number().nullable().default(null),
   name: yup.string().required(),
   phone: yup.string().nullable().default(null),
   email: yup.string().nullable().default(null),

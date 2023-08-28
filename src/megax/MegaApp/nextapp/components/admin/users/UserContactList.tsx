@@ -68,7 +68,7 @@ export default function UserContactList() {
         : toast.error("Something went wrong");
 
       if (result.success) {
-        setShowDrawer(false);
+        handleCloseDrawer();
       }
     });
   };
