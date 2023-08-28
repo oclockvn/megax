@@ -3,6 +3,7 @@ import { Filter, PagedResult, Result } from "@/lib/models/common.model";
 import { User, UserDeviceRecord } from "@/lib/models/user.model";
 import { qs } from "../util";
 import { AxiosError } from "axios";
+import { Contact } from "../models/contact.model";
 
 export async function fetchUserList(filter: Partial<Filter>) {
   const res = await api.get<PagedResult<User>>("api/users?" + qs(filter));
@@ -63,4 +64,14 @@ export async function returnDevice(id: number, deviceId: number) {
       data: false,
     } as Result<boolean>;
   }
+}
+
+export async function creteUpdateContact(id: number, req: Partial<Contact | null>) {
+  const res = await api.post<Result<Contact>>(`api/users/${id}/contact`, req);
+  return res.data;
+}
+
+export async function deleteContact(id: number, contactId: number) {
+  const res = await api.delete<Result<boolean>>(`api/users/${id}/contact/${contactId}`);
+  return res.data;
 }

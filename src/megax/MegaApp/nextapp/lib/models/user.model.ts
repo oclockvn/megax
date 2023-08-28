@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { contactSchema } from "./contact.model";
 
 export interface UserDeviceRecord {
   id: number;
@@ -12,15 +13,15 @@ export interface UserDeviceRecord {
 export const userSchema = yup.object({
   id: yup.number().nullable().default(null),
   accountId: yup.number().nullable().default(null),
-  code: yup.string().nullable().default(null),
+  code: yup.string().label('Employee ID').required().default(null),
   email: yup.string().required(),
-  fullName: yup.string().required(),
+  fullName: yup.string().label('Full name').required(),
   nickname: yup.string().nullable().default(null),
   phone: yup.string().nullable().default(null),
   address: yup.string().nullable().default(null),
   permanentResidence: yup.string().nullable().default(null),
   dob: yup.date().required(), // Date | string | null;
-  identityNumber: yup.string().label('Identity').required(),
+  identityNumber: yup.string().label("Identity").required(),
   role: yup.string().nullable().default(null),
   workingType: yup
     .string()
@@ -52,10 +53,10 @@ export const userSchema = yup.object({
   bankAccountNumber: yup.string().nullable().default(null),
   bankBranch: yup.string().nullable().default(null),
   bankId: yup.number().nullable().default(null),
-  contractStart: yup.date().required().label('Contract start'),
+  contractStart: yup.date().required().label("Contract start"),
   contractEnd: yup
     .date()
-    .label('Contract end')
+    .label("Contract end")
     .required()
     .min(
       yup.ref("contractStart"),
@@ -63,55 +64,12 @@ export const userSchema = yup.object({
     ),
   contractType: yup
     .string()
+    .label('Contract type')
     .oneOf(["official", "contractor", "fresher"])
     .required()
     .default("official"),
   teamId: yup.number().nullable().default(null),
+  contacts: yup.array().of(contactSchema).nullable().default([])
 });
 
 export type User = yup.InferType<typeof userSchema>;
-
-// export interface User {
-//   id: number;
-//   code: string;
-//   email: string;
-//   fullName: string;
-//   nickname: string;
-//   phone: string;
-//   address: string;
-//   permanentResidence: string;
-//   dob: Date;
-//   identityNumber: string;
-//   role: string;
-//   workingType: 'remote' | 'office' | 'hybrid'
-//   gender: 'male' | 'female' | 'secret';
-//   personalEmail: string;
-//   hometown: string;
-//   birthPlace: string;
-//   nation: string;
-//   religion: string;
-//   taxNumber: string;
-//   insuranceNumber: string;
-//   married: boolean;
-//   academicLevel: string;
-//   university: string;
-//   major: string;
-//   vehicleType: string;// bike|motobike|automobike
-//   vehicleBrand: string;
-//   vehicleColor: string;
-//   vehiclePlateNumber: string;
-//   bankAccountNumber: string;
-//   bankBranch: string;
-//   bankId: number | null;
-//   // bank: Bank;
-//   contractStart: Date;
-//   contractEnd: Date | null;
-//   contractType: 'official'|'contractor'|'fresher'
-//   teamId: number | null;
-//   // team: Team;
-//   // accounts: Account[];
-//   // documents: UserDocument[];
-//   // contacts: Contact[];
-//   // createdAt: Date | string;
-//   // createdBy: number | null;
-// }

@@ -4,6 +4,8 @@ import {
   fetchUserDetail,
   fetchUserList,
   updateUserDetail,
+  creteUpdateContact,
+  deleteContact,
 } from "../apis/user.api";
 import {
   EmptyPaged,
@@ -11,6 +13,7 @@ import {
   PagedResult,
   Result,
 } from "../models/common.model";
+import { Contact } from "../models/contact.model";
 
 export interface UsersState {
   pagedUsers: PagedResult<User>;
@@ -61,6 +64,52 @@ export const updateUserDetailThunk = createAsyncThunk(
   }
 );
 
+export const createUpdateContactThunk = createAsyncThunk(
+  "users/create-update-contact",
+  async (req: { id: number; contact: Partial<Contact | null> }, thunkApi) => {
+    thunkApi.dispatch(
+      userSlice.actions.setLoading({ loading: true, msg: "Saving changes..." })
+    );
+    try {
+      const result = await creteUpdateContact(req.id, req.contact);
+      if (result.success) {
+        thunkApi.dispatch(userSlice.actions.updateContacts(result.data));
+      }
+
+      return result;
+    } catch {
+      return Promise.resolve<Result<Contact | null>>({
+        code: "Failed",
+        data: null,
+        success: false,
+      });
+    }
+  }
+);
+
+export const deleteContactThunk = createAsyncThunk(
+  "users/delete-contact",
+  async (req: { id: number; contactId: number }, thunkApi) => {
+    thunkApi.dispatch(
+      userSlice.actions.setLoading({ loading: true, msg: "Deleting..." })
+    );
+    try {
+      const result = await deleteContact(req.id, req.contactId);
+      if (result.success) {
+        thunkApi.dispatch(userSlice.actions.deleteContacts(req.contactId));
+      }
+
+      return result;
+    } catch {
+      return Promise.resolve<Result<boolean>>({
+        code: "Failed",
+        data: false,
+        success: false,
+      });
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "users",
   initialState,
@@ -79,7 +128,40 @@ export const userSlice = createSlice({
     clearError: state => {
       state.error = undefined;
     },
-    reset: state => initialState,
+    reset: _ => initialState,
+    updateContacts: (state, action: PayloadAction<Contact>) => {
+      if (!state.user) {
+        return;
+      }
+
+      const { payload: contact } = action;
+      const updating = state.user.contacts?.some(c => c.id === contact.id);
+      if (updating) {
+        state.user.contacts =
+          state.user.contacts?.map(c =>
+            c.id === contact.id
+              ? { ...c, ...contact }
+              : {
+                  ...c,
+                  isPrimaryContact: contact.isPrimaryContact
+                    ? false
+                    : c.isPrimaryContact,
+                }
+          ) || [];
+      } else {
+        state.user.contacts = [contact, ...(state.user.contacts || [])];
+      }
+    },
+    deleteContacts: (state, action: PayloadAction<number>) => {
+      if (!state.user) {
+        return;
+      }
+
+      const { payload: contactId } = action;
+      state.user.contacts = (state.user.contacts || []).filter(
+        c => c.id !== contactId
+      );
+    },
   },
   extraReducers(builder) {
     builder

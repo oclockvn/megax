@@ -9,6 +9,7 @@ namespace MegaApp.Core.Services;
 
 public interface IUserService
 {
+    Task<UserModel.Slim> GetUserSlimAsync(int id);
     Task<UserModel> GetUserAsync(int id);
     Task<UserModel> GetUserAsync(string username);
     Task<PagedResult<UserModel>> GetUsersAsync(Filter filter);
@@ -19,6 +20,9 @@ public interface IUserService
     Task<Result<UserDeviceRecord>> AssignDeviceAsync(int id, int deviceId);
     Task<Result<bool>> ReturnDeviceAsync(int id, int deviceId);
     Task<List<UserDeviceRecord>> UserDevicesAsync(int id);
+
+    Task<Result<ContactModel>> CreateUpdateContactAsync(int userId, ContactModel req);
+    Task<Result<bool>> DeleteContactAsync(int contactId);
 }
 
 internal class UserService : IUserService
@@ -36,7 +40,35 @@ internal class UserService : IUserService
     {
         using var db = UseDb();
         return await db.Users.Where(u => u.Id == id)
-            .Select(u => new UserModel(u) { AccountId = u.Accounts.Select(a => a.Id).FirstOrDefault() })
+            .Select(u => new UserModel(u)
+            {
+                AccountId = u.Accounts.Select(a => a.Id).FirstOrDefault(),
+                Contacts = u.Contacts.Select(c => new ContactModel
+                {
+                    Id = c.Id,
+                    Address = c.Address,
+                    Dob = c.Dob,
+                    Name = c.Name,
+                    Email = c.Email,
+                    IsPrimaryContact = c.IsPrimaryContact,
+                    Phone = c.Phone,
+                    Relationship = c.Relationship
+                }).ToList()
+            })
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<UserModel.Slim> GetUserSlimAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.Accounts.Where(a => a.UserId == id)
+            .Select(a => new UserModel.Slim
+            {
+                Id = a.UserId,
+                AccountId = a.Id,
+                Email = a.User.Email,
+                FullName = a.User.FullName,
+            })
             .FirstOrDefaultAsync();
     }
 
@@ -249,4 +281,63 @@ internal class UserService : IUserService
         return active;
     }
 
+    public async Task<Result<ContactModel>> CreateUpdateContactAsync(int userId, ContactModel req)
+    {
+        using var db = UseDb();
+        Contact contact;
+        if (req.Id > 0)
+        {
+            contact = await db.Contacts.FirstOrDefaultAsync(c => c.Id == req.Id);
+            if (contact == null)
+            {
+                throw new EntityNotFoundException($"Contact {req.Id} could not be found");
+            }
+
+            contact.IsPrimaryContact = req.IsPrimaryContact;
+            contact.Name = req.Name;
+            contact.Email = req.Email;
+            contact.Phone = req.Phone;
+            contact.Relationship = req.Relationship;
+            contact.Dob = req.Dob;
+            contact.Address = req.Address;
+        }
+        else
+        {
+            // if this is the very first contact of the user, set it to primary anyway
+            var shouldBePrimary = req.IsPrimaryContact || await db.Contacts.AnyAsync(c => c.UserId == userId);
+            contact = db.Contacts.Add(new Contact
+            {
+                IsPrimaryContact = shouldBePrimary,
+                Name = req.Name,
+                Email = req.Email,
+                Phone = req.Phone,
+                Address = req.Address,
+                Dob = req.Dob,
+                Id = 0,
+                Relationship = req.Relationship,
+                UserId = userId,
+            }).Entity;
+        }
+
+        await db.SaveChangesAsync();
+
+        var switchPrimaryContact = contact.IsPrimaryContact && await db.Contacts.Where(c => c.Id != contact.Id && c.IsPrimaryContact).AnyAsync();
+        if (switchPrimaryContact)
+        {
+            // remove primary from other contacts of this user
+            await db.Contacts
+                .Where(c => c.UserId == userId && c.Id != contact.Id && c.IsPrimaryContact)
+                .ExecuteUpdateAsync(c => c.SetProperty(c => c.IsPrimaryContact, false));
+        }
+
+        return new Result<ContactModel>(new ContactModel(contact));
+    }
+
+    public async Task<Result<bool>> DeleteContactAsync(int contactId)
+    {
+        using var db = UseDb();
+        await db.Contacts.Where(c => c.Id == contactId).ExecuteDeleteAsync();
+
+        return new Result<bool>(true);
+    }
 }

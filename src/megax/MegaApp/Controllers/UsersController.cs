@@ -112,9 +112,45 @@ public class UsersController : ApplicationControllerBase
     [HttpPost("{id}/return-device/{deviceId}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(List<bool>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ReturnDeviceAsync(int id, int deviceId)
+    public async Task<IActionResult> ReturnDevice(int id, int deviceId)
     {
         var result = await userService.ReturnDeviceAsync(id, deviceId);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Create or update user contact
+    /// </summary>
+    /// <param name="id">User id</param>
+    /// <param name="req"><see cref="ContactModel"/></param>
+    /// <returns></returns>
+    [HttpPost("{id}/contact")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<ContactModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateUpdateContact(int id, ContactModel req)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await userService.CreateUpdateContactAsync(id, req);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Delete a contact
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <param name="cid">The contact id</param>
+    /// <returns></returns>
+    [HttpDelete("{id}/contact/{cid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteContact(int id, int cid)
+    {
+        _ = id;
+        var result = await userService.DeleteContactAsync(cid);
         return Ok(result);
     }
 }
