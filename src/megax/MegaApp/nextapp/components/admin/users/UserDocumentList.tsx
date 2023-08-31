@@ -141,7 +141,7 @@ export default function UserDocumentList() {
         </Table>
       </TableContainer>
 
-      <Drawer anchor="right" open={showDrawer}>
+      <Drawer anchor="right" open={showDrawer} onClose={handleCloseDrawer}>
         {document && (
           <UserDocumentForm
             document={document!}

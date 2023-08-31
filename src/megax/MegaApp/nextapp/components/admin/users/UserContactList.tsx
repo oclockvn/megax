@@ -150,7 +150,7 @@ export default function UserContactList() {
         </Table>
       </TableContainer>
 
-      <Drawer anchor="right" open={showDrawer}>
+      <Drawer anchor="right" open={showDrawer} onClose={handleCloseDrawer}>
         {contact && (
           <UserContactForm
             contact={contact!}
