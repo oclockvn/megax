@@ -13,16 +13,21 @@ import DropzoneWrapper from "@/components/form/DropzoneWrapper";
 
 type UserDocumentFormProps = {
   document: Partial<UserDocument>;
-  handleSave: (contact: Partial<UserDocument>) => void;
+  handleSave: (contact: Partial<UserDocument>, files?: File[]) => void;
   handleClose: () => void;
   loading?: boolean;
 };
 
 export default function UserDocumentForm(props: UserDocumentFormProps) {
   const { document, handleSave, handleClose, loading } = props;
+  let _selectedFiles: File[] = [];
 
   const handleSubmit = (contact: Partial<UserDocument>) => {
-    handleSave(contact);
+    handleSave(contact, _selectedFiles);
+  };
+
+  const handleFileChanged = (files: File[]) => {
+    _selectedFiles = [...files];
   };
 
   const documentTypes = [
@@ -84,7 +89,7 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
           </div>
 
           <div className="mb-4">
-            <DropzoneWrapper />
+            <DropzoneWrapper fileSelected={handleFileChanged} />
           </div>
 
           <div className="flex items-center gap-2">

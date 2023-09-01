@@ -163,7 +163,7 @@ public class UsersController : ApplicationControllerBase
     [HttpPost("{id}/document")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<DocumentModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateUpdateDocument(int id, DocumentModel req)
+    public async Task<IActionResult> CreateUpdateDocument(int id, [FromForm] Models.DocumentModelForm req)
     {
         if (!ModelState.IsValid)
         {

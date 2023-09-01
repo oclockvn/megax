@@ -1,10 +1,11 @@
-import api from "@/lib/api";
+import api, { upload } from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
 import { User, UserDeviceRecord } from "@/lib/models/user.model";
-import { qs } from "../util";
-import { AxiosError } from "axios";
+import { normalizeDateTimePayload, qs, toFormData } from "../util";
+import { AxiosError,  } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
+import datetime from "../datetime";
 
 export async function fetchUserList(filter: Partial<Filter>) {
   const res = await api.get<PagedResult<User>>("api/users?" + qs(filter));
@@ -77,8 +78,9 @@ export async function deleteContact(id: number, contactId: number) {
   return res.data;
 }
 
-export async function creteUpdateDocument(id: number, req: Partial<UserDocument | null>) {
-  const res = await api.post<Result<UserDocument>>(`api/users/${id}/document`, req);
+export async function creteUpdateDocument(id: number, req: Partial<UserDocument | null>, files?: File[]) {
+  const payload = normalizeDateTimePayload(req!)
+  const res = await upload<Result<UserDocument>>(`api/users/${id}/document`, toFormData(payload!, files));
   return res.data;
 }
 

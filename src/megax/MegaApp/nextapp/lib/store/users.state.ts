@@ -117,14 +117,14 @@ export const deleteContactThunk = createAsyncThunk(
 export const createUpdateDocumentThunk = createAsyncThunk(
   "users/create-update-document",
   async (
-    req: { id: number; document: Partial<UserDocument | null> },
+    req: { id: number; document: Partial<UserDocument | null>, files?: File[] },
     thunkApi
   ) => {
     thunkApi.dispatch(
       userSlice.actions.setLoading({ loading: true, msg: "Saving changes..." })
     );
     try {
-      const result = await creteUpdateDocument(req.id, req.document);
+      const result = await creteUpdateDocument(req.id, req.document, req.files);
       if (result.success) {
         thunkApi.dispatch(userSlice.actions.updateDocuments(result.data));
       }

@@ -7,13 +7,13 @@ const api = axios.create({
   withCredentials: true,
   headers: {
     "Content-type": "application/json",
-    "Accept": "application/json",
+    Accept: "application/json",
     "x-rewrite-me": 1,
   },
 });
 
 api.interceptors.request.use(async request => {
-  const token = storage.get('token');
+  const token = storage.get("token");
 
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;
@@ -78,5 +78,13 @@ export function handleResponse(body: any) {
 function isIsoDateString(value: any): boolean {
   return value && typeof value === "string" && isoFormat.test(value);
 }
+
+export function upload<T>(url: string, form: FormData) {
+  return api.post<T>(url, form, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
 
 export default api;

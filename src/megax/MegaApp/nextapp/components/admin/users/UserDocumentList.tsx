@@ -69,9 +69,9 @@ export default function UserDocumentList() {
     appDispatch(setLoading({ loading: false }));
   };
 
-  const handleSave = (document: Partial<UserDocument | null>) => {
+  const handleSave = (document: Partial<UserDocument | null>, files?: File[]) => {
     const resp = appDispatch(
-      createUpdateDocumentThunk({ id: user?.id || 0, document })
+      createUpdateDocumentThunk({ id: user?.id || 0, document, files })
     ).unwrap();
 
     resp.then(result => {
