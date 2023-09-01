@@ -9,6 +9,7 @@ import {
 import Button from "@mui/material/Button";
 import { Document as UserDocument } from "@/lib/models/document.model";
 import Grid from "@mui/material/Grid";
+import DropzoneWrapper from "@/components/form/DropzoneWrapper";
 
 type UserDocumentFormProps = {
   document: Partial<UserDocument>;
@@ -80,6 +81,10 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
 
           <div className="mb-4">
             <TextFieldElement fullWidth label="Issue place" name="issuePlace" />
+          </div>
+
+          <div className="mb-4">
+            <DropzoneWrapper />
           </div>
 
           <div className="flex items-center gap-2">
