@@ -1,6 +1,6 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Dtos;
-using MegaApp.Core.Extensions;
+using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Exceptions;

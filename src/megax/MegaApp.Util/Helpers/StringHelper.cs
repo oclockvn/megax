@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
-namespace MegaApp.Core.Helpers;
+namespace MegaApp.Utils.Helpers;
 
 public static partial class StringHelper
 {

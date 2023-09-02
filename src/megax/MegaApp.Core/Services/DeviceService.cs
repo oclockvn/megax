@@ -1,7 +1,7 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Dtos;
-using MegaApp.Core.Extensions;
-using MegaApp.Core.Helpers;
+using MegaApp.Utils.Extensions;
+using MegaApp.Utils.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;

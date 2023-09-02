@@ -1,4 +1,4 @@
-namespace MegaApp.Core.Extensions;
+namespace MegaApp.Utils.Extensions;
 
 public static class EncryptExtension
 {
