@@ -1,18 +1,17 @@
 using Azure.Storage.Blobs;
+using MegaApp.Utils.Extensions;
 using System.Diagnostics;
 
 namespace MegaApp.Infrastructure.Files;
 
-internal class AzureFileService
+internal class AzureBlobFileService : FileServiceBase, IFileService
 {
-
     private record BlobPart(string Container, string Path);
-    private readonly string connection;
+    private readonly string blobConnection;
 
-
-    public AzureFileService(string connection)
+    public AzureBlobFileService(string connection)
     {
-        this.connection = connection;
+        this.blobConnection = connection;
     }
 
     public async Task<FileDownloadResult> DownloadAsync(string fullPath)
@@ -20,13 +19,10 @@ internal class AzureFileService
         // mainly to convert the blob info
         var blobInfo = new BlobClient(new Uri(fullPath));
         var bytes = await DownloadBlobInternalAsync(blobInfo.BlobContainerName, blobInfo.Name);
+        var (_, fileName, _) = ExtractPath(fullPath);
 
-        return new FileDownloadResult(GetFileName(blobInfo.Name), bytes);
+        return new FileDownloadResult(fileName, bytes);
     }
-
-    private string GetFileName(string path) => path.Contains('/')
-            ? path[(path.LastIndexOf('/') + 1)..].Trim()
-            : path;
 
     private async Task<byte[]> DownloadBlobInternalAsync(string container, string path)
     {
@@ -35,7 +31,7 @@ internal class AzureFileService
         using var ms = new MemoryStream();
         await blobClient.DownloadToAsync(ms);
 
-        return ms.ToArray();
+        return await ms.ToBytesAsync();
     }
 
     public async Task<FileUploadResult> UploadAsync(string fullPath, byte[] content)
@@ -53,9 +49,7 @@ internal class AzureFileService
         // assume fullPath contains full azure blob path
         // for example: megax/uploads/documents/sample.pdf
         // then megax would be the container name
-        var firstSlash = fullPath.IndexOf('/');
-        var container = fullPath[..firstSlash];
-        var path = fullPath[(firstSlash + 1)..];
+        var (container, fileName, path) = ExtractPath(fullPath);
 
         using var ms = new MemoryStream();
         await ms.WriteAsync(content);
@@ -63,7 +57,7 @@ internal class AzureFileService
 
         var url = await UploadBlobInternalAsync(container, path, ms);
 
-        return new FileUploadResult(GetFileName(fullPath), url);
+        return new FileUploadResult(fileName, url);
     }
 
     private async Task<string> UploadBlobInternalAsync(string container, string path, Stream stream, bool createSnapshot = false)
@@ -84,33 +78,9 @@ internal class AzureFileService
 
     private BlobClient GetClient(string container, string path)
     {
-        var blobService = new BlobServiceClient(connection);
+        var blobService = new BlobServiceClient(blobConnection);
 
         var containerClient = blobService.GetBlobContainerClient(container);
         return containerClient.GetBlobClient(path);
-    }
-
-    private BlobPart Parse(string url)
-    {
-        var blobInfo = new BlobClient(new Uri(url));
-        return new BlobPart(blobInfo.BlobContainerName, blobInfo.Name);
-    }
-
-    private bool TryParse(string url, out BlobPart part)
-    {
-        part = null;
-
-        try
-        {
-            var blobInfo = new BlobClient(new Uri(url));
-            part = new BlobPart(blobInfo.BlobContainerName, blobInfo.Name);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex.Message);
-        }
-
-        return false;
     }
 }

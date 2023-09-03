@@ -52,10 +52,10 @@ public class UserModel
     // public DateTimeOffset CreatedAt { get; set; }
     // public int? CreatedBy { get; set; }
 
-    public UserModel()
-    {
+    // public UserModel()
+    // {
 
-    }
+    // }
 
     // public UserModel(Db.Entities.User user, int accountId) : this(user)
     // {
@@ -106,24 +106,24 @@ public class UserModel
     {
         [Required]
         [MaxLength(100)]
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string Username { get; set; } = null!;
+        public string Password { get; set; } = null!;
 
         [Required]
         [MaxLength(100)]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Required]
-        public string FullName { get; set; }
+        public string FullName { get; set; } = null!;
 
         [Required]
         [MaxLength(200)]
-        public string Address { get; set; }
+        public string Address { get; set; } = null!;
         public DateTimeOffset? Dob { get; set; }
         [MaxLength(100)]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = null!;
         [MaxLength(200)]
-        public string IdentityNumber { get; set; }
+        public string IdentityNumber { get; set; } = null!;
 
         public ProviderType ProviderType { get; set; }
         public OAuthType? OAuthType { get; set; }
@@ -132,18 +132,18 @@ public class UserModel
     public record UserLogin
     {
         [Required]
-        public string Username { get; set; }
+        public string Username { get; set; } = null!;
 
         [Required]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
     }
 
     public record Slim
     {
         public int Id { get; set; }
         public int AccountId { get; set; }
-        public string Email { get; set; }
-        public string FullName { get; set; }
+        public string Email { get; set; } = null!;
+        public string FullName { get; set; } = null!;
     }
 }
 

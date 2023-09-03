@@ -9,103 +9,103 @@ public class User : ICreatedByEntity
     public int Id { get; set; }
 
     [MaxLength(100)]
-    public string Code { get; set; }
+    public string Code { get; set; } = null!;
 
     [MaxLength(100)]
     [Required]
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
     [MaxLength(100)]
-    public string FullName { get; set; }
+    public string FullName { get; set; } = null!;
 
     [MaxLength(255)]
-    public string Nickname { get; set; }
+    public string Nickname { get; set; } = null!;
 
     [MaxLength(100)]
-    public string Phone { get; set; }
+    public string Phone { get; set; } = null!;
     [MaxLength(200)]
-    public string Address { get; set; }
+    public string Address { get; set; } = null!;
 
     [MaxLength(255)]
-    public string PermanentResidence { get; set; }
+    public string PermanentResidence { get; set; } = null!;
 
     [MaxLength(255)]
-    public string Nationality { get; set; }
+    public string Nationality { get; set; } = null!;
 
-    public DateTimeOffset? Dob { get; set; }
+    public DateTimeOffset? Dob { get; set; } = null!;
 
     [MaxLength(100)]
-    public string IdentityNumber { get; set; }
+    public string IdentityNumber { get; set; } = null!;
 
     [MaxLength(255)]
-    public string Role { get; set; }
+    public string Role { get; set; } = null!;
 
     [MaxLength(255)]
-    public string WorkingType { get; set; } // remote | office | hybrid
+    public string WorkingType { get; set; } = null!; // remote | office | hybrid
 
     [MaxLength(255)]
-    public string Gender { get; set; }
+    public string Gender { get; set; } = null!;
 
     [MaxLength(255)]
-    public string PersonalEmail { get; set; }
+    public string PersonalEmail { get; set; } = null!;
 
     [MaxLength(255)]
-    public string Hometown { get; set; }
+    public string Hometown { get; set; } = null!;
 
     [MaxLength(255)]
-    public string BirthPlace { get; set; }
+    public string BirthPlace { get; set; } = null!;
 
     [MaxLength(255)]
-    public string Nation { get; set; }
+    public string Nation { get; set; } = null!;
 
     [MaxLength(255)]
-    public string Religion { get; set; }
+    public string Religion { get; set; } = null!;
 
     [MaxLength(255)]
-    public string TaxNumber { get; set; }
+    public string TaxNumber { get; set; } = null!;
 
     [MaxLength(255)]
-    public string InsuranceNumber { get; set; }
+    public string InsuranceNumber { get; set; } = null!;
 
     public bool Married { get; set; }
 
     [MaxLength(255)]
-    public string AcademicLevel { get; set; }
+    public string AcademicLevel { get; set; } = null!;
 
     [MaxLength(255)]
-    public string University { get; set; }
+    public string University { get; set; } = null!;
 
     [MaxLength(255)]
-    public string Major { get; set; }
+    public string Major { get; set; } = null!;
 
     [MaxLength(255)]
-    public string VehicleType { get; set; }// bike|motobike|automobike
+    public string VehicleType { get; set; } = null!;// bike|motobike|automobike
 
     [MaxLength(255)]
-    public string VehicleBrand { get; set; }
+    public string VehicleBrand { get; set; } = null!;
 
     [MaxLength(255)]
-    public string VehicleColor { get; set; }
+    public string VehicleColor { get; set; } = null!;
 
     [MaxLength(255)]
-    public string VehiclePlateNumber { get; set; }
+    public string VehiclePlateNumber { get; set; } = null!;
 
     [MaxLength(255)]
-    public string BankAccountNumber { get; set; }
+    public string BankAccountNumber { get; set; } = null!;
 
     [MaxLength(255)]
-    public string BankBranch { get; set; }
-    public int? BankId { get; set; }
-    public Bank Bank { get; set; }
+    public string BankBranch { get; set; } = null!;
+    public int? BankId { get; set; } = null!;
+    public Bank Bank { get; set; } = null!;
 
     public DateTimeOffset ContractStart { get; set; }
     public DateTimeOffset ContractEnd { get; set; }
 
     [MaxLength(255)]
-    public string ContractType { get; set; }// official|contractor|fresher
+    public string ContractType { get; set; } = null!;// official|contractor|fresher
 
-    public int? TeamId { get; set; }
-    public Team Team { get; set; }
+    public int? TeamId { get; set; } = null!;
+    public Team Team { get; set; } = null!;
 
     public List<Account> Accounts { get; set; } = new();
     public List<UserDocument> Documents { get; set; } = new();

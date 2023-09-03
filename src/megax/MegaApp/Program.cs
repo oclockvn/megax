@@ -27,7 +27,7 @@ builder.Services
         ;
     }, builder.Configuration)
     .AddGeneratorServices()
-    .AddInfrastructureServices(builder.Configuration)
+    .AddInfrastructureServices(builder.Configuration, builder.Environment.ContentRootPath)
     .AddNextJs(builder.Configuration)
     .AddSwaggerGen(o =>
     {
