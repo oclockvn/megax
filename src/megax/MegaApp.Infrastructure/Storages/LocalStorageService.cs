@@ -1,15 +1,15 @@
 
 using MegaApp.Infrastructure.Http;
 
-namespace MegaApp.Infrastructure.Files;
+namespace MegaApp.Infrastructure.Storages;
 
-internal partial class LocalFileService : FileServiceBase, IFileService
+internal partial class LocalStorageService : StorageServiceBase, IStorageService
 {
     private readonly string root;
     private readonly IHttpOriginResolver httpOriginResolver;
     private readonly string _uploadFolder = "_LOCAL_UPLOAD";
 
-    public LocalFileService(string root, IHttpOriginResolver httpOriginResolver)
+    public LocalStorageService(string root, IHttpOriginResolver httpOriginResolver)
     {
         this.root = root;
         this.httpOriginResolver = httpOriginResolver;

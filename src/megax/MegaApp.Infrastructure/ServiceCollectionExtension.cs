@@ -1,4 +1,4 @@
-using MegaApp.Infrastructure.Files;
+using MegaApp.Infrastructure.Storages;
 using MegaApp.Infrastructure.GoogleClient;
 using MegaApp.Infrastructure.Http;
 using Microsoft.Extensions.Configuration;
@@ -17,19 +17,19 @@ namespace MegaApp.Infrastructure
             services.AddHttpClient();
             return services
                 .AddScoped<IGoogleAuthenticateClient, GoogleAuthenticateClient>()
-                .AddScoped<IFileService>(sp =>
+                .AddScoped<IStorageService>(sp =>
                 {
                     var fileConfig = sp.GetRequiredService<IOptions<FileServiceConfig>>().Value;
                     if (!string.IsNullOrWhiteSpace(fileConfig.AzureBlobStorageConnection))
                     {
-                        return new AzureBlobFileService(fileConfig.AzureBlobStorageConnection);
+                        return new AzureBlobStorageService(fileConfig.AzureBlobStorageConnection);
                     }
                     else if (!string.IsNullOrWhiteSpace(fileConfig.GoogleApplicationDefaultCredential))
                     {
-                        return new GoogleCloudFileService();
+                        return new GoogleCloudStorageService();
                     }
 
-                    return new LocalFileService(contentRootPath, sp.GetRequiredService<IHttpOriginResolver>());
+                    return new LocalStorageService(contentRootPath, sp.GetRequiredService<IHttpOriginResolver>());
                 });
             ;
         }

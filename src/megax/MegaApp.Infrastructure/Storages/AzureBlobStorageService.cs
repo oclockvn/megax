@@ -2,14 +2,14 @@ using Azure.Storage.Blobs;
 using MegaApp.Utils.Extensions;
 using System.Diagnostics;
 
-namespace MegaApp.Infrastructure.Files;
+namespace MegaApp.Infrastructure.Storages;
 
-internal class AzureBlobFileService : FileServiceBase, IFileService
+internal class AzureBlobStorageService : StorageServiceBase, IStorageService
 {
     private record BlobPart(string Container, string Path);
     private readonly string blobConnection;
 
-    public AzureBlobFileService(string connection)
+    public AzureBlobStorageService(string connection)
     {
         this.blobConnection = connection;
     }

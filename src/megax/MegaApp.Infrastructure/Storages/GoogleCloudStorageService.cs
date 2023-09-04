@@ -1,9 +1,9 @@
 using Google.Cloud.Storage.V1;
 using MegaApp.Utils.Extensions;
 
-namespace MegaApp.Infrastructure.Files;
+namespace MegaApp.Infrastructure.Storages;
 
-internal class GoogleCloudFileService : FileServiceBase, IFileService
+internal class GoogleCloudStorageService : StorageServiceBase, IStorageService
 {
     public async Task<FileDownloadResult> DownloadAsync(string fullPath)
     {

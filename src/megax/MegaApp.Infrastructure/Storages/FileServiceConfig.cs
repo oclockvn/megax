@@ -1,4 +1,4 @@
-namespace MegaApp.Infrastructure.Files;
+namespace MegaApp.Infrastructure.Storages;
 
 public record FileServiceConfig
 {

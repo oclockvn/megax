@@ -1,17 +1,17 @@
 using System.Data.SqlTypes;
 
-namespace MegaApp.Infrastructure.Files;
+namespace MegaApp.Infrastructure.Storages;
 
 public record FileUploadResult(string FileName, string Url);
 public record FileDownloadResult(string FileName, byte[] Content);
 
-public interface IFileService
+public interface IStorageService
 {
     Task<FileUploadResult> UploadAsync(string target, byte[] bytes);
     Task<FileDownloadResult> DownloadAsync(string target);
 }
 
-internal abstract class FileServiceBase
+internal abstract class StorageServiceBase
 {
     public (string root, string fileName, string path) ExtractPath(string fullPath)
     {
