@@ -37,6 +37,7 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new BankConfiguration());
             modelBuilder.ApplyConfiguration(new TeamConfiguration());
             modelBuilder.ApplyConfiguration(new FileConfiguration());
+            modelBuilder.ApplyConfiguration(new FileReferenceConfiguration());
         }
     }
 }

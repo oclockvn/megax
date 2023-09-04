@@ -1,3 +1,7 @@
+using MegaApp.Core.Enums;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 namespace MegaApp.Core.Db.Entities;
 
 public class FileReference : ICreatedByEntity
@@ -8,7 +12,7 @@ public class FileReference : ICreatedByEntity
     /// determine entity associate with the file
     /// </summary>
     /// <value>nameof entity</value>
-    public string FileType { get; set; }
+    public FileType FileType { get; set; }
 
     /// <summary>
     /// cast to string from entity id when save file attachments
@@ -18,4 +22,16 @@ public class FileReference : ICreatedByEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+}
+
+public class FileReferenceConfiguration : IEntityTypeConfiguration<FileReference>
+{
+    public void Configure(EntityTypeBuilder<FileReference> builder)
+    {
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("sysdatetimeoffset()");
+
+        builder.Property(x => x.FileType)
+            .HasConversion(v => v.ToString(), v => Enum.Parse<FileType>(v));
+    }
 }

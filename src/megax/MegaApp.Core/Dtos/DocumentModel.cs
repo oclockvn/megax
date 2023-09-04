@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MegaApp.Core.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
 
@@ -18,6 +19,8 @@ public record DocumentModel
 
     [MaxLength(255)]
     public string IssueBy { get; set; }
+
+    public List<FileRecord> Files { get; set; } = new();
 
     public DocumentModel()
     {

@@ -31,10 +31,12 @@ public interface IUserService
 internal class UserService : IUserService
 {
     private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly IFileService fileService;
 
-    public UserService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public UserService(IDbContextFactory<ApplicationDbContext> dbContextFactory, IFileService fileService)
     {
         this.dbContextFactory = dbContextFactory;
+        this.fileService = fileService;
     }
 
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
@@ -385,8 +387,13 @@ internal class UserService : IUserService
             }).Entity;
         }
 
-        // todo: upload file
         await db.SaveChangesAsync();
+
+        // upload file
+        if (req.Files?.Count > 0)
+        {
+            await fileService.AddFilesAsync(document.Id.ToString(), Enums.FileType.UserDocument, req.Files);
+        }
 
         return new Result<DocumentModel>(new DocumentModel(document));
     }
