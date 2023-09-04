@@ -1,7 +1,7 @@
 ﻿using MegaApp.Core;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
-using MegaApp.Infrastructure.Files;
+using MegaApp.Infrastructure.Storages;
 using MegaApp.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +12,11 @@ namespace MegaApp.Controllers;
 public class UsersController : ApplicationControllerBase
 {
     private readonly IUserService userService;
-    private readonly IFileService fileService;
+    private readonly IStorageService fileService;
 
     public UsersController(
         IUserService userService,
-        IFileService fileService
+        IStorageService fileService
         )
     {
         this.userService = userService;

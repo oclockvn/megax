@@ -21,6 +21,8 @@ namespace MegaApp.Core.Db
         public DbSet<UserDocument> UserDocuments { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Entities.File> Files { get; set; }
+        public DbSet<FileReference> FileReferences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +36,7 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new DeviceHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new BankConfiguration());
             modelBuilder.ApplyConfiguration(new TeamConfiguration());
+            modelBuilder.ApplyConfiguration(new FileConfiguration());
         }
     }
 }
