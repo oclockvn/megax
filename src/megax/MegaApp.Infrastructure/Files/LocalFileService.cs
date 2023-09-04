@@ -7,6 +7,7 @@ internal partial class LocalFileService : FileServiceBase, IFileService
 {
     private readonly string root;
     private readonly IHttpOriginResolver httpOriginResolver;
+    private readonly string _uploadFolder = "_LOCAL_UPLOAD";
 
     public LocalFileService(string root, IHttpOriginResolver httpOriginResolver)
     {
@@ -44,7 +45,13 @@ internal partial class LocalFileService : FileServiceBase, IFileService
         var (_, fileName, _) = ExtractPath(fullPath);
         // fullPath is parent/documents/sub/path/file.txt
         fullPath = Path.Combine(fullPath.Split('/'));
-        fullPath = Path.Combine(root, fullPath);
+        fullPath = Path.Combine(root, _uploadFolder, fullPath);
+
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory!);
+        }
 
         await File.WriteAllBytesAsync(fullPath, bytes);
 

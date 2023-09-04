@@ -1,7 +1,10 @@
+using System.Diagnostics;
+
 namespace MegaApp.Utils.Extensions;
 
 public static class StreamExtension
 {
+    [DebuggerStepThrough]
     public static async Task<byte[]> ToBytesAsync(this Stream stream)
     {
         if (stream is MemoryStream memory)
@@ -16,6 +19,7 @@ public static class StreamExtension
         return ms.ToArray();
     }
 
+    [DebuggerStepThrough]
     public static Stream ToStream(this byte[] bytes)
     {
         return new MemoryStream(bytes)

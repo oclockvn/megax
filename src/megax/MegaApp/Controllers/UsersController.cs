@@ -1,6 +1,8 @@
 ﻿using MegaApp.Core;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
+using MegaApp.Infrastructure.Files;
+using MegaApp.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MegaApp.Controllers;
@@ -10,12 +12,15 @@ namespace MegaApp.Controllers;
 public class UsersController : ApplicationControllerBase
 {
     private readonly IUserService userService;
+    private readonly IFileService fileService;
 
     public UsersController(
-        IUserService userService
+        IUserService userService,
+        IFileService fileService
         )
     {
         this.userService = userService;
+        this.fileService = fileService;
     }
 
     /// <summary>
@@ -168,6 +173,17 @@ public class UsersController : ApplicationControllerBase
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
+        }
+
+        if (req.Files?.Length > 0)
+        {
+            // upload files
+            foreach (var file in req.Files)
+            {
+                using var ms = new MemoryStream();
+                await file.CopyToAsync(ms);
+                await fileService.UploadAsync($"users/{id}/documents/{file.FileName}", await ms.ToBytesAsync());
+            }
         }
 
         var result = await userService.CreateUpdateDocumentAsync(id, req);
