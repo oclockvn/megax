@@ -270,3 +270,5 @@ nextapp/package-lock.json
 **/wwwroot/ClientApp
 
 .env.production
+
+_LOCAL_UPLOAD/
