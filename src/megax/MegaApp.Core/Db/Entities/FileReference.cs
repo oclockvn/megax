@@ -6,6 +6,8 @@ namespace MegaApp.Core.Db.Entities;
 
 public class FileReference : ICreatedByEntity
 {
+    public int Id { get; set; }
+
     public List<File> Files { get; set; } = new();
 
     /// <summary>
