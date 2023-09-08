@@ -44,7 +44,7 @@ internal class UserService : IUserService
     public async Task<UserModel> GetUserAsync(int id)
     {
         using var db = UseDb();
-        return await db.Users.Where(u => u.Id == id)
+        var user = await db.Users.Where(u => u.Id == id)
             .Select(u => new UserModel(u)
             {
                 AccountId = u.Accounts.Select(a => a.Id).FirstOrDefault(),
@@ -70,6 +70,18 @@ internal class UserService : IUserService
                 }).ToList()
             })
             .FirstOrDefaultAsync();
+
+        var documentIds = user.Documents?.Select(x => x.Id.ToString()).ToArray();
+        var files = await fileService.GetFilesAsync(documentIds, Enums.FileType.UserDocument);
+        if (files.Count > 0)
+        {
+            foreach (var doc in user.Documents)
+            {
+                doc.Files = files.Where(f => f.RefId == doc.Id.ToString()).ToList();
+            }
+        }
+
+        return user;
     }
 
     public async Task<UserModel.Slim> GetUserSlimAsync(int id)
@@ -318,7 +330,7 @@ internal class UserService : IUserService
         else
         {
             // if this is the very first contact of the user, set it to primary anyway
-            var shouldBePrimary = req.IsPrimaryContact || await db.Contacts.AnyAsync(c => c.UserId == userId);
+            var shouldBePrimary = req.IsPrimaryContact || !await db.Contacts.AnyAsync(c => c.UserId == userId);
             contact = db.Contacts.Add(new Contact
             {
                 IsPrimaryContact = shouldBePrimary,

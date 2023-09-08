@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
 
-public record FileRecord(int Id, string FileName, string Url, int FileSizeKb);
+public record FileRecord(int Id, string FileName, string Url, int FileSizeKb, string RefId);
 
 public interface IFileService
 {
-    Task<List<FileRecord>> GetFilesAsync(string typeId, FileType fileType);
-    Task<List<int>> AddFilesAsync(string typeId, FileType fileType, List<FileRecord> files);
+    Task<List<FileRecord>> GetFilesAsync(string refId, FileType fileType);
+    Task<List<FileRecord>> GetFilesAsync(string[] refIds, FileType fileType);
+    Task<List<int>> AddFilesAsync(string refId, FileType fileType, List<FileRecord> files);
 }
 
 internal class FileService : IFileService
@@ -21,18 +22,17 @@ internal class FileService : IFileService
         this.dbContextFactory = dbContextFactory;
     }
 
-    public async Task<List<int>> AddFilesAsync(string typeId, FileType fileType, List<FileRecord> files)
+    public async Task<List<int>> AddFilesAsync(string refId, FileType fileType, List<FileRecord> files)
     {
         using var db = UseDb();
-        var fileReference = await db.FileReferences.Where(f => f.FileType == fileType && f.TypeId == typeId)
-        .SingleOrDefaultAsync();
+        var fileReference = await db.FileReferences.SingleOrDefaultAsync(f => f.FileType == fileType && f.RefId == refId);
 
         fileReference ??= db.FileReferences.Add(new()
         {
             CreatedAt = DateTimeOffset.Now,
             Files = new(),
             FileType = fileType,
-            TypeId = typeId,
+            RefId = refId,
 
         }).Entity;
 
@@ -54,13 +54,18 @@ internal class FileService : IFileService
         return result;
     }
 
-    public async Task<List<FileRecord>> GetFilesAsync(string typeId, FileType fileType)
+    public async Task<List<FileRecord>> GetFilesAsync(string refId, FileType fileType)
+    {
+        return await GetFilesAsync(new[] { refId }, fileType);
+    }
+
+    public async Task<List<FileRecord>> GetFilesAsync(string[] refIds, FileType fileType)
     {
         using var db = UseDb();
         var files = await db.Files
-            .Where(f => f.FileReference.TypeId == typeId && f.FileReference.FileType == fileType)
+            .Where(f => refIds.Contains(f.FileReference.RefId) && f.FileReference.FileType == fileType)
             .OrderByDescending(x => x.CreatedAt)
-            .Select(f => new FileRecord(f.Id, f.FileName, f.Url, f.FileSizeKb))
+            .Select(f => new FileRecord(f.Id, f.FileName, f.Url, f.FileSizeKb, f.FileReference.RefId))
             .ToListAsync();
 
         return files;

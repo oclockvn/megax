@@ -18,7 +18,7 @@ public class FileReference : ICreatedByEntity
     /// cast to string from entity id when save file attachments
     /// </summary>
     /// <value>id as string of the entity</value>
-    public string TypeId { get; set; }
+    public string RefId { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
