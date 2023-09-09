@@ -20,7 +20,8 @@ public record DocumentModel
     [MaxLength(255)]
     public string IssueBy { get; set; }
 
-    public List<FileRecord> Files { get; set; } = new();
+    public List<FileRecord> FileReferences { get; set; } = new();
+    public List<FileRecord> FilesUpload { get; set; } = new();
 
     public DocumentModel()
     {

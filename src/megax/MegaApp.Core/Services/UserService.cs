@@ -77,7 +77,7 @@ internal class UserService : IUserService
         {
             foreach (var doc in user.Documents)
             {
-                doc.Files = files.Where(f => f.RefId == doc.Id.ToString()).ToList();
+                doc.FileReferences = files.Where(f => f.RefId == doc.Id.ToString()).ToList();
             }
         }
 
@@ -402,9 +402,9 @@ internal class UserService : IUserService
         await db.SaveChangesAsync();
 
         // upload file
-        if (req.Files?.Count > 0)
+        if (req.FilesUpload?.Count > 0)
         {
-            await fileService.AddFilesAsync(document.Id.ToString(), Enums.FileType.UserDocument, req.Files);
+            await fileService.AddFilesAsync(document.Id.ToString(), Enums.FileType.UserDocument, req.FilesUpload);
         }
 
         return new Result<DocumentModel>(new DocumentModel(document));

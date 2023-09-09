@@ -4,7 +4,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
 
-public record FileRecord(int Id, string FileName, string Url, int FileSizeKb, string RefId);
+public record FileRecord
+{
+    public int Id { get; set; }
+    public string FileName { get; set; }
+    public string Url { get; set; }
+    public long FileSize { get; set; }
+    public string RefId { get; set; }
+
+    public FileRecord(int id, string fileName, string url, long fileSizeKb, string refId) : this(fileName, url, fileSizeKb)
+    {
+        Id = id;
+        RefId = refId;
+    }
+
+    public FileRecord(string fileName, string url, long fileSizeKb)
+    {
+        FileName = fileName;
+        Url = url;
+        FileSize = fileSizeKb;
+    }
+}
 
 public interface IFileService
 {
@@ -33,7 +53,6 @@ internal class FileService : IFileService
             Files = new(),
             FileType = fileType,
             RefId = refId,
-
         }).Entity;
 
         foreach (var file in files)
@@ -43,7 +62,7 @@ internal class FileService : IFileService
                 CreatedAt = DateTimeOffset.Now,
                 // CreatedBy = 0,
                 FileName = file.FileName,
-                FileSizeKb = file.FileSizeKb,
+                FileSize = file.FileSize,
                 Url = file.Url,
             });
         }
@@ -65,7 +84,7 @@ internal class FileService : IFileService
         var files = await db.Files
             .Where(f => refIds.Contains(f.FileReference.RefId) && f.FileReference.FileType == fileType)
             .OrderByDescending(x => x.CreatedAt)
-            .Select(f => new FileRecord(f.Id, f.FileName, f.Url, f.FileSizeKb, f.FileReference.RefId))
+            .Select(f => new FileRecord(f.Id, f.FileName, f.Url, f.FileSize, f.FileReference.RefId))
             .ToListAsync();
 
         return files;

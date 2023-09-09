@@ -14,7 +14,7 @@ public class File : ICreatedByEntity
 
     [MaxLength(255)]
     public string FileName { get; set; }
-    public int FileSizeKb { get; set; }
+    public long FileSize { get; set; }
 
     public int FileReferenceId { get; set; }
     public FileReference FileReference { get; set; }

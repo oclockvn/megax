@@ -12,15 +12,15 @@ namespace MegaApp.Controllers;
 public class UsersController : ApplicationControllerBase
 {
     private readonly IUserService userService;
-    private readonly IStorageService fileService;
+    private readonly IStorageService storageService;
 
     public UsersController(
         IUserService userService,
-        IStorageService fileService
+        IStorageService storageService
         )
     {
         this.userService = userService;
-        this.fileService = fileService;
+        this.storageService = storageService;
     }
 
     /// <summary>
@@ -182,7 +182,8 @@ public class UsersController : ApplicationControllerBase
             {
                 using var ms = new MemoryStream();
                 await file.CopyToAsync(ms);
-                await fileService.UploadAsync($"users/{id}/documents/{file.FileName}", await ms.ToBytesAsync());
+                var fileResult = await storageService.UploadAsync($"users/{id}/documents/{file.FileName}", await ms.ToBytesAsync());
+                req.FilesUpload.Add(new FileRecord(fileResult.FileName, fileResult.Url, file.Length));
             }
         }
 
