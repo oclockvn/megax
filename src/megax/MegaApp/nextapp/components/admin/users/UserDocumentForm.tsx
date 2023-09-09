@@ -10,6 +10,7 @@ import Button from "@mui/material/Button";
 import { Document as UserDocument } from "@/lib/models/document.model";
 import Grid from "@mui/material/Grid";
 import DropzoneWrapper from "@/components/form/DropzoneWrapper";
+import FileList from "@/components/form/FileList";
 
 type UserDocumentFormProps = {
   document: Partial<UserDocument>;
@@ -40,6 +41,13 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
     id: x.toLowerCase().replace(/\W/, _ => "_"),
     label: x,
   }));
+
+  const files =
+    document.fileReferences?.map(f => ({
+      id: f.id,
+      name: f.fileName,
+      url: f.url,
+    })) || [];
 
   return (
     <>
@@ -87,6 +95,15 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
           <div className="mb-4">
             <TextFieldElement fullWidth label="Issue place" name="issuePlace" />
           </div>
+
+          {files.length > 0 && (
+            <div className="mb-4">
+              <FileList
+                files={files}
+                titleFormatter={v => `${v} file(s) uploaded`}
+              />
+            </div>
+          )}
 
           <div className="mb-4">
             <DropzoneWrapper fileSelected={handleFileChanged} />

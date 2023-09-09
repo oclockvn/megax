@@ -2,6 +2,7 @@
 
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import FileList from "@/components/form/FileList";
 
 declare type FileUploadProps = {
   maxFiles?: 1;
@@ -25,16 +26,10 @@ export default function DropzoneWrapper(props: FileUploadProps) {
       maxFiles: props?.maxFiles,
     });
 
-  const selectedFiles = acceptedFiles.map((f, i) => (
-    <div key={i} className="p-2 bg-slate-100 border-b border-slate-300 text-sm">
-      {f.name}
-    </div>
-  ));
-
   return (
     <>
       <div
-        className="dropzone border-[3px] border-dashed p-6 flex items-center justify-center"
+        className="dropzone border-[3px] border-dashed p-6 flex items-center justify-center mb-4"
         {...getRootProps()}
       >
         <input {...getInputProps()} />
@@ -48,15 +43,13 @@ export default function DropzoneWrapper(props: FileUploadProps) {
         )}
       </div>
 
-      {selectedFiles.length > 0 && (
-        <>
-          <div className="mt-4 font-bold">
-            {selectedFiles.length} selected{" "}
-            {selectedFiles.length > 1 ? "files" : "file"}
-          </div>
-          <div className="text-sm">{selectedFiles}</div>
-        </>
-      )}
+      <FileList
+        files={acceptedFiles.map((f, i) => ({
+          id: -i,
+          name: f.name,
+          url: f.webkitRelativePath,
+        }))}
+      />
     </>
   );
 }

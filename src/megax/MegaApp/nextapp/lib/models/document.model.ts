@@ -21,4 +21,21 @@ export const documentSchema = yup.object({
   issueBy: yup.string().label("Issued by").required(),
 });
 
-export type Document = yup.InferType<typeof documentSchema>;
+/*
+{
+  "id": 2,
+  "fileName": "100000022-invoice-2022-07-01.pdf",
+  "url": "http://localhost:5291/users/2306/documents/100000022-invoice-2022-07-01.pdf",
+  "fileSize": 602092,
+  "refId": "3"
+}
+*/
+export interface FileReference {
+  id: number;
+  fileName: string;
+  url: string;
+  fileSize: number;
+  refId: string;
+}
+
+export type Document = yup.InferType<typeof documentSchema> & { fileReferences?: FileReference[] };

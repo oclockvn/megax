@@ -407,7 +407,10 @@ internal class UserService : IUserService
             await fileService.AddFilesAsync(document.Id.ToString(), Enums.FileType.UserDocument, req.FilesUpload);
         }
 
-        return new Result<DocumentModel>(new DocumentModel(document));
+        // reload files
+        var files = await fileService.GetFilesAsync(document.Id.ToString(), Enums.FileType.UserDocument);
+        var result = new DocumentModel(document) { FileReferences = files };
+        return new Result<DocumentModel>(result);
     }
 
     public async Task<Result<bool>> DeleteDocumentAsync(int documentId)
