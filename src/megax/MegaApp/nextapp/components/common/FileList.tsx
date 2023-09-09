@@ -1,6 +1,8 @@
 "use client";
 
+import IconButton from "@mui/material/IconButton";
 import React from "react";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 declare type FileRef = {
   id: number;
@@ -19,9 +21,14 @@ export default function FileList({
     files?.map((f, i) => (
       <div
         key={i}
-        className="p-2 bg-slate-100 border-b border-slate-300 text-sm"
+        className="p-2 bg-slate-100 border-b border-slate-300 text-sm flex items-center justify-between"
       >
-        {f.name}
+        <span>
+          {f.name}
+        </span>
+        <IconButton size="small">
+          <FileDownloadIcon fontSize="small" />
+        </IconButton>
       </div>
     )) || [];
 
