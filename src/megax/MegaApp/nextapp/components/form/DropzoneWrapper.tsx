@@ -2,7 +2,7 @@
 
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import FileList from "@/components/form/FileList";
+import FileList from "@/components/common/FileList";
 
 declare type FileUploadProps = {
   maxFiles?: 1;

@@ -10,7 +10,7 @@ import Button from "@mui/material/Button";
 import { Document as UserDocument } from "@/lib/models/document.model";
 import Grid from "@mui/material/Grid";
 import DropzoneWrapper from "@/components/form/DropzoneWrapper";
-import FileList from "@/components/form/FileList";
+import FileList from "@/components/common/FileList";
 
 type UserDocumentFormProps = {
   document: Partial<UserDocument>;
