@@ -61,7 +61,7 @@ internal partial class LocalStorageService : StorageServiceBase, IStorageService
             throw new NullReferenceException(nameof(origin));
         }
 
-        var url = origin.TrimEnd('/') + '/' + originalPath.TrimStart('/');
+        var url = $"{origin.TrimEnd('/')}/{_uploadFolder}/{originalPath.TrimStart('/')}";
         // http://localhost:5000/path/to/file.txt
         return new FileUploadResult(fileName, url);
     }

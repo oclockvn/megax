@@ -87,4 +87,15 @@ export function upload<T>(url: string, form: FormData) {
   });
 };
 
+export async function download(id: number) {
+  const resp = await api.get<Blob>(`/api/files/${id}`, {
+    responseType: 'blob',
+    headers: {
+      "Content-Type": undefined
+    }
+  })
+
+  return resp.data;
+}
+
 export default api;

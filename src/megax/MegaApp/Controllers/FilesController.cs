@@ -1,5 +1,6 @@
 ﻿using MegaApp.Core.Enums;
 using MegaApp.Core.Services;
+using MegaApp.Infrastructure.Storages;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MegaApp.Controllers;
@@ -9,10 +10,12 @@ namespace MegaApp.Controllers;
 public class FilesController : ApplicationControllerBase
 {
     private readonly IFileService fileService;
+    private readonly IStorageService storageService;
 
-    public FilesController(IFileService fileService)
+    public FilesController(IFileService fileService, IStorageService storageService)
     {
         this.fileService = fileService;
+        this.storageService = storageService;
     }
 
     /// <summary>
@@ -42,5 +45,30 @@ public class FilesController : ApplicationControllerBase
     {
         var files = await fileService.GetFilesAsync(id, fileType);
         return Ok(files);
+    }
+
+    /// <summary>
+    /// Download file from given id
+    /// </summary>
+    /// <param name="id">File id</param>
+    /// <returns>File content</returns>
+    [HttpGet("{id}")]
+    [Produces("application/octet-stream")]
+    // [ProducesResponseType(typeof(List<FileRecord>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DownloadFile(int id)
+    {
+        var file = await fileService.GetFileAsync(id);
+        if (file == null)
+        {
+            return BadRequest($"File {id} could not be found");
+        }
+
+        var fileResult = await storageService.DownloadAsync(file.Url);
+        if (fileResult == null)
+        {
+            return BadRequest($"File {file.Url} could not be found");
+        }
+
+        return new FileContentResult(fileResult.Content, "application/octet-stream");
     }
 }

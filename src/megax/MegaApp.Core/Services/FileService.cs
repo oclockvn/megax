@@ -24,10 +24,18 @@ public record FileRecord
         Url = url;
         FileSize = fileSizeKb;
     }
+
+    public FileRecord(int id, string fileName, string url)
+    {
+        Id = id;
+        FileName = fileName;
+        Url = url;
+    }
 }
 
 public interface IFileService
 {
+    Task<FileRecord> GetFileAsync(int id);
     Task<List<FileRecord>> GetFilesAsync(string refId, FileType fileType);
     Task<List<FileRecord>> GetFilesAsync(string[] refIds, FileType fileType);
     Task<List<int>> AddFilesAsync(string refId, FileType fileType, List<FileRecord> files);
@@ -71,6 +79,14 @@ internal class FileService : IFileService
         var result = fileReference.Files.Select(f => f.Id).ToList();
 
         return result;
+    }
+
+    public async Task<FileRecord> GetFileAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.Files.Where(f => f.Id == id)
+            .Select(f => new FileRecord(f.Id, f.FileName, f.Url))
+            .SingleOrDefaultAsync();
     }
 
     public async Task<List<FileRecord>> GetFilesAsync(string refId, FileType fileType)

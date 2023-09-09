@@ -4,6 +4,9 @@ import IconButton from "@mui/material/IconButton";
 import React from "react";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
+import { saveAs } from 'file-saver';
+import { download } from "@/lib/api";
+
 declare type FileRef = {
   id: number;
   name: string;
@@ -17,6 +20,11 @@ export default function FileList({
   files?: FileRef[];
   titleFormatter?: (count: number) => string;
 }) {
+  const handleDownloadFile = async (file: FileRef) => {
+    const blob = await download(file.id);
+    saveAs(blob, file.name);
+  }
+
   const selectedFiles =
     files?.map((f, i) => (
       <div
@@ -26,9 +34,9 @@ export default function FileList({
         <span>
           {f.name}
         </span>
-        <IconButton size="small">
+        {f.id > 0 && <IconButton size="small" onClick={() => handleDownloadFile(f)}>
           <FileDownloadIcon fontSize="small" />
-        </IconButton>
+        </IconButton>}
       </div>
     )) || [];
 
