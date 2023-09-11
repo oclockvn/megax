@@ -12,21 +12,26 @@ namespace MegaApp.Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, string contentRootPath)
         {
             services.Configure<GoogleClientOption>(configuration.GetSection("GoogleClient"));
-            services.Configure<FileServiceConfig>(configuration.GetSection("FileService"));
+            services.Configure<StorageConfig>(configuration.GetSection("StorageConfig"));
 
             services.AddHttpClient();
             return services
                 .AddScoped<IGoogleAuthenticateClient, GoogleAuthenticateClient>()
                 .AddScoped<IStorageService>(sp =>
                 {
-                    var fileConfig = sp.GetRequiredService<IOptions<FileServiceConfig>>().Value;
+                    var fileConfig = sp.GetRequiredService<IOptions<StorageConfig>>().Value;
                     if (!string.IsNullOrWhiteSpace(fileConfig.AzureBlobStorageConnection))
                     {
                         return new AzureBlobStorageService(fileConfig.AzureBlobStorageConnection);
                     }
-                    else if (!string.IsNullOrWhiteSpace(fileConfig.GoogleApplicationDefaultCredential))
+                    else if (!string.IsNullOrWhiteSpace(fileConfig.GoogleApplicationDefaultCredential) && !string.IsNullOrWhiteSpace(fileConfig.GoogleBucketName))
                     {
-                        return new GoogleCloudStorageService();
+                        // apply the credential for local only
+                        #if DEBUG
+                        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", fileConfig.GoogleApplicationDefaultCredential);
+                        #endif
+
+                        return new GoogleCloudStorageService(fileConfig.GoogleBucketName);
                     }
 
                     return new LocalStorageService(contentRootPath, sp.GetRequiredService<IHttpOriginResolver>());

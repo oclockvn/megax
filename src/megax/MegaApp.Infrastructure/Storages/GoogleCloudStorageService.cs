@@ -1,19 +1,36 @@
 using Google.Cloud.Storage.V1;
 using MegaApp.Utils.Extensions;
+using System.Diagnostics;
 
 namespace MegaApp.Infrastructure.Storages;
 
 internal class GoogleCloudStorageService : StorageServiceBase, IStorageService
 {
+    private readonly string bucketName;
+
+    public GoogleCloudStorageService(string bucketName)
+    {
+        this.bucketName = bucketName;
+    }
+
     public async Task<FileDownloadResult> DownloadAsync(string fullPath)
     {
+        // trim base url
+        // "https://storage.googleapis.com/{bucketName}/{blob.Name}";
+        var storagePath = $"https://storage.googleapis.com/{bucketName}/";
+        if (!fullPath.StartsWith(storagePath))
+        {
+            throw new Exception($"Invalid storage file url: {fullPath}");
+        }
+
+        var path = fullPath[storagePath.Length..];
         var storage = StorageClient.Create();
-        var (bucket, fileName, path) = ExtractPath(fullPath);
 
         using var stream = new MemoryStream();
-        var result = await storage.DownloadObjectAsync(bucket, path, stream);
+        var result = await storage.DownloadObjectAsync(bucketName, path, stream);
         stream.Position = 0;
 
+        var (_, fileName, _) = ExtractPath(fullPath);
         return new FileDownloadResult(fileName, await stream.ToBytesAsync());
     }
 
@@ -29,15 +46,26 @@ internal class GoogleCloudStorageService : StorageServiceBase, IStorageService
             throw new ArgumentNullException(nameof(content));
         }
 
-        var (bucket, name, path) = ExtractPath(fullPath);
+        var (_, name, _) = ExtractPath(fullPath);
 
         using var ms = new MemoryStream();
         await ms.WriteAsync(content);
         await ms.FlushAsync();
 
         var storage = StorageClient.Create();
-        var blob = storage.UploadObject(bucket, path, null, ms);
+        var url = "";
 
-        return new FileUploadResult(path, blob.SelfLink);
+        try
+        {
+            var blob = storage.UploadObject(bucketName, fullPath, null, ms);
+            url = $"https://storage.googleapis.com/{bucketName}/{blob.Name}";
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message + ex.InnerException?.Message);
+            throw;
+        }
+
+        return new FileUploadResult(name, url);
     }
 }

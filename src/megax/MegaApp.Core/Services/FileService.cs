@@ -63,13 +63,24 @@ internal class FileService : IFileService
             RefId = refId,
         }).Entity;
 
+        string ExtractName(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            var lastSlash = path.LastIndexOf('/');
+            return lastSlash < 0 ? path : path[(lastSlash + 1)..];
+        }
+
         foreach (var file in files)
         {
             fileReference.Files.Add(new()
             {
                 CreatedAt = DateTimeOffset.Now,
                 // CreatedBy = 0,
-                FileName = file.FileName,
+                FileName = ExtractName(file.FileName),
                 FileSize = file.FileSize,
                 Url = file.Url,
             });

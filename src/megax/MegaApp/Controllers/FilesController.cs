@@ -69,6 +69,6 @@ public class FilesController : ApplicationControllerBase
             return BadRequest($"File {file.Url} could not be found");
         }
 
-        return new FileContentResult(fileResult.Content, "application/octet-stream");
+        return File(fileResult.Content, "application/octet-stream", fileResult.FileName);
     }
 }
