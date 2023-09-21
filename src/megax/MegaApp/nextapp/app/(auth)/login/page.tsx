@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
   const router = useRouter()
-  const [error, setEror] = useState("");
+  const [error, setError] = useState("");
 
   const googleLogin = useGoogleLogin({
     // flow: "auth-code",
@@ -32,7 +32,7 @@ export default function SignInPage() {
       }
     },
     onError: errorResponse =>
-      setEror(
+      setError(
         errorResponse.error_description ||
           "Unable to login using your google account"
       ),
