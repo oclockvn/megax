@@ -32,6 +32,8 @@ public class Device
 
     public DateTimeOffset PurchasedAt { get; set; }
     public DateTimeOffset? WarrantyToDate { get; set; }
+
+    [Precision(18, 2)]
     public decimal Price { get; set; }
 
     public int? SupplierId { get; set; }

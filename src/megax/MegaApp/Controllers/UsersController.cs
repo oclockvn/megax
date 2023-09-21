@@ -1,6 +1,8 @@
 ﻿using MegaApp.Core;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Services;
+using MegaApp.Infrastructure.Storages;
+using MegaApp.Utils.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MegaApp.Controllers;
@@ -10,12 +12,15 @@ namespace MegaApp.Controllers;
 public class UsersController : ApplicationControllerBase
 {
     private readonly IUserService userService;
+    private readonly IStorageService storageService;
 
     public UsersController(
-        IUserService userService
+        IUserService userService,
+        IStorageService storageService
         )
     {
         this.userService = userService;
+        this.storageService = storageService;
     }
 
     /// <summary>
@@ -151,6 +156,54 @@ public class UsersController : ApplicationControllerBase
     {
         _ = id;
         var result = await userService.DeleteContactAsync(cid);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Create or update user document
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <param name="req"><see cref="DocumentModel"/></param>
+    /// <returns></returns>
+    [HttpPost("{id}/document")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<DocumentModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateUpdateDocument(int id, [FromForm] Models.DocumentModelForm req)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (req.Files?.Length > 0)
+        {
+            // upload files
+            foreach (var file in req.Files)
+            {
+                using var ms = new MemoryStream();
+                await file.CopyToAsync(ms);
+                var fileResult = await storageService.UploadAsync($"users/{id}/documents/{file.FileName}", await ms.ToBytesAsync());
+                req.FilesUpload.Add(new FileRecord(fileResult.FileName, fileResult.Url, file.Length));
+            }
+        }
+
+        var result = await userService.CreateUpdateDocumentAsync(id, req);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Delete a document
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <param name="docid">The document id</param>
+    /// <returns></returns>
+    [HttpDelete("{id}/document/{docid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteDocument(int id, int docid)
+    {
+        _ = id;
+        var result = await userService.DeleteDocumentAsync(docid);
         return Ok(result);
     }
 }

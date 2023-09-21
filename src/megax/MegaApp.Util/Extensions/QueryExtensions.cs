@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace MegaApp.Core.Extensions;
+namespace MegaApp.Utils.Extensions;
 
 public static class QueryExtensions
 {

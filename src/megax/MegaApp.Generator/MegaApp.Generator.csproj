@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MegaApp.Core\MegaApp.Core.csproj" />
+    <ProjectReference Include="..\MegaApp.Util\MegaApp.Util.csproj" />
   </ItemGroup>
 
 </Project>

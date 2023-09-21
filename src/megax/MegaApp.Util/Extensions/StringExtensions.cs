@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace MegaApp.Core.Extensions;
+namespace MegaApp.Utils.Extensions;
 
 public static class StringExtension
 {

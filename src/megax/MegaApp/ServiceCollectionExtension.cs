@@ -1,3 +1,5 @@
+using MegaApp.Infrastructure.Http;
+using MegaApp.Resolvers;
 using MegaApp.Services;
 
 namespace MegaApp
@@ -13,7 +15,9 @@ namespace MegaApp
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         {
             return services
+                .AddHttpContextAccessor()
                 .AddScoped<ITokenService, TokenService>()
+                .AddScoped<IHttpOriginResolver, HttpOriginResolver>();
                 ;
         }
     }

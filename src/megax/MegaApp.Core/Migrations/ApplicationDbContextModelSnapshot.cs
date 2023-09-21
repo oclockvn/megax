@@ -155,6 +155,7 @@ namespace MegaApp.Core.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("PurchasedAt")
@@ -295,6 +296,71 @@ namespace MegaApp.Core.Migrations
                             Id = 10,
                             Name = "Laptop"
                         });
+                });
+
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.File", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("sysdatetimeoffset()");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("FileReferenceId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileReferenceId");
+
+                    b.ToTable("Files");
+                });
+
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.FileReference", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("sysdatetimeoffset()");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FileReferences");
                 });
 
             modelBuilder.Entity("MegaApp.Core.Db.Entities.RefreshToken", b =>
@@ -584,7 +650,7 @@ namespace MegaApp.Core.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -652,6 +718,17 @@ namespace MegaApp.Core.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.File", b =>
+                {
+                    b.HasOne("MegaApp.Core.Db.Entities.FileReference", "FileReference")
+                        .WithMany("Files")
+                        .HasForeignKey("FileReferenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FileReference");
+                });
+
             modelBuilder.Entity("MegaApp.Core.Db.Entities.RefreshToken", b =>
                 {
                     b.HasOne("MegaApp.Core.Db.Entities.Account", "Account")
@@ -680,9 +757,13 @@ namespace MegaApp.Core.Migrations
 
             modelBuilder.Entity("MegaApp.Core.Db.Entities.UserDocument", b =>
                 {
-                    b.HasOne("MegaApp.Core.Db.Entities.User", null)
+                    b.HasOne("MegaApp.Core.Db.Entities.User", "User")
                         .WithMany("Documents")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MegaApp.Core.Db.Entities.Account", b =>
@@ -698,6 +779,11 @@ namespace MegaApp.Core.Migrations
             modelBuilder.Entity("MegaApp.Core.Db.Entities.DeviceType", b =>
                 {
                     b.Navigation("Devices");
+                });
+
+            modelBuilder.Entity("MegaApp.Core.Db.Entities.FileReference", b =>
+                {
+                    b.Navigation("Files");
                 });
 
             modelBuilder.Entity("MegaApp.Core.Db.Entities.Team", b =>
