@@ -8,49 +8,62 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
-import FlagIcon from '@mui/icons-material/Flag';
+import FlagIcon from "@mui/icons-material/Flag";
 import Grid from "@mui/material/Grid";
 import Checkbox from "@mui/material/Checkbox";
+import { useAppSelector } from "@/lib/store/state.hook";
+import ShortLink from "@/components/common/ShortLink";
 
 export default function Personal() {
-  const todos = [1, 2, 3, 4, 5];
+  const { todos, loading } = useAppSelector(s => s.todos)
 
   return (
     <>
-      <Grid container alignItems="center" justifyContent="center">
-        <h2 className="text-[3rem] font-bold">01:15</h2>
-        <Grid container alignItems="center" justifyContent="center" gap={2}>
-          <IconButton color="success">
-            <PlayCircleIcon />
-          </IconButton>
-          <IconButton color="secondary">
-            <PauseCircleIcon />
-          </IconButton>
+      <div className="pb-4">
+        <Grid container alignItems="center" justifyContent="center">
+          <h2 className="text-[3rem] font-bold">01:15</h2>
+          <Grid container alignItems="center" justifyContent="center" gap={2}>
+            <IconButton color="success" size="large">
+              <PlayCircleIcon fontSize="large" />
+            </IconButton>
+            <IconButton color="secondary" size="large">
+              <PauseCircleIcon fontSize="large" />
+            </IconButton>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {todos.map(i => (
+        <div className="text-center">
+          <Button
+            variant="contained"
+            className="!px-10"
+            startIcon={<AddIcon />}
+          >
+            Add Work
+          </Button>
+        </div>
+      </div>
+
+      {todos.map(todo => (
         <div
-          key={i}
+          key={todo.id}
           className="py-2 mb-2 bg-slate-100 border-b border-s rounded overflow-hidden"
         >
           <Grid
             container
             alignItems="center"
             className="px-4 py-2 border-l-4 border-fuchsia-500"
+            spacing={2}
           >
             <Grid item flex={1}>
-              <a className="text-sm text-blue-500" href="#">
-                TALLY-1234
-              </a>
-              <div className="font-bold">Lorem ipsum dolor sit amet.</div>
+              <ShortLink url={todo.reference} className="text-sm text-blue-500" />
+              <div className="font-bold"><span className="uppercase text-fuchsia-500">{todo.project} |</span> {todo.title}</div>
             </Grid>
             <Grid item>
-              <div className="font-bold">01:15</div>
+              <div className="font-bold text-green-700">{todo.time.format()}</div>
             </Grid>
           </Grid>
           <div className="mx-4 mt-2">
-            {[1,2,3].map(j => (
+            {[1, 2, 3].map(j => (
               <div key={j} className="border-b border-solid last:border-none">
                 <Grid container alignItems={"center"} spacing={1}>
                   <Grid item>
