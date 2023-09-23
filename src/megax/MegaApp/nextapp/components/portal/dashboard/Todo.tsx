@@ -133,7 +133,6 @@ export default function Todo() {
   const { tasks, loading } = useAppSelector(s => s.tasks);
 
   const handleDelete = (id: number) => {
-    console.log({ id });
     confirmation({
       title: "Are you sure?",
       description: `Delete this record`,
@@ -176,7 +175,7 @@ export default function Todo() {
             className="!px-10"
             startIcon={<AddIcon />}
           >
-            Add Work
+            Add Todo
           </Button>
         </div>
       </div>
@@ -184,7 +183,7 @@ export default function Todo() {
       {tasks.map(todo => (
         <div
           key={todo.id}
-          className="py-2 mb-2 bg-slate-100 border-b border-s rounded overflow-hidden relative"
+          className="py-2 mb-2 bg-slate-100 rounded overflow-hidden relative shadow"
         >
           <TaskMenu id={todo.id} handleDelete={handleDelete} />
 
