@@ -5,6 +5,7 @@ export interface Task {
   project: string;
   client: string;
   time: Time;
+  subtasks: SubTask[]
 }
 
 export interface SubTask {
