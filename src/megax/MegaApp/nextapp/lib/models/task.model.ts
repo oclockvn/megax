@@ -12,7 +12,7 @@ export interface SubTask {
   id: number;
   title: string;
   isFlag: boolean;
-  todoId: number;
+  taskId: number;
   isCompleted: boolean;
 }
 

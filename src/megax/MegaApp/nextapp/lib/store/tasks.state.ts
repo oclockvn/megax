@@ -1,7 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
-import { Task } from "../models/task.model";
-import { deleteTask as deleteTask, fetchTasks } from "../apis/task.api";
+import { SubTask, Task } from "../models/task.model";
+import {
+  addSubTask,
+  deleteTask as deleteTask,
+  fetchTasks,
+} from "../apis/task.api";
 // import { fetchTodo } from "../apis/s.api";
 
 export interface TaskState {
@@ -29,6 +33,13 @@ export const deleteTaskThunk = createAsyncThunk(
   }
 );
 
+export const addSubTaskThunk = createAsyncThunk(
+  "tasks/add-subtask",
+  async (subtask: SubTask, _thunkApi) => {
+    return await addSubTask(subtask);
+  }
+);
+
 export const sSlice = createSlice({
   name: "tasks",
   initialState,
@@ -51,6 +62,21 @@ export const sSlice = createSlice({
       })
       .addCase(deleteTaskThunk.fulfilled, (state, action) => {
         state.tasks = state.tasks.filter(x => x.id !== action.payload.data);
+      })
+      .addCase(addSubTaskThunk.fulfilled, (state, action) => {
+        // state.tasks = state.tasks.filter(x => x.id !== action.payload.data);
+        const task = state.tasks.find(t => t.id === action.payload.data.taskId);
+        if (task == null) {
+          throw new Error(
+            `Something went wrong with task ${action.payload.data.taskId}`
+          );
+        }
+
+        if (!task.subtasks) {
+          task.subtasks = [];
+        }
+
+        task.subtasks.push(action.payload.data);
       });
   },
 });

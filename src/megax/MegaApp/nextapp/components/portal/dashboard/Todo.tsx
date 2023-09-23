@@ -27,9 +27,14 @@ import MenuList from "@mui/material/MenuList";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useConfirm } from "material-ui-confirm";
-import { deleteTaskThunk } from "@/lib/store/tasks.state";
+import { addSubTaskThunk, deleteTaskThunk } from "@/lib/store/tasks.state";
 import toast from "react-hot-toast";
 import { SubTask, Task } from "@/lib/models/task.model";
+import Input from "@mui/material/Input";
+import InputAdornment from "@mui/material/InputAdornment";
+import { ChangeEvent, KeyboardEvent, useRef } from "react";
+import { addSubTask } from "@/lib/apis/task.api";
+import SubTaskForm from "./SubTaskForm";
 
 function TaskItem({ todo }: { todo: Task }) {
   return (
@@ -48,7 +53,24 @@ function TaskItem({ todo }: { todo: Task }) {
   );
 }
 
-function SubTaskList({ subtasks }: { subtasks: SubTask[] }) {
+function SubTaskList({
+  subtasks,
+  onAdd,
+}: {
+  subtasks: SubTask[];
+  onAdd: (subtask: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleEnter = (
+    e: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    const value = inputRef?.current?.value;
+    if (e.key === "Enter" && !!value) {
+      onAdd(value);
+    }
+  };
+
   return (
     <>
       {subtasks?.length > 0 &&
@@ -62,7 +84,7 @@ function SubTaskList({ subtasks }: { subtasks: SubTask[] }) {
                 />
               </Grid>
               <Grid item flex={1} fontSize={".8rem"}>
-                Lorem ipsum
+                {sub.title}
               </Grid>
               <Grid item>
                 <IconButton title="Red flag">
@@ -77,9 +99,7 @@ function SubTaskList({ subtasks }: { subtasks: SubTask[] }) {
         ))}
 
       <div className="mt-2">
-        <Button variant="text" startIcon={<AddIcon />} className="!px-4">
-          Next step
-        </Button>
+        <SubTaskForm onAdd={onAdd} />
       </div>
     </>
   );
@@ -146,6 +166,18 @@ export default function Todo() {
       });
   };
 
+  const handleAddSubTask = (taskId: number, subtask: string) => {
+    appDispatch(
+      addSubTaskThunk({
+        id: 0,
+        isCompleted: false,
+        isFlag: false,
+        taskId,
+        title: subtask,
+      })
+    );
+  };
+
   return (
     <>
       <div className="pb-4">
@@ -182,7 +214,10 @@ export default function Todo() {
           <TaskItem todo={todo} />
 
           <div className="mx-4 mt-2">
-            <SubTaskList subtasks={todo.subtasks} />
+            <SubTaskList
+              subtasks={todo.subtasks}
+              onAdd={name => handleAddSubTask(todo.id, name)}
+            />
           </div>
         </div>
       ))}
