@@ -1,29 +1,36 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
-import { Todo } from "../models/todo.model";
-import { fetchTodos } from "../apis/todo.api";
+import { Task } from "../models/task.model";
+import { deleteTask as deleteTask, fetchTasks } from "../apis/task.api";
 // import { fetchTodo } from "../apis/s.api";
 
-export interface TodoState {
-  todos: Todo[]
+export interface TaskState {
+  tasks: Task[];
   loading: boolean;
 }
 
-const initialState: TodoState = {
-  todos: [],
+const initialState: TaskState = {
+  tasks: [],
   loading: false,
 };
 
-export const fetchTodoThunk = createAsyncThunk(
-  "todo/fetch",
+export const fetchTaskListThunk = createAsyncThunk(
+  "tasks/fetch",
   async (filter: Partial<Filter> | undefined, thunkApi) => {
     thunkApi.dispatch(sSlice.actions.setLoadingState("Loading..."));
-    return await fetchTodos(filter);
+    return await fetchTasks(filter);
+  }
+);
+
+export const deleteTaskThunk = createAsyncThunk(
+  "tasks/delete",
+  async (id: number, _thunkApi) => {
+    return await deleteTask(id);
   }
 );
 
 export const sSlice = createSlice({
-  name: "todos",
+  name: "tasks",
   initialState,
   reducers: {
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -35,12 +42,15 @@ export const sSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(fetchTodoThunk.fulfilled, (state, action) => {
-        state.todos = action.payload;
+      .addCase(fetchTaskListThunk.fulfilled, (state, action) => {
+        state.tasks = action.payload;
         state.loading = false;
       })
-      .addCase(fetchTodoThunk.pending, (state, action) => {
+      .addCase(fetchTaskListThunk.pending, (state, action) => {
         state.loading = true;
+      })
+      .addCase(deleteTaskThunk.fulfilled, (state, action) => {
+        state.tasks = state.tasks.filter(x => x.id !== action.payload.data);
       });
   },
 });

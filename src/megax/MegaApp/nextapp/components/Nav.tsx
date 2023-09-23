@@ -66,7 +66,7 @@ function Nav() {
                   <Button
                     variant="outlined"
                     href="/admin/users"
-                    className="text-white"
+                    className="!text-white"
                   >
                     Users
                   </Button>
@@ -74,7 +74,7 @@ function Nav() {
                   <Button
                     variant="outlined"
                     href="/admin/devices"
-                    className="text-white"
+                    className="!text-white"
                   >
                     Devices
                   </Button>

@@ -5,9 +5,9 @@ import { normalizeDateTimePayload, qs, toFormData } from "../util";
 import { AxiosError,  } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
-import { Time, Todo } from "../models/todo.model";
+import { Time, Task } from "../models/task.model";
 
-export async function fetchTodos(filter: Partial<Filter> | undefined) {
+export async function fetchTasks(filter: Partial<Filter> | undefined) {
   const src = JSON.parse(`
   [{
     "id": 1,
@@ -82,18 +82,20 @@ export async function fetchTodos(filter: Partial<Filter> | undefined) {
   }]`)
 
   const todos = src.map((x: any) => {
-    let t = x as Todo;
+    let t = x as Task;
     t.time = new Time(Math.ceil(x.time), Number(x.time) % Math.ceil(x.time));
 
     return t;
   })
+  console.log(`fetching todos`);
 
   return await Promise.resolve(todos);
   // const res = await api.get<Todo[]>("api/todos?" + qs(filter));
   // return res.data;
 }
 
-export async function deleteTodo(id: number) {
-  const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
-  return res.data;
+export async function deleteTask(id: number) {
+  // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
+  // return res.data;
+  return Promise.resolve({ code: '', data: id, success: true } as Result<number>)
 }

@@ -1,4 +1,4 @@
-export interface Todo {
+export interface Task {
   id: number;
   reference: string;
   title: string;
@@ -7,7 +7,7 @@ export interface Todo {
   time: Time;
 }
 
-export interface TodoStep {
+export interface SubTask {
   id: number;
   title: string;
   isFlag: boolean;
