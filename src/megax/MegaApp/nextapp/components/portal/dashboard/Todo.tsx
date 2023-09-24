@@ -27,7 +27,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useConfirm } from "material-ui-confirm";
 import {
-  addSubTaskThunk,
+  saveSubTaskThunk,
   deleteTaskThunk,
   handleSubTaskThunk,
   toggleEditSubTask,
@@ -61,7 +61,7 @@ function SubTaskList({
 }: {
   subtasks: SubTask[];
   taskId: number;
-  onAdd: (subtask: string) => void;
+  onAdd: (value: string, id?: number) => void;
 }) {
   const appDispatch = useAppDispatch();
   const handleSubTaskAction = (id: number, action: SubTaskAction) => {
@@ -79,7 +79,7 @@ function SubTaskList({
   return (
     <>
       {hasSub && (
-        <h2 className="font-bold">
+        <div>
           Sub tasks ({completed}/{subtasks?.length})
           {blocker > 0 ? (
             <span className="ms-2 text-red-500">
@@ -87,7 +87,7 @@ function SubTaskList({
               {blocker} blocker(s)
             </span>
           ) : null}
-        </h2>
+        </div>
       )}
       {hasSub &&
         subtasks.map(sub => (
@@ -107,9 +107,11 @@ function SubTaskList({
               <Grid item flex={1} fontSize={".8rem"}>
                 {sub.isEdit ? (
                   <SubTaskForm
+                    id={sub.id}
+                    taskId={taskId}
                     isEdit
                     currentValue={sub.title}
-                    onAdd={onAdd}
+                    onOk={value => onAdd(value, sub.id)}
                     onCancel={() => handleEditSubTask(sub.id)}
                   />
                 ) : (
@@ -146,7 +148,7 @@ function SubTaskList({
         ))}
 
       <div className="mt-2">
-        <SubTaskForm onAdd={onAdd} />
+        <SubTaskForm onOk={onAdd} id={0} taskId={taskId} />
       </div>
     </>
   );
@@ -213,14 +215,14 @@ export default function Todo() {
       });
   };
 
-  const handleAddSubTask = (taskId: number, subtask: string) => {
+  const handleSaveSubTask = (id: number, taskId: number, value: string) => {
     appDispatch(
-      addSubTaskThunk({
-        id: 0,
+      saveSubTaskThunk({
+        id,
         isCompleted: false,
         isFlag: false,
         taskId,
-        title: subtask,
+        title: value,
       })
     );
   };
@@ -264,7 +266,7 @@ export default function Todo() {
             <SubTaskList
               subtasks={todo.subtasks}
               taskId={todo.id}
-              onAdd={name => handleAddSubTask(todo.id, name)}
+              onAdd={(value, id) => handleSaveSubTask(id || 0, todo.id, value)}
             />
           </div>
         </div>

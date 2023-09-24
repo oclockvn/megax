@@ -2,7 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
 import { SubTask, SubTaskAction, Task } from "../models/task.model";
 import {
-  addSubTask,
+  saveSubTask,
   deleteTask as deleteTask,
   fetchTasks,
   handleSubTaskAction,
@@ -34,10 +34,10 @@ export const deleteTaskThunk = createAsyncThunk(
   }
 );
 
-export const addSubTaskThunk = createAsyncThunk(
-  "tasks/add-subtask",
+export const saveSubTaskThunk = createAsyncThunk(
+  "tasks/save-subtask",
   async (subtask: SubTask, _thunkApi) => {
-    return await addSubTask(subtask);
+    return await saveSubTask(subtask);
   }
 );
 
@@ -92,20 +92,23 @@ export const sSlice = createSlice({
       .addCase(deleteTaskThunk.fulfilled, (state, action) => {
         state.tasks = state.tasks.filter(x => x.id !== action.payload.data);
       })
-      .addCase(addSubTaskThunk.fulfilled, (state, action) => {
-        // state.tasks = state.tasks.filter(x => x.id !== action.payload.data);
-        const task = state.tasks.find(t => t.id === action.payload.data.taskId);
+      .addCase(saveSubTaskThunk.fulfilled, (state, action) => {
+        const subTask = action.payload.data;
+        const task = state.tasks.find(t => t.id === subTask.taskId);
         if (task == null) {
-          throw new Error(
-            `Something went wrong with task ${action.payload.data.taskId}`
-          );
+          throw new Error(`Something went wrong with task ${subTask.taskId}`);
         }
 
         if (!task.subtasks) {
           task.subtasks = [];
         }
 
-        task.subtasks.push(action.payload.data);
+        const sub = task.subtasks.find(s => s.id === subTask.id);
+        if (sub) {
+          sub.title = subTask.title;
+        } else {
+          task.subtasks.push(subTask);
+        }
       })
       .addCase(handleSubTaskThunk.fulfilled, (state, action) => {
         const {
