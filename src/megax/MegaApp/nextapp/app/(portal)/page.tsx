@@ -1,6 +1,6 @@
 "use client";
 
-import Todo from "@/components/portal/dashboard/Todo";
+import TodoTask from "@/components/portal/dashboard/TodoTask";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { fetchTaskListThunk } from "@/lib/store/tasks.state";
 import Grid from "@mui/material/Grid";
@@ -18,7 +18,7 @@ export default function Home() {
     <Grid container spacing={2} className="p-2">
       <Grid item xs={12} sm={8}>Dashboard</Grid>
       <Grid item xs={12} sm={4}>
-        <Todo />
+        <TodoTask />
       </Grid>
     </Grid>
   )
