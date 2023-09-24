@@ -1,10 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
-import { SubTask, Task } from "../models/task.model";
+import { SubTask, SubTaskAction, Task } from "../models/task.model";
 import {
   addSubTask,
   deleteTask as deleteTask,
   fetchTasks,
+  handleSubTaskAction,
 } from "../apis/task.api";
 // import { fetchTodo } from "../apis/s.api";
 
@@ -37,6 +38,20 @@ export const addSubTaskThunk = createAsyncThunk(
   "tasks/add-subtask",
   async (subtask: SubTask, _thunkApi) => {
     return await addSubTask(subtask);
+  }
+);
+
+export const handleSubTaskThunk = createAsyncThunk(
+  "tasks/handle-subtask",
+  async (
+    payload: { id: number; taskId: number; action: SubTaskAction },
+    _thunkApi
+  ) => {
+    return await handleSubTaskAction(
+      payload.id,
+      payload.taskId,
+      payload.action
+    );
   }
 );
 
@@ -77,6 +92,37 @@ export const sSlice = createSlice({
         }
 
         task.subtasks.push(action.payload.data);
+      })
+      .addCase(handleSubTaskThunk.fulfilled, (state, action) => {
+        const {
+          data: { id, action: subTaskAction, taskId },
+        } = action.payload;
+        const task = state.tasks.find(t => t.id === taskId);
+
+        if (task == null) {
+          throw new Error(
+            `Something went wrong with task ${action.payload.data.taskId}`
+          );
+        }
+
+        const subTask = task.subtasks.find(s => s.id === id);
+        if (subTask == null) {
+          throw new Error(`Something went wrong with subtask ${id}`);
+        }
+
+        switch (subTaskAction) {
+          case "complete":
+            subTask.isCompleted = !subTask.isCompleted;
+            subTask.isFlag = false;
+            break;
+          case "flag":
+            subTask.isFlag = !subTask.isFlag;
+            subTask.isCompleted = false;
+            break;
+          default:
+            task.subtasks = task?.subtasks.filter(s => s.id !== id);
+            break;
+        }
       });
   },
 });

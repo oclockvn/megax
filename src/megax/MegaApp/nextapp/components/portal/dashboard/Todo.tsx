@@ -10,6 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import FlagIcon from "@mui/icons-material/Flag";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import BlockIcon from "@mui/icons-material/Block";
 import Grid from "@mui/material/Grid";
 import Checkbox from "@mui/material/Checkbox";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
@@ -21,25 +22,27 @@ import {
   usePopupState,
   bindTrigger,
   bindMenu,
-  bindDialog,
 } from "material-ui-popup-state/hooks";
-import MenuList from "@mui/material/MenuList";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useConfirm } from "material-ui-confirm";
-import { addSubTaskThunk, deleteTaskThunk } from "@/lib/store/tasks.state";
+import {
+  addSubTaskThunk,
+  deleteTaskThunk,
+  handleSubTaskThunk,
+} from "@/lib/store/tasks.state";
 import toast from "react-hot-toast";
-import { SubTask, Task } from "@/lib/models/task.model";
-import Input from "@mui/material/Input";
-import InputAdornment from "@mui/material/InputAdornment";
-import { ChangeEvent, KeyboardEvent, useRef } from "react";
-import { addSubTask } from "@/lib/apis/task.api";
+import {
+  SubTask,
+  SubTaskAction,
+  Task,
+} from "@/lib/models/task.model";
 import SubTaskForm from "./SubTaskForm";
 
 function TaskItem({ todo }: { todo: Task }) {
   return (
     <>
-      <div className="flex items-center px-4 py-2 border-l-4 border-solid border-fuchsia-500 mt-0 w-full mx-0">
+      <div className="flex gap-2 items-center px-4 py-2 border-l-4 border-solid border-fuchsia-500 mt-0 w-full mx-0">
         <div className="flex-[1] w-full mx-0 mt-0">
           <ShortLink url={todo.reference} className="text-sm text-blue-500" />
           <div className="font-bold">
@@ -55,42 +58,70 @@ function TaskItem({ todo }: { todo: Task }) {
 
 function SubTaskList({
   subtasks,
+  taskId,
   onAdd,
 }: {
   subtasks: SubTask[];
+  taskId: number;
   onAdd: (subtask: string) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleEnter = (
-    e: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    const value = inputRef?.current?.value;
-    if (e.key === "Enter" && !!value) {
-      onAdd(value);
-    }
+  const appDispatch = useAppDispatch();
+  const handleSubTaskAction = (id: number, action: SubTaskAction) => {
+    appDispatch(handleSubTaskThunk({ id, taskId, action }));
   };
+
+  const hasSub = subtasks?.length > 0;
+  const completed = subtasks?.filter(s => s.isCompleted)?.length;
+  const blocker = subtasks?.filter(s => s.isFlag)?.length || 0;
 
   return (
     <>
-      {subtasks?.length > 0 &&
+      {hasSub && (
+        <h2 className="font-bold">
+          Sub tasks ({completed}/{subtasks?.length})
+          {blocker > 0 ? (
+            <span className="ms-2 text-red-500">
+              <BlockIcon fontSize="small" className="me-1" />
+              {blocker} blocker(s)
+            </span>
+          ) : null}
+        </h2>
+      )}
+      {hasSub &&
         subtasks.map(sub => (
-          <div key={sub.id} className="border-b border-solid last:border-none">
+          <div
+            key={sub.id}
+            className="group border-b border-solid last:border-none"
+          >
             <Grid container alignItems={"center"} spacing={1}>
               <Grid item>
                 <Checkbox
                   icon={<RadioButtonUncheckedIcon />}
                   checkedIcon={<CheckCircleIcon />}
+                  checked={sub.isCompleted}
+                  onChange={() => handleSubTaskAction(sub.id, "complete")}
                 />
               </Grid>
               <Grid item flex={1} fontSize={".8rem"}>
                 {sub.title}
               </Grid>
               <Grid item>
-                <IconButton title="Red flag">
-                  <FlagIcon fontSize="small" />
+                <IconButton
+                  title="Red flag"
+                  className={`${
+                    sub.isFlag ? "opacity-100" : "opacity-0"
+                  } transition-opacity group-hover:opacity-100`}
+                  onClick={() => handleSubTaskAction(sub.id, "flag")}
+                >
+                  <FlagIcon
+                    fontSize="small"
+                    className={`${sub.isFlag ? "text-red-500" : ""}`}
+                  />
                 </IconButton>
-                <IconButton color="warning">
+                <IconButton
+                  color="warning"
+                  onClick={() => handleSubTaskAction(sub.id, "delete")}
+                >
                   <CloseIcon fontSize="small" />
                 </IconButton>
               </Grid>
@@ -216,6 +247,7 @@ export default function Todo() {
           <div className="mx-4 mt-2">
             <SubTaskList
               subtasks={todo.subtasks}
+              taskId={todo.id}
               onAdd={name => handleAddSubTask(todo.id, name)}
             />
           </div>

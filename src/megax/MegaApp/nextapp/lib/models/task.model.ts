@@ -29,3 +29,11 @@ export class Time {
     return `${this.hour}:${this.minute}`;
   }
 }
+
+export type SubTaskAction = 'complete' | 'flag' | 'delete'
+
+export type SubTaskActionResult = {
+  id: number;
+  taskId: number;
+  action: SubTaskAction,
+}
