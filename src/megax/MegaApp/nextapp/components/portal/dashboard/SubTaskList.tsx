@@ -21,7 +21,7 @@ export default function SubTaskList({
   const blocker = subtasks?.filter(s => s.isFlag)?.length || 0;
 
   const Overview = () => (
-    <div>
+    <div className="mb-2">
       Sub tasks ({completed}/{subtasks?.length})
       {blocker > 0 ? (
         <span className="ms-2 text-red-500">
@@ -32,6 +32,11 @@ export default function SubTaskList({
     </div>
   );
 
+  const classes = {
+    default: 'group border-b border-solid last:border-none rounded',
+    flagged: 'bg-red-50',
+  }
+
   return (
     <>
       {hasSub && <Overview />}
@@ -39,7 +44,7 @@ export default function SubTaskList({
         subtasks.map(sub => (
           <div
             key={sub.id}
-            className="group border-b border-solid last:border-none"
+            className={[classes.default, sub.isFlag ? classes.flagged : ''].join(' ')}
           >
             <SubTaskItem sub={sub} onOk={onAdd} />
           </div>

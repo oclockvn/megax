@@ -31,16 +31,14 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
 
   return (
     <>
-      <Grid container alignItems={"center"} spacing={1}>
-        <Grid item>
-          <Checkbox
-            icon={<RadioButtonUncheckedIcon />}
-            checkedIcon={<CheckCircleIcon />}
-            checked={sub.isCompleted}
-            onChange={() => handleSubTaskAction(sub.id, "complete")}
-          />
-        </Grid>
-        <Grid item flex={1} fontSize={".8rem"}>
+      <div className="flex items-center gap-1">
+        <Checkbox
+          icon={<RadioButtonUncheckedIcon />}
+          checkedIcon={<CheckCircleIcon />}
+          checked={sub.isCompleted}
+          onChange={() => handleSubTaskAction(sub.id, "complete")}
+        />
+        <div className="flex-[1] font-[.8rem]">
           {sub.isEdit ? (
             <SubTaskForm
               id={sub.id}
@@ -52,14 +50,14 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
             />
           ) : (
             <div
-              className="cursor-pointer"
+              className={ `cursor-pointer ${sub.isFlag ? 'text-red-500' : ''}` }
               onClick={() => handleEditSubTask(sub.id)}
             >
               {sub.title}
             </div>
           )}
-        </Grid>
-        <Grid item>
+        </div>
+        <div className="flex items-center">
           <IconButton
             title="Red flag"
             className={`${
@@ -78,8 +76,8 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
           >
             <CloseIcon fontSize="small" />
           </IconButton>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
     </>
   );
 }
