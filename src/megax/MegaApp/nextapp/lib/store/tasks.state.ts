@@ -55,6 +55,8 @@ export const handleSubTaskThunk = createAsyncThunk(
   }
 );
 
+export type EditSubTaskType = { id: number; taskId: number };
+
 export const sSlice = createSlice({
   name: "tasks",
   initialState,
@@ -64,6 +66,18 @@ export const sSlice = createSlice({
     },
     setLoadingState: (state, action: PayloadAction<string>) => {
       state.loading = true;
+    },
+    toggleEditSubTask: (state, action: PayloadAction<EditSubTaskType>) => {
+      const task = state.tasks.find(t => t.id === action.payload.taskId);
+      if (!task || !task.subtasks) {
+        throw new Error("500");
+      }
+
+      const { id } = action.payload;
+      task.subtasks = task.subtasks.map(t => ({
+        ...t,
+        isEdit: t.id === id ? !t.isEdit : false,
+      }));
     },
   },
   extraReducers(builder) {
@@ -127,6 +141,7 @@ export const sSlice = createSlice({
   },
 });
 
-export const { setLoading, setLoadingState } = sSlice.actions;
+export const { setLoading, setLoadingState, toggleEditSubTask } =
+  sSlice.actions;
 
 export default sSlice.reducer;

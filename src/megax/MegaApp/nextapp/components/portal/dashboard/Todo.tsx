@@ -30,14 +30,12 @@ import {
   addSubTaskThunk,
   deleteTaskThunk,
   handleSubTaskThunk,
+  toggleEditSubTask,
 } from "@/lib/store/tasks.state";
 import toast from "react-hot-toast";
-import {
-  SubTask,
-  SubTaskAction,
-  Task,
-} from "@/lib/models/task.model";
+import { SubTask, SubTaskAction, Task } from "@/lib/models/task.model";
 import SubTaskForm from "./SubTaskForm";
+import InputBase from "@mui/material/InputBase";
 
 function TaskItem({ todo }: { todo: Task }) {
   return (
@@ -68,6 +66,10 @@ function SubTaskList({
   const appDispatch = useAppDispatch();
   const handleSubTaskAction = (id: number, action: SubTaskAction) => {
     appDispatch(handleSubTaskThunk({ id, taskId, action }));
+  };
+
+  const handleEditSubTask = (id: number) => {
+    appDispatch(toggleEditSubTask({ id, taskId }));
   };
 
   const hasSub = subtasks?.length > 0;
@@ -103,7 +105,21 @@ function SubTaskList({
                 />
               </Grid>
               <Grid item flex={1} fontSize={".8rem"}>
-                {sub.title}
+                {sub.isEdit ? (
+                  <SubTaskForm
+                    isEdit
+                    currentValue={sub.title}
+                    onAdd={onAdd}
+                    onCancel={() => handleEditSubTask(sub.id)}
+                  />
+                ) : (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleEditSubTask(sub.id)}
+                  >
+                    {sub.title}
+                  </div>
+                )}
               </Grid>
               <Grid item>
                 <IconButton

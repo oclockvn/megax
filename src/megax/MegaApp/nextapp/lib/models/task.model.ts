@@ -5,7 +5,7 @@ export interface Task {
   project: string;
   client: string;
   time: Time;
-  subtasks: SubTask[]
+  subtasks: SubTask[];
 }
 
 export interface SubTask {
@@ -14,6 +14,7 @@ export interface SubTask {
   isFlag: boolean;
   taskId: number;
   isCompleted: boolean;
+  isEdit?: boolean;
 }
 
 export class Time {
