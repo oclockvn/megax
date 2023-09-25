@@ -18,12 +18,13 @@ export interface SubTask {
 }
 
 export class Time {
-  hour = 0
-  minute = 0
+  hour = 0;
+  minute = 0;
 
-  constructor(hr: number, min: number) {
-    this.hour = hr;
-    this.minute = min;
+  constructor(time: number) {
+    this.hour = Math.floor(time);
+    const dec = time % this.hour;
+    this.minute = Math.ceil(dec * 100);
   }
 
   format() {
@@ -31,10 +32,10 @@ export class Time {
   }
 }
 
-export type SubTaskAction = 'complete' | 'flag' | 'delete'
+export type SubTaskAction = "complete" | "flag" | "delete";
 
 export type SubTaskActionResult = {
   id: number;
   taskId: number;
-  action: SubTaskAction,
-}
+  action: SubTaskAction;
+};

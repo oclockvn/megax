@@ -83,7 +83,7 @@ export async function fetchTasks(filter: Partial<Filter> | undefined) {
 
   const todos = src.map((x: any) => {
     let t = x as Task;
-    t.time = new Time(Math.ceil(x.time), Number(x.time) % Math.ceil(x.time));
+    t.time = new Time(Number( x.time ));
 
     return t;
   })
