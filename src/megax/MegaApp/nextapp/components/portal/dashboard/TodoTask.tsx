@@ -1,11 +1,9 @@
 "use client";
 
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Grid from "@mui/material/Grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
@@ -25,7 +23,7 @@ import { saveSubTaskThunk, deleteTaskThunk } from "@/lib/store/tasks.state";
 import toast from "react-hot-toast";
 import { Task } from "@/lib/models/task.model";
 import SubTaskList from "./SubTaskList";
-import Collapse from "@mui/material/Collapse";
+import TaskForm from "./TaskForm";
 
 function TaskItem({ todo }: { todo: Task }) {
   return (
@@ -143,17 +141,7 @@ export default function TodoTask() {
           </Grid>
         </Grid>
 
-        <div className="text-center">
-          <Button
-            variant="contained"
-            className="!px-10"
-            startIcon={<AddIcon />}
-          >
-            Add Todo
-          </Button>
-
-          <Collapse in={true}></Collapse>
-        </div>
+        <TaskForm />
       </div>
 
       {tasks.map(todo => (
