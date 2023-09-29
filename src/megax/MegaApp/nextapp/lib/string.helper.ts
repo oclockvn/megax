@@ -23,3 +23,10 @@ export const trimLeft = (s: string, trim: string): string => {
 
   return s.substring(1, s.length);
 };
+
+export const shortenLink = (url: string) => {
+  const trimmed = trimRight(url, "/");
+  const short = trimmed.split("/").at(-1);
+
+  return short;
+}

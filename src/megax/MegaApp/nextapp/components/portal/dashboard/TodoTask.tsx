@@ -8,6 +8,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Grid from "@mui/material/Grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import ShortLink from "@/components/common/ShortLink";
+import LinkIcon from '@mui/icons-material/Link';
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -24,8 +25,11 @@ import toast from "react-hot-toast";
 import { Task } from "@/lib/models/task.model";
 import SubTaskList from "./SubTaskList";
 import TaskForm from "./TaskForm";
+import Chip from "@mui/material/Chip";
+import { shortenLink } from "@/lib/string.helper";
 
 function TaskItem({ todo }: { todo: Task }) {
+  const shorten = todo.reference ? shortenLink(todo.reference) : ''
   return (
     <>
       <div className="flex gap-2 items-center px-4 py-2 border-l-4 border-solid border-fuchsia-500 mt-0 w-full mx-0">
@@ -35,19 +39,24 @@ function TaskItem({ todo }: { todo: Task }) {
               {todo.project}
             </span>
           </div>
-          <div>
-            {todo.reference?.length > 0 && (
-              <>
-                <ShortLink
-                  url={todo.reference}
-                  className="text-sm text-blue-500"
-                />
-              </>
-            )}
-            <span className="ms-1">{todo.title}</span>
-          </div>
+          <div>{todo.title}</div>
+          {todo.reference?.length > 0 && (
+            <div className="mt-2">
+              <Chip
+                label={shorten}
+                component="a"
+                href={todo.reference}
+                clickable
+                size="small"
+                color="info"
+                deleteIcon={<LinkIcon />}
+              />
+            </div>
+          )}
         </div>
-        {!!todo.time && <div className="font-bold text-green-700">{todo.time.format()}</div>}
+        {!!todo.time && (
+          <div className="font-bold text-green-700">{todo.time.format()}</div>
+        )}
       </div>
     </>
   );
