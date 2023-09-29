@@ -11,6 +11,7 @@ export interface Task {
 }
 
 export type TaskAdd = Pick<Task, 'clientId' | 'projectId' | 'title'>
+export type TaskPatchKey = keyof TaskAdd;
 
 export interface SubTask {
   id: number;

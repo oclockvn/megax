@@ -2,10 +2,18 @@ import api, { upload } from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
 import { User, UserDeviceRecord } from "@/lib/models/user.model";
 import { normalizeDateTimePayload, qs, toFormData } from "../util";
-import { AxiosError,  } from "axios";
+import { AxiosError } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
-import { Time, Task, SubTask, SubTaskAction, SubTaskActionResult, TaskAdd } from "../models/task.model";
+import {
+  Time,
+  Task,
+  SubTask,
+  SubTaskAction,
+  SubTaskActionResult,
+  TaskAdd,
+  TaskPatchKey,
+} from "../models/task.model";
 
 export async function fetchTasks(filter: Partial<Filter> | undefined) {
   const src = JSON.parse(`
@@ -79,14 +87,14 @@ export async function fetchTasks(filter: Partial<Filter> | undefined) {
     "client": "Ntag",
     "time": 93.57,
     "reference": "http://yelp.com/massa/donec/dapibus/duis/at/velit.xml"
-  }]`)
+  }]`);
 
   const todos = src.map((x: any) => {
     let t = x as Task;
-    t.time = new Time(Number( x.time ));
+    t.time = new Time(Number(x.time));
 
     return t;
-  })
+  });
   console.log(`fetching todos`);
 
   return await Promise.resolve(todos);
@@ -97,23 +105,57 @@ export async function fetchTasks(filter: Partial<Filter> | undefined) {
 export async function deleteTask(id: number) {
   // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
   // return res.data;
-  return Promise.resolve({ code: '', data: id, success: true } as Result<number>)
+  return Promise.resolve({
+    code: "",
+    data: id,
+    success: true,
+  } as Result<number>);
 }
 
 export async function saveSubTask(subtask: SubTask) {
   // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
   // return res.data;
-  return Promise.resolve({ code: '', data: { ...subtask, id: subtask.id || Date.now() }, success: true } as Result<SubTask>)
+  return Promise.resolve({
+    code: "",
+    data: { ...subtask, id: subtask.id || Date.now() },
+    success: true,
+  } as Result<SubTask>);
 }
 
-export async function handleSubTaskAction(id: number, taskId:number, action: SubTaskAction) {
+export async function handleSubTaskAction(
+  id: number,
+  taskId: number,
+  action: SubTaskAction
+) {
   // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
   // return res.data;
-  return Promise.resolve({ code: '', data: { id, action, taskId }, success: true } as Result<SubTaskActionResult>)
+  return Promise.resolve({
+    code: "",
+    data: { id, action, taskId },
+    success: true,
+  } as Result<SubTaskActionResult>);
 }
 
 export async function addTask(task: TaskAdd) {
   // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
   // return res.data;
-  return Promise.resolve({ code: '', data: { ...task, id: Date.now() }, success: true } as Result<Task>)
+  return Promise.resolve({
+    code: "",
+    data: { ...task, id: Date.now() },
+    success: true,
+  } as Result<Task>);
+}
+
+export async function patchTask(
+  id: number,
+  key: TaskPatchKey,
+  value: string | number
+) {
+  // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
+  // return res.data;
+  return Promise.resolve({
+    code: "",
+    data: { id, [key]: value as any },
+    success: true,
+  } as Result<Task>);
 }
