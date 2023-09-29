@@ -36,7 +36,7 @@ function TaskItem({ todo }: { todo: Task }) {
             </span>
           </div>
           <div>
-            {todo.reference.length > 0 && (
+            {todo.reference?.length > 0 && (
               <>
                 <ShortLink
                   url={todo.reference}
@@ -47,7 +47,7 @@ function TaskItem({ todo }: { todo: Task }) {
             <span className="ms-1">{todo.title}</span>
           </div>
         </div>
-        <div className="font-bold text-green-700">{todo.time.format()}</div>
+        {!!todo.time && <div className="font-bold text-green-700">{todo.time.format()}</div>}
       </div>
     </>
   );

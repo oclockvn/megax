@@ -3,10 +3,14 @@ export interface Task {
   reference: string;
   title: string;
   project: string;
+  projectId?: number;
   client: string;
-  time: Time;
+  clientId?: number;
+  time?: Time;
   subtasks: SubTask[];
 }
+
+export type TaskAdd = Pick<Task, 'clientId' | 'projectId' | 'title'>
 
 export interface SubTask {
   id: number;

@@ -5,7 +5,7 @@ import { normalizeDateTimePayload, qs, toFormData } from "../util";
 import { AxiosError,  } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
-import { Time, Task, SubTask, SubTaskAction, SubTaskActionResult } from "../models/task.model";
+import { Time, Task, SubTask, SubTaskAction, SubTaskActionResult, TaskAdd } from "../models/task.model";
 
 export async function fetchTasks(filter: Partial<Filter> | undefined) {
   const src = JSON.parse(`
@@ -110,4 +110,10 @@ export async function handleSubTaskAction(id: number, taskId:number, action: Sub
   // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
   // return res.data;
   return Promise.resolve({ code: '', data: { id, action, taskId }, success: true } as Result<SubTaskActionResult>)
+}
+
+export async function addTask(task: TaskAdd) {
+  // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
+  // return res.data;
+  return Promise.resolve({ code: '', data: { ...task, id: Date.now() }, success: true } as Result<Task>)
 }

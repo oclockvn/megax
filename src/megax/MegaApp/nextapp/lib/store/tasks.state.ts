@@ -1,11 +1,12 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
-import { SubTask, SubTaskAction, Task } from "../models/task.model";
+import { SubTask, SubTaskAction, Task, TaskAdd } from "../models/task.model";
 import {
   saveSubTask,
   deleteTask as deleteTask,
   fetchTasks,
   handleSubTaskAction,
+  addTask,
 } from "../apis/task.api";
 // import { fetchTodo } from "../apis/s.api";
 
@@ -52,6 +53,13 @@ export const handleSubTaskThunk = createAsyncThunk(
       payload.taskId,
       payload.action
     );
+  }
+);
+
+export const addTaskThunk = createAsyncThunk(
+  "tasks/add-task",
+  async (task: TaskAdd, _thunkApi) => {
+    return await addTask(task);
   }
 );
 
@@ -140,6 +148,9 @@ export const sSlice = createSlice({
             task.subtasks = task?.subtasks.filter(s => s.id !== id);
             break;
         }
+      })
+      .addCase(addTaskThunk.fulfilled, (state, action) => {
+        state.tasks.unshift(action.payload.data);
       });
   },
 });

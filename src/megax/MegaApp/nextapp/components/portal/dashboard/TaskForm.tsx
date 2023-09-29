@@ -15,6 +15,8 @@ import {
   bindPopover,
 } from "material-ui-popup-state/hooks";
 import Popover from "@mui/material/Popover";
+import { useAppDispatch } from "@/lib/store/state.hook";
+import { addTaskThunk } from "@/lib/store/tasks.state";
 
 type TaskModel = {
   title: string;
@@ -23,25 +25,37 @@ type TaskModel = {
 };
 
 export default function TaskForm() {
+  const appDispatch = useAppDispatch();
   const formContext = useForm<TaskModel>({
     values: {
-      title: '',
-    }
+      title: "",
+    },
   });
   const taskDetailPopup = usePopupState({
     variant: "popover",
     popupId: "task-details",
   });
 
-  const handleSubmit = (contact: any) => {
-    // handleSave(contact, _selectedFiles);
-  };
-
-  const handleKeyUp = (
+  const handleKeyUp = async (
     e: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     if (e.key === "Enter") {
-      console.log(formContext.getValues());
+      const form = formContext.getValues();
+      if (!form.title) {
+        return;
+      }
+
+      const result = await appDispatch(
+        addTaskThunk({
+          clientId: form.clientId,
+          projectId: form.projectId,
+          title: form.title,
+        })
+      ).unwrap();
+
+      if (result.success) {
+        formContext.reset();
+      }
     }
   };
 
