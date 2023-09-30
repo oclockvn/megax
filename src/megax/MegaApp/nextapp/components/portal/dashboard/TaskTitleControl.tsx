@@ -74,7 +74,7 @@ export default function TaskTitleControl({ title, onOk }: TitleControlProps) {
         </>
       ) : (
         <div
-          className="hover:bg-slate-200 cursor-pointer py-1 rounded"
+          className="hover:bg-slate-200 cursor-pointer py-1 rounded mx-[-4px] px-[4px]"
           onClick={toggleEdit}
         >
           {title}

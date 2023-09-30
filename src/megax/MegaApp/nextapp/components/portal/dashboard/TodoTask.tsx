@@ -31,6 +31,7 @@ import TaskForm from "./TaskForm";
 import Chip from "@mui/material/Chip";
 import { shortenLink } from "@/lib/string.helper";
 import TaskTitleControl from "./TaskTitleControl";
+import TaskProjectControl from "./TaskProjectControl";
 
 function TaskItem({ todo }: { todo: Task }) {
   const appDispatch = useAppDispatch();
@@ -50,11 +51,7 @@ function TaskItem({ todo }: { todo: Task }) {
     <>
       <div className="flex gap-2 items-center px-4 py-2 border-l-4 border-solid border-fuchsia-500 mt-0 w-full mx-0">
         <div className="flex-[1] w-full mx-0 mt-0">
-          <div>
-            <span className="uppercase text-fuchsia-500 font-bold">
-              {todo.project}
-            </span>
-          </div>
+          <TaskProjectControl onOk={() => {}} projectName="Tally" />
 
           <TaskTitleControl
             title={todo.title}
@@ -62,7 +59,7 @@ function TaskItem({ todo }: { todo: Task }) {
           />
 
           {todo.reference?.length > 0 && (
-            <div className="mt-2">
+            <div className="">
               <Chip
                 label={shorten}
                 component="a"
