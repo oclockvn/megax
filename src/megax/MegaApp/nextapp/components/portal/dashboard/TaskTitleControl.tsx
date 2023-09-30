@@ -1,7 +1,7 @@
 import TextField from "@mui/material/TextField";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
 
 export type TitleControlProps = {
@@ -16,6 +16,16 @@ export default function TaskTitleControl({ title, onOk }: TitleControlProps) {
   const toggleEdit = () => {
     setEdit(prev => !prev);
   };
+
+  useEffect(() => {
+    if (isEdit && inputRef?.current != null) {
+      const input = inputRef.current;
+      const value = input.value;
+
+      input.focus();
+      input.setSelectionRange(value.length, value.length);
+    }
+  }, [isEdit])
 
   const handleOk = () => {
     const text = inputRef?.current?.value;
@@ -34,6 +44,7 @@ export default function TaskTitleControl({ title, onOk }: TitleControlProps) {
           <div className="relative">
             <TextField
               inputRef={inputRef}
+              autoFocus
               defaultValue={title}
               multiline
               fullWidth
@@ -63,7 +74,7 @@ export default function TaskTitleControl({ title, onOk }: TitleControlProps) {
         </>
       ) : (
         <div
-          className="hover:bg-slate-200 cursor-pointer py-1"
+          className="hover:bg-slate-200 cursor-pointer py-1 rounded"
           onClick={toggleEdit}
         >
           {title}
