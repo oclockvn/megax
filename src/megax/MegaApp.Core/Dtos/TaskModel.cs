@@ -1,6 +1,5 @@
 ﻿using MegaApp.Core.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace MegaApp.Core.Dtos;
 
@@ -8,6 +7,7 @@ public record TodoTaskModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = null!;
+    public string Reference { get; set; } = null!;
     public TaskState Status { get; set; }
 
     public int? ProjectId { get; set; }
@@ -31,7 +31,8 @@ public record TodoTaskModel
     {
         Id = task.Id;
         UserId = task.UserId;
-        Title  = task.Title;
+        Title = task.Title;
+        Reference = task.Reference;
         Status = task.Status;
         ProjectId = task.ProjectId;
         CreatedAt = task.CreatedAt;
@@ -39,6 +40,15 @@ public record TodoTaskModel
         UpdatedAt = task.UpdatedAt;
         UpdatedBy = task.UpdatedBy;
         SubTasks = task.SubTasks.Select(s => new SubTaskModel(s)).ToList();
+    }
+
+    public record Add
+    {
+        [Required, MaxLength(255)]
+        public string Title { get; set; }
+        [MaxLength(255)]
+        public string Reference{get;set;}
+        public int? ProjectId { get; set; }
     }
 }
 

@@ -39,7 +39,7 @@ public class TasksController : ApplicationControllerBase
     [HttpPost]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<TodoTaskModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddTask(TodoTaskModel request)
+    public async Task<IActionResult> AddTask(TodoTaskModel.Add request)
     {
         if (!ModelState.IsValid)
         {

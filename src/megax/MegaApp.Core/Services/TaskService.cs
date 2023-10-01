@@ -9,7 +9,7 @@ namespace MegaApp.Core.Services;
 public interface ITaskService
 {
     Task<List<TodoTaskModel>> GetTaskListAsync(int userId);
-    Task<Result<TodoTaskModel>> AddTaskAsync(int userId, TodoTaskModel request);
+    Task<Result<TodoTaskModel>> AddTaskAsync(int userId, TodoTaskModel.Add request);
     Task<Result<TodoTaskModel>> PatchTaskAsync(int id, Dictionary<string, object> patch);
     Task<Result<SubTaskModel>> AddSubTaskAsync(SubTaskModel request);
     Task<Result<SubTaskModel>> PatchSubTaskAsync(int id, Dictionary<string, object> patch);
@@ -38,18 +38,19 @@ internal class TaskService : ITaskService
         return new Result<SubTaskModel>(new SubTaskModel(subTask));
     }
 
-    public async Task<Result<TodoTaskModel>> AddTaskAsync(int userId, TodoTaskModel request)
+    public async Task<Result<TodoTaskModel>> AddTaskAsync(int userId, TodoTaskModel.Add request)
     {
         using var db = UseDb();
-        var task = db.Tasks.Add(new Db.Entities.TodoTask
+        var task = db.Tasks.Add(new TodoTask
         {
-            Id = 0,
+            // Id = 0,
             UserId = userId,
-            Project = null,
+            // Project = null,
             ProjectId = request.ProjectId,
             Status = Enums.TaskState.Todo,
-            SubTasks = new(),
+            // SubTasks = new(),
             Title = request.Title,
+            Reference = request.Reference,
             CreatedAt = DateTimeOffset.Now,
             // CreatedBy = 0,
             // UpdatedAt = DateTimeOffset.Now,

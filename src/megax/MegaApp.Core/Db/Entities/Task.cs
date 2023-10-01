@@ -8,7 +8,10 @@ namespace MegaApp.Core.Db.Entities;
 public class TodoTask : ICreatedByEntity, IUpdatedByEntity
 {
     public int Id { get; set; }
+    [Required, MaxLength(255)]
     public string Title { get; set; } = null!;
+    [MaxLength(255)]
+    public string Reference { get; set; } = null!;
     public TaskState Status { get; set; } = TaskState.Todo;
 
     public int? ProjectId { get; set; }
@@ -28,6 +31,7 @@ public class TodoTask : ICreatedByEntity, IUpdatedByEntity
 public class SubTask : ICreatedByEntity, IUpdatedByEntity
 {
     public int Id { get; set; }
+    [Required, MaxLength(255)]
     public string Title { get; set; }
     public SubTaskState Status { get; set; }
 
@@ -44,7 +48,7 @@ public class Project : ICreatedByEntity
 {
     public int Id { get; set; }
 
-    [MaxLength(255)]
+    [Required, MaxLength(255)]
     public string Name { get; set; } = null!;
     public bool Active { get; set; }
 
@@ -60,7 +64,7 @@ public class Project : ICreatedByEntity
 public class Client : ICreatedByEntity
 {
     public int Id { get; set; }
-    [MaxLength(255)]
+    [Required, MaxLength(255)]
     public string Name { get; set; } = null!;
     public bool Active { get; set; }
 
