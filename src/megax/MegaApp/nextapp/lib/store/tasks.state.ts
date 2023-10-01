@@ -94,12 +94,12 @@ export const sSlice = createSlice({
     },
     toggleEditSubTask: (state, action: PayloadAction<EditSubTaskType>) => {
       const task = state.tasks.find(t => t.id === action.payload.taskId);
-      if (!task || !task.subtasks) {
+      if (!task || !task.subTasks) {
         throw new Error("500");
       }
 
       const { id } = action.payload;
-      task.subtasks = task.subtasks.map(t => ({
+      task.subTasks = task.subTasks.map(t => ({
         ...t,
         isEdit: t.id === id ? !t.isEdit : false,
       }));
@@ -124,15 +124,15 @@ export const sSlice = createSlice({
           throw new Error(`Something went wrong with task ${subTask.taskId}`);
         }
 
-        if (!task.subtasks) {
-          task.subtasks = [];
+        if (!task.subTasks) {
+          task.subTasks = [];
         }
 
-        const sub = task.subtasks.find(s => s.id === subTask.id);
+        const sub = task.subTasks.find(s => s.id === subTask.id);
         if (sub) {
           sub.title = subTask.title;
         } else {
-          task.subtasks.push(subTask);
+          task.subTasks.push(subTask);
         }
       })
       .addCase(handleSubTaskThunk.fulfilled, (state, action) => {
@@ -147,7 +147,7 @@ export const sSlice = createSlice({
           );
         }
 
-        const subTask = task.subtasks.find(s => s.id === id);
+        const subTask = task.subTasks.find(s => s.id === id);
         if (subTask == null) {
           throw new Error(`Something went wrong with subtask ${id}`);
         }
@@ -162,7 +162,7 @@ export const sSlice = createSlice({
             subTask.isCompleted = false;
             break;
           default:
-            task.subtasks = task?.subtasks.filter(s => s.id !== id);
+            task.subTasks = task?.subTasks.filter(s => s.id !== id);
             break;
         }
       })

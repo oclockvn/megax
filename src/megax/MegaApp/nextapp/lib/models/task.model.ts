@@ -7,7 +7,7 @@ export interface Task {
   client: string;
   clientId?: number;
   time?: Time;
-  subtasks: SubTask[];
+  subTasks: SubTask[];
 }
 
 export type TaskAdd = Pick<Task, 'clientId' | 'projectId' | 'title'>
@@ -21,6 +21,8 @@ export interface SubTask {
   isCompleted: boolean;
   isEdit?: boolean;
 }
+
+export type SubTaskAdd = Pick<SubTask, 'title' | 'taskId'>;
 
 export class Time {
   hour = 0;

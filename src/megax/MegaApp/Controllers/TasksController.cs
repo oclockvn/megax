@@ -68,7 +68,7 @@ public class TasksController : ApplicationControllerBase
     [HttpPost("subtask")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<SubTaskModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddSubTask([FromBody] SubTaskModel request)
+    public async Task<IActionResult> AddSubTask([FromBody] SubTaskModel.Add request)
     {
         if (!ModelState.IsValid)
         {

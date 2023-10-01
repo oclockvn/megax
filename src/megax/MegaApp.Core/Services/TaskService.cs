@@ -11,7 +11,7 @@ public interface ITaskService
     Task<List<TodoTaskModel>> GetTaskListAsync(int userId);
     Task<Result<TodoTaskModel>> AddTaskAsync(int userId, TodoTaskModel.Add request);
     Task<Result<TodoTaskModel>> PatchTaskAsync(int id, Dictionary<string, object> patch);
-    Task<Result<SubTaskModel>> AddSubTaskAsync(SubTaskModel request);
+    Task<Result<SubTaskModel>> AddSubTaskAsync(SubTaskModel.Add request);
     Task<Result<SubTaskModel>> PatchSubTaskAsync(int id, Dictionary<string, object> patch);
 }
 
@@ -24,10 +24,10 @@ internal class TaskService : ITaskService
         this.dbContextFactory = dbContextFactory;
     }
 
-    public async Task<Result<SubTaskModel>> AddSubTaskAsync(SubTaskModel request)
+    public async Task<Result<SubTaskModel>> AddSubTaskAsync(SubTaskModel.Add request)
     {
         using var db = UseDb();
-        var subTask = db.SubTasks.Add(new Db.Entities.SubTask
+        var subTask = db.SubTasks.Add(new SubTask
         {
             Status = Enums.SubTaskState.New,
             TaskId = request.TaskId,
@@ -65,6 +65,7 @@ internal class TaskService : ITaskService
     {
         using var db = UseDb();
         var tasks = await db.Tasks.Where(x => x.UserId == userId)
+            .Include(t => t.SubTasks)
             .OrderByDescending(x => x.Id)
             .Select(t => new TodoTaskModel(t))
             .ToListAsync();
@@ -75,7 +76,7 @@ internal class TaskService : ITaskService
     public async Task<Result<SubTaskModel>> PatchSubTaskAsync(int id, Dictionary<string, object> patch)
     {
         using var db = UseDb();
-        var sub = await db.SubTasks.FirstOrDefaultAsync(x=>x.Id == id) ?? throw new EntityNotFoundException($"No sub-task found by id {id}");
+        var sub = await db.SubTasks.FirstOrDefaultAsync(x => x.Id == id) ?? throw new EntityNotFoundException($"No sub-task found by id {id}");
 
         foreach (var pair in patch)
         {

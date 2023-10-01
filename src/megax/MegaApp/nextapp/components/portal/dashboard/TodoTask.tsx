@@ -180,7 +180,7 @@ export default function TodoTask() {
           <TaskItem todo={todo} />
           <div className="mx-4 mt-2">
             <SubTaskList
-              subtasks={todo.subtasks}
+              subtasks={todo.subTasks}
               taskId={todo.id}
               onAdd={(value, id) => handleSaveSubTask(id || 0, todo.id, value)}
             />

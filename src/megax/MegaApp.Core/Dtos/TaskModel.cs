@@ -47,7 +47,7 @@ public record TodoTaskModel
         [Required, MaxLength(255)]
         public string Title { get; set; }
         [MaxLength(255)]
-        public string Reference{get;set;}
+        public string Reference { get; set; }
         public int? ProjectId { get; set; }
     }
 }
@@ -81,6 +81,13 @@ public record SubTaskModel
         CreatedBy = sub.CreatedBy;
         UpdatedAt = sub.UpdatedAt;
         UpdatedBy = sub.UpdatedBy;
+    }
+
+    public record Add
+    {
+        public string Title { get; set; }
+        public SubTaskState Status { get; set; }
+        public int TaskId { get; set; }
     }
 }
 

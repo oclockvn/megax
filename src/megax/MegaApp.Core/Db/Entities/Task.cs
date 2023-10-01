@@ -107,3 +107,12 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
             .HasForeignKey(p => p.ClientId);
     }
 }
+
+public class SubTaskConfiguration : IEntityTypeConfiguration<SubTask>
+{
+    public void Configure(EntityTypeBuilder<SubTask> builder)
+    {
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("sysdatetimeoffset()");
+    }
+}
