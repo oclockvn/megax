@@ -24,6 +24,7 @@ public static class ServiceCollectionExtension
             .AddScoped<ISupplierService, SupplierService>()
             .AddScoped<IBankService, BankService>()
             .AddScoped<IFileService, FileService>()
+            .AddScoped<ITaskService, TaskService>()
             .AddSettings(configuration)
             ;
     }

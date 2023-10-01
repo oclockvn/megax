@@ -21,7 +21,7 @@ namespace MegaApp.Services
 
     public interface ITokenService
     {
-        TokenRecord GenerateToken(TokenClaim claim, int expiryMinites = 1140);
+        TokenRecord GenerateToken(TokenClaim claim, int expiryMinutes = 1140);
         Result<TokenClaim> ReadToken(string token, bool skipExpiryCheck = false);
     }
 
@@ -34,7 +34,7 @@ namespace MegaApp.Services
             this.jwtOption = jwtOption.Value;
         }
 
-        public TokenRecord GenerateToken(TokenClaim claim, int expiryMinites = 1140)
+        public TokenRecord GenerateToken(TokenClaim claim, int expiryMinutes = 1140)
         {
             var claims = new List<Claim>
             {
@@ -52,13 +52,13 @@ namespace MegaApp.Services
 #endif
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.JwtSecret));
-            var expTime = DateTime.Now.AddMinutes(expiryMinites);
+            var expTime = DateTime.Now.AddMinutes(expiryMinutes);
             var token = new JwtSecurityToken(
                 issuer: jwtOption.Issuer,
                 audience: jwtOption.Audience,
                 claims: claims,
                 notBefore: DateTime.Now,
-                // expires: expiryMinites == 0 ? DateTime.Now.AddSeconds(10) : DateTime.Now.AddMinutes(expiryMinites),
+                // expires: expiryMinutes == 0 ? DateTime.Now.AddSeconds(10) : DateTime.Now.AddMinutes(expiryMinutes),
                 expires: expTime,
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 

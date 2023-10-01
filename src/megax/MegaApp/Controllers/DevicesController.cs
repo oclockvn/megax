@@ -103,7 +103,7 @@ public class DevicesController : ApplicationControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DeletedateDevice(int id)
+    public async Task<IActionResult> DeleteDevice(int id)
     {
         var result = await deviceService.DeleteDeviceAsync(id);
         return Ok(result);
