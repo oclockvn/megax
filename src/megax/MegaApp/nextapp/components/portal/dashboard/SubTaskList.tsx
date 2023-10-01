@@ -3,7 +3,7 @@
 import BlockIcon from "@mui/icons-material/Block";
 import SubTaskForm from "./SubTaskForm";
 import SubTaskItem from "./SubTaskItem";
-import { SubTask } from "@/lib/models/task.model";
+import { SubTask, SubTaskState } from "@/lib/models/task.model";
 
 type SubTaskListProps = {
   subtasks: SubTask[];
@@ -17,8 +17,8 @@ export default function SubTaskList({
   onAdd,
 }: SubTaskListProps) {
   const hasSub = subtasks?.length > 0;
-  const completed = subtasks?.filter(s => s.isCompleted)?.length;
-  const blocker = subtasks?.filter(s => s.isFlag)?.length || 0;
+  const completed = subtasks?.filter(s => s.status === SubTaskState.Completed)?.length;
+  const blocker = subtasks?.filter(s => s.status === SubTaskState.Flagged)?.length || 0;
 
   const Overview = () => (
     <div className="mb-2">
@@ -44,7 +44,7 @@ export default function SubTaskList({
         subtasks.map(sub => (
           <div
             key={sub.id}
-            className={[classes.default, sub.isFlag ? classes.flagged : ''].join(' ')}
+            className={[classes.default, sub.status === SubTaskState.Flagged ? classes.flagged : ''].join(' ')}
           >
             <SubTaskItem sub={sub} onOk={onAdd} />
           </div>

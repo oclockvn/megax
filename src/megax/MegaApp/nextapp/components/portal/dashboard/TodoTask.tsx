@@ -145,8 +145,6 @@ export default function TodoTask() {
     appDispatch(
       saveSubTaskThunk({
         id,
-        isCompleted: false,
-        isFlag: false,
         taskId,
         title: value,
       })

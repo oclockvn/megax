@@ -10,7 +10,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { useAppDispatch } from "@/lib/store/state.hook";
 
 import { handleSubTaskThunk, toggleEditSubTask } from "@/lib/store/tasks.state";
-import { SubTask, SubTaskAction } from "@/lib/models/task.model";
+import { SubTask, SubTaskAction, SubTaskState } from "@/lib/models/task.model";
 import SubTaskForm from "./SubTaskForm";
 
 type SubTaskItemProps = {
@@ -29,13 +29,16 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
     appDispatch(toggleEditSubTask({ id, taskId }));
   };
 
+  const isCompleted = sub.status=== SubTaskState.Completed;
+  const isFlagged = sub.status === SubTaskState.Flagged;
+
   return (
     <>
       <div className="flex items-center gap-1">
         <Checkbox
           icon={<RadioButtonUncheckedIcon />}
           checkedIcon={<CheckCircleIcon />}
-          checked={sub.isCompleted}
+          checked={isCompleted}
           onChange={() => handleSubTaskAction(sub.id, "complete")}
         />
         <div className="flex-[1] font-[.8rem]">
@@ -50,7 +53,7 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
             />
           ) : (
             <div
-              className={ `cursor-pointer ${sub.isFlag ? 'text-red-500' : ''}` }
+              className={ `cursor-pointer ${isFlagged ? 'text-red-500' : ''}` }
               onClick={() => handleEditSubTask(sub.id)}
             >
               {sub.title}
@@ -61,13 +64,13 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
           <IconButton
             title="Red flag"
             className={`${
-              sub.isFlag ? "opacity-100" : "opacity-0"
+              isFlagged ? "opacity-100" : "opacity-0"
             } transition-opacity group-hover:opacity-100`}
             onClick={() => handleSubTaskAction(sub.id, "flag")}
           >
             <FlagIcon
               fontSize="small"
-              className={`${sub.isFlag ? "text-red-500" : ""}`}
+              className={`${isFlagged ? "text-red-500" : ""}`}
             />
           </IconButton>
           <IconButton

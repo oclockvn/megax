@@ -10,19 +10,24 @@ export interface Task {
   subTasks: SubTask[];
 }
 
-export type TaskAdd = Pick<Task, 'clientId' | 'projectId' | 'title'>
+export type TaskAdd = Pick<Task, "clientId" | "projectId" | "title">;
 export type TaskPatchKey = keyof TaskAdd;
 
 export interface SubTask {
   id: number;
   title: string;
-  isFlag: boolean;
+  status: SubTaskState;
   taskId: number;
-  isCompleted: boolean;
   isEdit?: boolean;
 }
 
-export type SubTaskAdd = Pick<SubTask, 'title' | 'taskId'>;
+export enum SubTaskState {
+  New = 0,
+  Flagged = 1,
+  Completed = 2,
+}
+
+export type SubTaskAdd = Pick<SubTask, "title" | "taskId">;
 
 export class Time {
   hour = 0;

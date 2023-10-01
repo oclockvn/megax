@@ -3,6 +3,7 @@ import { Filter } from "../models/common.model";
 import {
   SubTask,
   SubTaskAction,
+  SubTaskState,
   Task,
   TaskAdd,
   TaskPatchKey,
@@ -31,7 +32,7 @@ export const fetchTaskListThunk = createAsyncThunk(
   "tasks/fetch",
   async (filter: Partial<Filter> | undefined, thunkApi) => {
     thunkApi.dispatch(sSlice.actions.setLoadingState("Loading..."));
-    return await fetchTasks(filter);
+    return await fetchTasks();
   }
 );
 
@@ -44,7 +45,7 @@ export const deleteTaskThunk = createAsyncThunk(
 
 export const saveSubTaskThunk = createAsyncThunk(
   "tasks/save-subtask",
-  async (subtask: SubTask, _thunkApi) => {
+  async (subtask: Partial<SubTask>, _thunkApi) => {
     return await saveSubTask(subtask);
   }
 );
@@ -154,12 +155,16 @@ export const sSlice = createSlice({
 
         switch (subTaskAction) {
           case "complete":
-            subTask.isCompleted = !subTask.isCompleted;
-            subTask.isFlag = false;
+            subTask.status =
+              subTask.status === SubTaskState.Completed
+                ? SubTaskState.New
+                : SubTaskState.Completed;
             break;
           case "flag":
-            subTask.isFlag = !subTask.isFlag;
-            subTask.isCompleted = false;
+            subTask.status =
+              subTask.status === SubTaskState.Flagged
+                ? SubTaskState.New
+                : SubTaskState.Flagged;
             break;
           default:
             task.subTasks = task?.subTasks.filter(s => s.id !== id);

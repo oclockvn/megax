@@ -31,7 +31,7 @@ export async function deleteTask(id: number) {
   } as Result<number>);
 }
 
-export async function saveSubTask(subtask: SubTaskAdd) {
+export async function saveSubTask(subtask: Partial<SubTaskAdd>) {
   const res = await api.post<Result<SubTask>>(`api/tasks/subtask`, subtask);
   return res.data;
 }
