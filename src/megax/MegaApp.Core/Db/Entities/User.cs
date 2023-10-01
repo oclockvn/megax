@@ -110,6 +110,7 @@ public class User : ICreatedByEntity
     public List<Account> Accounts { get; set; } = new();
     public List<UserDocument> Documents { get; set; } = new();
     public List<Contact> Contacts { get; set; } = new();
+    public List<TodoTask> Tasks {get;set;} = new();
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }

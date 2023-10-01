@@ -9,10 +9,13 @@ public class TodoTask : ICreatedByEntity, IUpdatedByEntity
 {
     public int Id { get; set; }
     public string Title { get; set; } = null!;
-    public TaskState Status { get; set; }
+    public TaskState Status { get; set; } = TaskState.Todo;
 
     public int? ProjectId { get; set; }
     public Project Project { get; set; }
+
+    public int UserId { get; set; }
+    public User User { get; set; }
 
     public List<SubTask> SubTasks { get; set; } = new();
 
@@ -78,6 +81,10 @@ public class TaskConfiguration : IEntityTypeConfiguration<TodoTask>
         builder.HasOne(x => x.Project)
             .WithMany(p => p.Tasks)
             .HasForeignKey(p => p.ProjectId);
+
+        builder.HasOne(x => x.User)
+            .WithMany(p => p.Tasks)
+            .HasForeignKey(p => p.UserId);
 
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("sysdatetimeoffset()");
