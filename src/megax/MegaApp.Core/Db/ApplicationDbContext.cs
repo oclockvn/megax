@@ -24,6 +24,11 @@ namespace MegaApp.Core.Db
         public DbSet<Entities.File> Files { get; set; }
         public DbSet<FileReference> FileReferences { get; set; }
 
+        public DbSet<TodoTask> Tasks {get;set;}
+        public DbSet<SubTask> SubTasks { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<Client> Clients { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -38,6 +43,8 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new TeamConfiguration());
             modelBuilder.ApplyConfiguration(new FileConfiguration());
             modelBuilder.ApplyConfiguration(new FileReferenceConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientConfiguration());
         }
     }
 }
