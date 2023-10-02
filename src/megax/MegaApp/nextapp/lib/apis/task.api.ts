@@ -82,7 +82,7 @@ export async function patchTask(
   key: TaskPatchKey,
   value: string | number
 ) {
-  const res = await api.post<Result<Task>>(`api/tasks/${id}/patch`, {
+  const res = await api.put<Result<Task>>(`api/tasks/${id}/patch`, {
     key,
     [key]: value,
   });

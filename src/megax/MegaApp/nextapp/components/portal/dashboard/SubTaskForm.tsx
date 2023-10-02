@@ -83,8 +83,8 @@ export default function SubTaskForm({
             sx={{ ml: 1, flex: 1 }}
             inputRef={inputRef}
             onKeyUp={handleKeyUp}
-            placeholder="Subtask"
-            inputProps={{ "aria-label": "Subtask" }}
+            placeholder="Sub task"
+            inputProps={{ "aria-label": "Sub task" }}
             className={`${isEdit ? 'px-0 ms-0' : ''}`}
             {...field}
             onBlur={() => onCancel && onCancel()}

@@ -27,10 +27,12 @@ export default function SubTaskList({ subtasks, taskId }: SubTaskListProps) {
     subtasks?.filter(s => s.status === SubTaskState.Flagged)?.length || 0;
 
   const Overview = () => (
-    <div className="mb-2">
-      Sub tasks ({completed}/{subtasks?.length})
+    <div className="mb-2 flex items-center">
+      <span>
+        Sub tasks ({completed}/{subtasks?.length})
+      </span>
       {blocker > 0 ? (
-        <span className="ms-2 text-red-500">
+        <span className="ms-2 text-red-500 inline-flex items-center">
           <BlockIcon fontSize="small" className="me-1" />
           {blocker} blocker(s)
         </span>
