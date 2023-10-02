@@ -1,19 +1,12 @@
-import api, { upload } from "@/lib/api";
-import { Filter, PagedResult, Result } from "@/lib/models/common.model";
-import { User, UserDeviceRecord } from "@/lib/models/user.model";
-import { normalizeDateTimePayload, qs, toFormData } from "../util";
-import { AxiosError } from "axios";
-import { Contact } from "../models/contact.model";
-import { Document as UserDocument } from "../models/document.model";
+import api from "@/lib/api";
+import { Result } from "@/lib/models/common.model";
 import {
-  Time,
   Task,
   SubTask,
-  SubTaskAction,
-  SubTaskActionResult,
   TaskAdd,
   TaskPatchKey,
   SubTaskAdd,
+  SubTaskPatch,
 } from "../models/task.model";
 
 export async function fetchTasks() {
@@ -31,23 +24,52 @@ export async function deleteTask(id: number) {
   } as Result<number>);
 }
 
-export async function saveSubTask(subtask: Partial<SubTaskAdd>) {
+export async function addSubTask(subtask: Partial<SubTaskAdd>) {
   const res = await api.post<Result<SubTask>>(`api/tasks/subtask`, subtask);
   return res.data;
 }
 
-export async function handleSubTaskAction(
+type DeleteSubTaskResult = {
+  id: number;
+  taskId: number;
+};
+
+export async function deleteSubTask(id: number, taskId: number) {
+  const res = await api.delete<Result<DeleteSubTaskResult>>(
+    `api/tasks/subtask/${id}`
+  );
+
+  const result: Result<DeleteSubTaskResult> = {
+    code: res.data.code,
+    data: { id, taskId },
+    success: res.data.success,
+  };
+
+  return result;
+}
+
+export async function patchSubTask(
   id: number,
   taskId: number,
-  action: SubTaskAction
+  key: SubTaskPatch,
+  value: string | number
 ) {
-  // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
-  // return res.data;
-  return Promise.resolve({
-    code: "",
-    data: { id, action, taskId },
-    success: true,
-  } as Result<SubTaskActionResult>);
+  const res = await api.put<Result<SubTask>>(`api/tasks/${id}/patch-subtask`, {
+    key,
+    [key]: value,
+  });
+
+  const result: Result<{
+    id: number;
+    taskId: number;
+    key: SubTaskPatch;
+    value: string | number;
+  }> = {
+    code: res.data.code,
+    data: { id, taskId, key, value },
+    success: res.data.success,
+  };
+  return result;
 }
 
 export async function addTask(task: TaskAdd) {
@@ -60,11 +82,9 @@ export async function patchTask(
   key: TaskPatchKey,
   value: string | number
 ) {
-  // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
-  // return res.data;
-  return Promise.resolve({
-    code: "",
-    data: { id, [key]: value as any },
-    success: true,
-  } as Result<Task>);
+  const res = await api.post<Result<Task>>(`api/tasks/${id}/patch`, {
+    key,
+    [key]: value,
+  });
+  return res.data;
 }

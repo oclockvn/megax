@@ -28,6 +28,7 @@ export enum SubTaskState {
 }
 
 export type SubTaskAdd = Pick<SubTask, "title" | "taskId">;
+export type SubTaskPatch = keyof Pick<SubTask, "title" | "status">;
 
 export class Time {
   hour = 0;

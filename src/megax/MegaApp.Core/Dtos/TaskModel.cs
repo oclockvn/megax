@@ -50,6 +50,15 @@ public record TodoTaskModel
         public string Reference { get; set; }
         public int? ProjectId { get; set; }
     }
+
+    public record Patch
+    {
+        public string Key { get; set; }
+        public string Title { get; set; }
+        public string Reference { get; set; }
+        public TaskState? Status { get; set; }
+        public int? ProjectId { get; set; }
+    }
 }
 
 public record SubTaskModel
@@ -89,6 +98,15 @@ public record SubTaskModel
         public SubTaskState Status { get; set; }
         public int TaskId { get; set; }
     }
+
+    public record Patch
+    {
+        public string Key { get; set; }
+        public string Title { get; set; }
+        public SubTaskState? Status {get;set;}
+    }
+
+    public record DeleteResult(int Id, int TaskId);
 }
 
 public record ProjectModel

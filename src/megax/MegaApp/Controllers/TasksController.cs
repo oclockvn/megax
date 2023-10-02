@@ -54,7 +54,7 @@ public class TasksController : ApplicationControllerBase
     [HttpPut("{id}/patch")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<TodoTaskModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PatchTask(int id, [FromBody] Dictionary<string,object> request)
+    public async Task<IActionResult> PatchTask(int id, [FromBody] TodoTaskModel.Patch request)
     {
         if (!ModelState.IsValid)
         {
@@ -79,17 +79,37 @@ public class TasksController : ApplicationControllerBase
         return Ok(result);
     }
 
-    [HttpPut("{id}/patch-subtask")]
+    /// <summary>
+    /// Patch the subtask
+    /// </summary>
+    /// <param name="sid">Sub-task id</param>
+    /// <param name="request"><see cref="SubTaskModel.Patch"/></param>
+    /// <returns></returns>
+    [HttpPut("{sid}/patch-subtask")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<SubTaskModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PatchSubTask(int id, [FromBody] Dictionary<string,object> request)
+    public async Task<IActionResult> PatchSubTask(int sid, [FromBody] SubTaskModel.Patch request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var result = await taskService.PatchSubTaskAsync(id, request);
+        var result = await taskService.PatchSubTaskAsync(sid, request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Delete the subtask
+    /// </summary>
+    /// <param name="sid">Subtask id</param>
+    /// <returns></returns>
+    [HttpDelete("subtask/{sid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<SubTaskModel.DeleteResult>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteSubTask(int sid)
+    {
+        var result = await taskService.DeleteSubTaskAsync(sid);
         return Ok(result);
     }
 }

@@ -10,9 +10,10 @@ public interface ITaskService
 {
     Task<List<TodoTaskModel>> GetTaskListAsync(int userId);
     Task<Result<TodoTaskModel>> AddTaskAsync(int userId, TodoTaskModel.Add request);
-    Task<Result<TodoTaskModel>> PatchTaskAsync(int id, Dictionary<string, object> patch);
+    Task<Result<TodoTaskModel>> PatchTaskAsync(int id, TodoTaskModel.Patch patch);
     Task<Result<SubTaskModel>> AddSubTaskAsync(SubTaskModel.Add request);
-    Task<Result<SubTaskModel>> PatchSubTaskAsync(int id, Dictionary<string, object> patch);
+    Task<Result<SubTaskModel>> PatchSubTaskAsync(int id, SubTaskModel.Patch patch);
+    Task<Result<int>> DeleteSubTaskAsync(int id);
 }
 
 internal class TaskService : ITaskService
@@ -73,51 +74,54 @@ internal class TaskService : ITaskService
         return tasks;
     }
 
-    public async Task<Result<SubTaskModel>> PatchSubTaskAsync(int id, Dictionary<string, object> patch)
+    public async Task<Result<SubTaskModel>> PatchSubTaskAsync(int id, SubTaskModel.Patch patch)
     {
         using var db = UseDb();
         var sub = await db.SubTasks.FirstOrDefaultAsync(x => x.Id == id) ?? throw new EntityNotFoundException($"No sub-task found by id {id}");
 
-        foreach (var pair in patch)
+        if (EqualIgnoreCase(patch.Key, nameof(SubTask.Title)))
         {
-            if (pair.Key == nameof(SubTask.Title))
-            {
-                sub.Title = (string)pair.Value;
-            }
-            else if (pair.Key == nameof(SubTask.Status))
-            {
-                sub.Status = (Enums.SubTaskState)pair.Value;
-            }
+            sub.Title = patch.Title;
+        }
+        else if (EqualIgnoreCase(patch.Key, nameof(SubTask.Status)))
+        {
+            sub.Status = patch.Status.GetValueOrDefault();
         }
 
         await db.SaveChangesAsync();
         return new Result<SubTaskModel>(new SubTaskModel(sub));
     }
 
-    public async Task<Result<TodoTaskModel>> PatchTaskAsync(int id, Dictionary<string, object> patch)
+    public async Task<Result<TodoTaskModel>> PatchTaskAsync(int id, TodoTaskModel.Patch patch)
     {
         using var db = UseDb();
         var task = await db.Tasks.FirstOrDefaultAsync(t => t.Id == id) ?? throw new EntityNotFoundException($"No task found by id {id}");
 
-        foreach (var pair in patch)
+        if (EqualIgnoreCase(patch.Key, nameof(TodoTask.Title)))
         {
-            if (pair.Key == nameof(TodoTask.Title))
-            {
-                task.Title = (string)pair.Value;
-            }
-            else if (pair.Key == nameof(TodoTask.ProjectId))
-            {
-                task.ProjectId = (int?)pair.Value;
-            }
-            else if (pair.Key == nameof(TodoTask.Status))
-            {
-                task.Status = (Enums.TaskState)pair.Value;
-            }
+            task.Title = patch.Title?.Trim();
+        }
+        else if (EqualIgnoreCase(patch.Key, nameof(TodoTask.ProjectId)))
+        {
+            task.ProjectId = patch.ProjectId;
+        }
+        else if (EqualIgnoreCase(patch.Key, nameof(TodoTask.Status)))
+        {
+            task.Status = patch.Status.GetValueOrDefault();
         }
 
         await db.SaveChangesAsync();
         return new Result<TodoTaskModel>(new TodoTaskModel(task));
     }
 
+    public async Task<Result<int>> DeleteSubTaskAsync(int id)
+    {
+        using var db = UseDb();
+        await db.SubTasks.Where(t => t.Id == id).ExecuteDeleteAsync();
+
+        return new Result<int>(id);
+    }
+
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
+    private static bool EqualIgnoreCase(string a, string b) => string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
 }

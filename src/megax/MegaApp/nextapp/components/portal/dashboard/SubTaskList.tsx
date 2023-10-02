@@ -4,21 +4,27 @@ import BlockIcon from "@mui/icons-material/Block";
 import SubTaskForm from "./SubTaskForm";
 import SubTaskItem from "./SubTaskItem";
 import { SubTask, SubTaskState } from "@/lib/models/task.model";
+import { useAppDispatch } from "@/lib/store/state.hook";
+import { addSubTaskThunk } from "@/lib/store/tasks.state";
 
 type SubTaskListProps = {
   subtasks: SubTask[];
   taskId: number;
-  onAdd: (value: string, id?: number) => void;
 };
 
-export default function SubTaskList({
-  subtasks,
-  taskId,
-  onAdd,
-}: SubTaskListProps) {
+export default function SubTaskList({ subtasks, taskId }: SubTaskListProps) {
+  const appDispatch = useAppDispatch();
+
+  const handleAdd = (id: number, taskId: number, value: string) => {
+    appDispatch(addSubTaskThunk({ taskId, title: value }));
+  };
+
   const hasSub = subtasks?.length > 0;
-  const completed = subtasks?.filter(s => s.status === SubTaskState.Completed)?.length;
-  const blocker = subtasks?.filter(s => s.status === SubTaskState.Flagged)?.length || 0;
+  const completed = subtasks?.filter(
+    s => s.status === SubTaskState.Completed
+  )?.length;
+  const blocker =
+    subtasks?.filter(s => s.status === SubTaskState.Flagged)?.length || 0;
 
   const Overview = () => (
     <div className="mb-2">
@@ -33,9 +39,9 @@ export default function SubTaskList({
   );
 
   const classes = {
-    default: 'group border-b border-solid last:border-none rounded',
-    flagged: 'bg-red-50',
-  }
+    default: "group border-b border-solid last:border-none rounded",
+    flagged: "bg-red-50",
+  };
 
   return (
     <>
@@ -44,14 +50,21 @@ export default function SubTaskList({
         subtasks.map(sub => (
           <div
             key={sub.id}
-            className={[classes.default, sub.status === SubTaskState.Flagged ? classes.flagged : ''].join(' ')}
+            className={[
+              classes.default,
+              sub.status === SubTaskState.Flagged ? classes.flagged : "",
+            ].join(" ")}
           >
-            <SubTaskItem sub={sub} onOk={onAdd} />
+            <SubTaskItem sub={sub} />
           </div>
         ))}
 
       <div className="mt-2">
-        <SubTaskForm onOk={onAdd} id={0} taskId={taskId} />
+        <SubTaskForm
+          onOk={value => handleAdd(0, taskId, value)}
+          id={0}
+          taskId={taskId}
+        />
       </div>
     </>
   );

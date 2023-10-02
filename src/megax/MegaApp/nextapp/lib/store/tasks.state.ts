@@ -1,20 +1,21 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
 import {
-  SubTask,
-  SubTaskAction,
+  SubTaskAdd,
+  SubTaskPatch,
   SubTaskState,
   Task,
   TaskAdd,
   TaskPatchKey,
 } from "../models/task.model";
 import {
-  saveSubTask,
+  patchSubTask,
   deleteTask as deleteTask,
   fetchTasks,
-  handleSubTaskAction,
   addTask,
   patchTask,
+  addSubTask,
+  deleteSubTask,
 } from "../apis/task.api";
 // import { fetchTodo } from "../apis/s.api";
 
@@ -43,27 +44,6 @@ export const deleteTaskThunk = createAsyncThunk(
   }
 );
 
-export const saveSubTaskThunk = createAsyncThunk(
-  "tasks/save-subtask",
-  async (subtask: Partial<SubTask>, _thunkApi) => {
-    return await saveSubTask(subtask);
-  }
-);
-
-export const handleSubTaskThunk = createAsyncThunk(
-  "tasks/handle-subtask",
-  async (
-    payload: { id: number; taskId: number; action: SubTaskAction },
-    _thunkApi
-  ) => {
-    return await handleSubTaskAction(
-      payload.id,
-      payload.taskId,
-      payload.action
-    );
-  }
-);
-
 export const addTaskThunk = createAsyncThunk(
   "tasks/add-task",
   async (task: TaskAdd, _thunkApi) => {
@@ -80,6 +60,50 @@ export const patchTaskThunk = createAsyncThunk(
     return await patchTask(data.id, data.key, data.value);
   }
 );
+
+export const patchSubTaskThunk = createAsyncThunk(
+  "tasks/patch-subtask",
+  async (
+    data: {
+      id: number;
+      taskId: number;
+      key: SubTaskPatch;
+      value: string | number;
+    },
+    _thunkApi
+  ) => {
+    const { id, key, value, taskId } = data;
+    return await patchSubTask(id, taskId, key, value);
+  }
+);
+
+export const addSubTaskThunk = createAsyncThunk(
+  "tasks/add-subtask",
+  async (payload: SubTaskAdd, _thunkApi) => {
+    return await addSubTask(payload);
+  }
+);
+
+export const deleteSubTaskThunk = createAsyncThunk(
+  "tasks/delete-subtask",
+  async (payload: {id: number, taskId: number}, _thunkApi) => {
+    return await deleteSubTask(payload.id, payload.taskId);
+  }
+);
+
+// export const handleSubTaskThunk = createAsyncThunk(
+//   "tasks/handle-subtask",
+//   async (
+//     payload: { id: number; taskId: number; action: SubTaskAction },
+//     _thunkApi
+//   ) => {
+//     return await handleSubTaskAction(
+//       payload.id,
+//       payload.taskId,
+//       payload.action
+//     );
+//   }
+// );
 
 export type EditSubTaskType = { id: number; taskId: number };
 
@@ -118,7 +142,7 @@ export const sSlice = createSlice({
       .addCase(deleteTaskThunk.fulfilled, (state, action) => {
         state.tasks = state.tasks.filter(x => x.id !== action.payload.data);
       })
-      .addCase(saveSubTaskThunk.fulfilled, (state, action) => {
+      .addCase(addSubTaskThunk.fulfilled, (state, action) => {
         const subTask = action.payload.data;
         const task = state.tasks.find(t => t.id === subTask.taskId);
         if (task == null) {
@@ -136,9 +160,9 @@ export const sSlice = createSlice({
           task.subTasks.push(subTask);
         }
       })
-      .addCase(handleSubTaskThunk.fulfilled, (state, action) => {
+      .addCase(patchSubTaskThunk.fulfilled, (state, action) => {
         const {
-          data: { id, action: subTaskAction, taskId },
+          data: { id, taskId, key, value },
         } = action.payload;
         const task = state.tasks.find(t => t.id === taskId);
 
@@ -153,23 +177,33 @@ export const sSlice = createSlice({
           throw new Error(`Something went wrong with subtask ${id}`);
         }
 
-        switch (subTaskAction) {
-          case "complete":
-            subTask.status =
-              subTask.status === SubTaskState.Completed
-                ? SubTaskState.New
-                : SubTaskState.Completed;
+        switch (key) {
+          case "title":
+            subTask.title = value as string;
             break;
-          case "flag":
-            subTask.status =
-              subTask.status === SubTaskState.Flagged
-                ? SubTaskState.New
-                : SubTaskState.Flagged;
-            break;
-          default:
-            task.subTasks = task?.subTasks.filter(s => s.id !== id);
+          case "status":
+            subTask.status = value as SubTaskState;
             break;
         }
+      })
+      .addCase(deleteSubTaskThunk.fulfilled, (state, action) => {
+        const {
+          data: { id, taskId },
+        } = action.payload;
+        const task = state.tasks.find(t => t.id === taskId);
+
+        if (task == null) {
+          throw new Error(
+            `Something went wrong with task ${action.payload.data.taskId}`
+          );
+        }
+
+        const subTask = task.subTasks.find(s => s.id === id);
+        if (subTask == null) {
+          throw new Error(`Something went wrong with subtask ${id}`);
+        }
+
+        task.subTasks = task?.subTasks.filter(s => s.id !== id);
       })
       .addCase(addTaskThunk.fulfilled, (state, action) => {
         state.tasks.unshift(action.payload.data);

@@ -20,7 +20,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useConfirm } from "material-ui-confirm";
 import {
-  saveSubTaskThunk,
   deleteTaskThunk,
   patchTaskThunk,
 } from "@/lib/store/tasks.state";
@@ -141,16 +140,6 @@ export default function TodoTask() {
       });
   };
 
-  const handleSaveSubTask = (id: number, taskId: number, value: string) => {
-    appDispatch(
-      saveSubTaskThunk({
-        id,
-        taskId,
-        title: value,
-      })
-    );
-  };
-
   return (
     <>
       <div className="pb-4">
@@ -180,7 +169,6 @@ export default function TodoTask() {
             <SubTaskList
               subtasks={todo.subTasks}
               taskId={todo.id}
-              onAdd={(value, id) => handleSaveSubTask(id || 0, todo.id, value)}
             />
           </div>
         </div>

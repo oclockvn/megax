@@ -5,31 +5,47 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import FlagIcon from "@mui/icons-material/Flag";
-import Grid from "@mui/material/Grid";
 import Checkbox from "@mui/material/Checkbox";
 import { useAppDispatch } from "@/lib/store/state.hook";
 
-import { handleSubTaskThunk, toggleEditSubTask } from "@/lib/store/tasks.state";
-import { SubTask, SubTaskAction, SubTaskState } from "@/lib/models/task.model";
+import {
+  deleteSubTaskThunk,
+  patchSubTaskThunk,
+  toggleEditSubTask,
+} from "@/lib/store/tasks.state";
+import {
+  SubTask,
+  SubTaskPatch,
+  SubTaskState,
+} from "@/lib/models/task.model";
 import SubTaskForm from "./SubTaskForm";
 
 type SubTaskItemProps = {
   sub: SubTask;
-  onOk: (value: string, id?: number) => void;
 };
 
-export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
+export default function SubTaskItem({ sub }: SubTaskItemProps) {
   const taskId = sub.taskId;
   const appDispatch = useAppDispatch();
-  const handleSubTaskAction = (id: number, action: SubTaskAction) => {
-    appDispatch(handleSubTaskThunk({ id, taskId, action }));
+
+  const handlePatch = (key: SubTaskPatch, value: string | number) => {
+    appDispatch(patchSubTaskThunk({
+      id: sub.id,
+      taskId,
+      key,
+      value
+    }))
+  };
+
+  const handleDelete = () => {
+    appDispatch(deleteSubTaskThunk({ id: sub.id, taskId: sub.taskId }));
   };
 
   const handleEditSubTask = (id: number) => {
     appDispatch(toggleEditSubTask({ id, taskId }));
   };
 
-  const isCompleted = sub.status=== SubTaskState.Completed;
+  const isCompleted = sub.status === SubTaskState.Completed;
   const isFlagged = sub.status === SubTaskState.Flagged;
 
   return (
@@ -39,7 +55,12 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
           icon={<RadioButtonUncheckedIcon />}
           checkedIcon={<CheckCircleIcon />}
           checked={isCompleted}
-          onChange={() => handleSubTaskAction(sub.id, "complete")}
+          onChange={() =>
+            handlePatch(
+              "status",
+              isCompleted ? SubTaskState.New : SubTaskState.Completed
+            )
+          }
         />
         <div className="flex-[1] font-[.8rem]">
           {sub.isEdit ? (
@@ -48,12 +69,12 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
               taskId={taskId}
               isEdit
               currentValue={sub.title}
-              onOk={value => onOk(value, sub.id)}
+              onOk={value => handlePatch("title", value)}
               onCancel={() => handleEditSubTask(sub.id)}
             />
           ) : (
             <div
-              className={ `cursor-pointer ${isFlagged ? 'text-red-500' : ''}` }
+              className={`cursor-pointer ${isFlagged ? "text-red-500" : ""}`}
               onClick={() => handleEditSubTask(sub.id)}
             >
               {sub.title}
@@ -66,17 +87,19 @@ export default function SubTaskItem({ sub, onOk }: SubTaskItemProps) {
             className={`${
               isFlagged ? "opacity-100" : "opacity-0"
             } transition-opacity group-hover:opacity-100`}
-            onClick={() => handleSubTaskAction(sub.id, "flag")}
+            onClick={() =>
+              handlePatch(
+                "status",
+                isFlagged ? SubTaskState.New : SubTaskState.Flagged
+              )
+            }
           >
             <FlagIcon
               fontSize="small"
               className={`${isFlagged ? "text-red-500" : ""}`}
             />
           </IconButton>
-          <IconButton
-            color="warning"
-            onClick={() => handleSubTaskAction(sub.id, "delete")}
-          >
+          <IconButton color="warning" onClick={() => handleDelete()}>
             <CloseIcon fontSize="small" />
           </IconButton>
         </div>
