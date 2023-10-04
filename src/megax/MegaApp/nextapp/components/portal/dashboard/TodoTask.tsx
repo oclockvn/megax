@@ -169,14 +169,18 @@ export default function TodoTask() {
       });
   };
 
-  const handleStatusUpdate = (id: number, status: TaskState) => {
-    appDispatch(
+  const handleStatusUpdate = async (id: number, status: TaskState) => {
+    const result = await appDispatch(
       patchTaskThunk({
         id,
         key: "status",
         value: status,
       })
-    );
+    ).unwrap();
+
+    if (!result.success) {
+      toast.error('Beep beep! Do not try to hack the system!');
+    }
   };
 
   return (

@@ -114,6 +114,14 @@ internal class TaskService : ITaskService
         else if (EqualIgnoreCase(patch.Key, nameof(TodoTask.Status)))
         {
             task.Status = patch.Status.GetValueOrDefault();
+            if (task.Status == Enums.TaskState.Completed)
+            {
+                var inCompletedSubTask = await db.SubTasks.AnyAsync(s => s.TaskId == id && s.Status != Enums.SubTaskState.Completed);
+                if (inCompletedSubTask)
+                {
+                    return Result<TodoTaskModel>.Fail(Result.COMPLETE_SUBTASK_REQUIRED);
+                }
+            }
         }
 
         await db.SaveChangesAsync();

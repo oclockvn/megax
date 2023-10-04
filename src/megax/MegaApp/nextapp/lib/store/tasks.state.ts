@@ -200,6 +200,10 @@ export const sSlice = createSlice({
         state.tasks.unshift(action.payload.data);
       })
       .addCase(patchTaskThunk.fulfilled, (state, action) => {
+        if (!action.payload.success) {
+          return;
+        }
+
         const {id, status, title, projectId} = action.payload.data;
         const task = state.tasks.find(t => t.id === id);
         if (!task) {
