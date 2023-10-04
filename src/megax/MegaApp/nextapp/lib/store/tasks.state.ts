@@ -101,6 +101,12 @@ export const deleteSubTaskThunk = createAsyncThunk(
 
 export type EditSubTaskType = { id: number; taskId: number };
 
+const reorderTasks = (tasks: Task[]) => {
+  const inCompleted = tasks.filter(t => t.status !== TaskStatus.Completed);
+  const completed = tasks.filter(t => t.status === TaskStatus.Completed);
+  return inCompleted.concat(completed);
+};
+
 export const sSlice = createSlice({
   name: "tasks",
   initialState,
@@ -127,7 +133,7 @@ export const sSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(fetchTaskListThunk.fulfilled, (state, action) => {
-        state.tasks = action.payload;
+        state.tasks = reorderTasks(action.payload);
         state.loading = false;
       })
       .addCase(fetchTaskListThunk.pending, (state, action) => {
@@ -204,7 +210,7 @@ export const sSlice = createSlice({
           return;
         }
 
-        const {id, status, title, projectId} = action.payload.data;
+        const { id, status, title, projectId } = action.payload.data;
         const task = state.tasks.find(t => t.id === id);
         if (!task) {
           return;
@@ -218,6 +224,14 @@ export const sSlice = createSlice({
         task.title = title;
         task.status = status;
         task.projectId = projectId;
+
+        if (
+          action.meta.arg.key === "status" &&
+          action.meta.arg.value === TaskStatus.Completed
+        ) {
+          // reorder tasks
+          state.tasks = reorderTasks(state.tasks);
+        }
       });
   },
 });
