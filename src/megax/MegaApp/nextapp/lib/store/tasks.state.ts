@@ -7,6 +7,7 @@ import {
   Task,
   TaskAdd,
   TaskPatchKey,
+  TaskState as TaskStatus,
 } from "../models/task.model";
 import {
   patchSubTask,
@@ -34,13 +35,6 @@ export const fetchTaskListThunk = createAsyncThunk(
   async (filter: Partial<Filter> | undefined, thunkApi) => {
     thunkApi.dispatch(sSlice.actions.setLoadingState("Loading..."));
     return await fetchTasks();
-  }
-);
-
-export const deleteTaskThunk = createAsyncThunk(
-  "tasks/delete",
-  async (id: number, _thunkApi) => {
-    return await deleteTask(id);
   }
 );
 
@@ -86,7 +80,7 @@ export const addSubTaskThunk = createAsyncThunk(
 
 export const deleteSubTaskThunk = createAsyncThunk(
   "tasks/delete-subtask",
-  async (payload: {id: number, taskId: number}, _thunkApi) => {
+  async (payload: { id: number; taskId: number }, _thunkApi) => {
     return await deleteSubTask(payload.id, payload.taskId);
   }
 );
@@ -138,9 +132,6 @@ export const sSlice = createSlice({
       })
       .addCase(fetchTaskListThunk.pending, (state, action) => {
         state.loading = true;
-      })
-      .addCase(deleteTaskThunk.fulfilled, (state, action) => {
-        state.tasks = state.tasks.filter(x => x.id !== action.payload.data);
       })
       .addCase(addSubTaskThunk.fulfilled, (state, action) => {
         const subTask = action.payload.data;
@@ -209,14 +200,20 @@ export const sSlice = createSlice({
         state.tasks.unshift(action.payload.data);
       })
       .addCase(patchTaskThunk.fulfilled, (state, action) => {
-        const id = action.payload.data.id;
+        const {id, status, title, projectId} = action.payload.data;
         const task = state.tasks.find(t => t.id === id);
         if (!task) {
           return;
         }
 
-        const { title } = action.payload.data;
+        if (status === TaskStatus.Archived) {
+          state.tasks = state.tasks.filter(t => t.id !== id);
+          return;
+        }
+
         task.title = title;
+        task.status = status;
+        task.projectId = projectId;
       });
   },
 });

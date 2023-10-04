@@ -10,9 +10,10 @@ import { addSubTaskThunk } from "@/lib/store/tasks.state";
 type SubTaskListProps = {
   subtasks: SubTask[];
   taskId: number;
+  readonly: boolean;
 };
 
-export default function SubTaskList({ subtasks, taskId }: SubTaskListProps) {
+export default function SubTaskList({ subtasks, taskId, readonly }: SubTaskListProps) {
   const appDispatch = useAppDispatch();
 
   const handleAdd = (id: number, taskId: number, value: string) => {
@@ -57,17 +58,17 @@ export default function SubTaskList({ subtasks, taskId }: SubTaskListProps) {
               sub.status === SubTaskState.Flagged ? classes.flagged : "",
             ].join(" ")}
           >
-            <SubTaskItem sub={sub} />
+            <SubTaskItem sub={sub} readonly={readonly} />
           </div>
         ))}
 
-      <div className="mt-2">
+      {!readonly && <div className="mt-2">
         <SubTaskForm
           onOk={value => handleAdd(0, taskId, value)}
           id={0}
           taskId={taskId}
         />
-      </div>
+      </div>}
     </>
   );
 }

@@ -22,9 +22,10 @@ import SubTaskForm from "./SubTaskForm";
 
 type SubTaskItemProps = {
   sub: SubTask;
+  readonly: boolean;
 };
 
-export default function SubTaskItem({ sub }: SubTaskItemProps) {
+export default function SubTaskItem({ sub, readonly }: SubTaskItemProps) {
   const taskId = sub.taskId;
   const appDispatch = useAppDispatch();
 
@@ -55,8 +56,9 @@ export default function SubTaskItem({ sub }: SubTaskItemProps) {
           icon={<RadioButtonUncheckedIcon />}
           checkedIcon={<CheckCircleIcon />}
           checked={isCompleted}
+          readOnly={readonly}
           onChange={() =>
-            handlePatch(
+            !readonly && handlePatch(
               "status",
               isCompleted ? SubTaskState.New : SubTaskState.Completed
             )
@@ -75,14 +77,14 @@ export default function SubTaskItem({ sub }: SubTaskItemProps) {
           ) : (
             <div
               className={`cursor-pointer ${isFlagged ? "text-red-500" : ""}`}
-              onClick={() => handleEditSubTask(sub.id)}
+              onClick={() => !readonly && handleEditSubTask(sub.id)}
             >
               {sub.title}
             </div>
           )}
         </div>
         <div className="flex items-center">
-          <IconButton
+          {!readonly && <IconButton
             title="Red flag"
             className={`${
               isFlagged ? "opacity-100" : "opacity-0"
@@ -98,10 +100,10 @@ export default function SubTaskItem({ sub }: SubTaskItemProps) {
               fontSize="small"
               className={`${isFlagged ? "text-red-500" : ""}`}
             />
-          </IconButton>
-          <IconButton color="warning" onClick={() => handleDelete()}>
+          </IconButton> }
+          {!readonly && <IconButton color="warning" onClick={() => handleDelete()}>
             <CloseIcon fontSize="small" />
-          </IconButton>
+          </IconButton> }
         </div>
       </div>
     </>

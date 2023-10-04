@@ -8,9 +8,10 @@ export interface Task {
   clientId?: number;
   time?: Time;
   subTasks: SubTask[];
+  status: TaskState;
 }
 
-export type TaskAdd = Pick<Task, "clientId" | "projectId" | "title">;
+export type TaskAdd = Pick<Task, "clientId" | "projectId" | "title" | "status">;
 export type TaskPatchKey = keyof TaskAdd;
 
 export interface SubTask {
@@ -19,6 +20,13 @@ export interface SubTask {
   status: SubTaskState;
   taskId: number;
   isEdit?: boolean;
+}
+
+export enum TaskState {
+  Todo = 0,
+  InProgress = 1,
+  Completed = 2,
+  Archived = 3,
 }
 
 export enum SubTaskState {

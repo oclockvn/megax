@@ -6,15 +6,16 @@ import Button from "@mui/material/Button";
 
 export type TitleControlProps = {
   title: string;
+  readonly: boolean;
   onOk: (value: string) => void;
 };
 
-export default function TaskTitleControl({ title, onOk }: TitleControlProps) {
+export default function TaskTitleControl({ title, readonly, onOk }: TitleControlProps) {
   const [isEdit, setEdit] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>();
 
   const toggleEdit = () => {
-    setEdit(prev => !prev);
+    !readonly && setEdit(prev => !prev);
   };
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function TaskTitleControl({ title, onOk }: TitleControlProps) {
         </>
       ) : (
         <div
-          className="hover:bg-slate-200 cursor-pointer py-1 rounded mx-[-4px] px-[4px]"
+          className={`${readonly ? '' : 'hover:bg-slate-200 cursor-pointer'} py-1 rounded mx-[-4px] px-[4px]`}
           onClick={toggleEdit}
         >
           {title}

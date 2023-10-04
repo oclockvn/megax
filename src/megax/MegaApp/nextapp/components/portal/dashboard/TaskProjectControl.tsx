@@ -8,19 +8,21 @@ import Autocomplete from "@mui/material/Autocomplete";
 export type ProjectControlProps = {
   projectId?: number;
   projectName?: string;
+  readonly: boolean;
   onOk: (value: string) => void;
 };
 
 export default function TaskProjectControl({
   projectId,
   projectName,
+  readonly,
   onOk,
 }: ProjectControlProps) {
   const [isEdit, setEdit] = useState(false);
   // const inputRef = useRef<HTMLTextAreaElement>();
 
   const toggleEdit = () => {
-    setEdit(prev => !prev);
+    !readonly && setEdit(prev => !prev);
   };
 
   // useEffect(() => {
@@ -86,7 +88,7 @@ export default function TaskProjectControl({
       ) : (
         <div className="flex">
           <div
-            className="hover:bg-slate-200 cursor-pointer mx-[-4px] px-[4px] rounded uppercase text-fuchsia-500 font-bold"
+            className={ `${readonly ? '' : 'hover:bg-slate-200 cursor-pointer'} mx-[-4px] px-[4px] rounded uppercase text-fuchsia-500 font-bold` }
             onClick={toggleEdit}
           >
             {projectName}

@@ -1,14 +1,16 @@
-﻿using MegaApp.Core.Db;
+﻿using Humanizer;
+using MegaApp.Core.Db;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Exceptions;
+using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
 
 public interface ITaskService
 {
-    Task<List<TodoTaskModel>> GetTaskListAsync(int userId);
+    Task<List<TodoTaskModel>> GetTaskListAsync(int userId, DateTimeOffset? from = null, DateTimeOffset? to = null);
     Task<Result<TodoTaskModel>> AddTaskAsync(int userId, TodoTaskModel.Add request);
     Task<Result<TodoTaskModel>> PatchTaskAsync(int id, TodoTaskModel.Patch patch);
     Task<Result<SubTaskModel>> AddSubTaskAsync(SubTaskModel.Add request);
@@ -62,10 +64,14 @@ internal class TaskService : ITaskService
         return new Result<TodoTaskModel>(new TodoTaskModel(task));
     }
 
-    public async Task<List<TodoTaskModel>> GetTaskListAsync(int userId)
+    public async Task<List<TodoTaskModel>> GetTaskListAsync(int userId, DateTimeOffset? from = null, DateTimeOffset? to = null)
     {
+        // var from = DateTime.Today;
+        // var to = from.ToEndOfDate();
+        var predicate = PredicateBuilder.Create<TodoTask>(t => t.UserId == userId && t.Status != Enums.TaskState.Archived);
+
         using var db = UseDb();
-        var tasks = await db.Tasks.Where(x => x.UserId == userId)
+        var tasks = await db.Tasks.Where(x => x.UserId == userId && (x.Status != Enums.TaskState.Archived || x.CreatedAt >= from))
             .Include(t => t.SubTasks)
             .OrderByDescending(x => x.Id)
             .Select(t => new TodoTaskModel(t))

@@ -8,6 +8,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Grid from "@mui/material/Grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import LinkIcon from "@mui/icons-material/Link";
+import CheckIcon from "@mui/icons-material/Check";
+import ArchiveIcon from '@mui/icons-material/Archive';
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -19,12 +21,9 @@ import {
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useConfirm } from "material-ui-confirm";
-import {
-  deleteTaskThunk,
-  patchTaskThunk,
-} from "@/lib/store/tasks.state";
+import { patchTaskThunk } from "@/lib/store/tasks.state";
 import toast from "react-hot-toast";
-import { Task, TaskPatchKey } from "@/lib/models/task.model";
+import { SubTaskState, Task, TaskPatchKey, TaskState } from "@/lib/models/task.model";
 import SubTaskList from "./SubTaskList";
 import TaskForm from "./TaskForm";
 import Chip from "@mui/material/Chip";
@@ -46,14 +45,28 @@ function TaskItem({ todo }: { todo: Task }) {
     );
   };
 
+  const statusCls =
+    todo.status === TaskState.Completed
+      ? "border-green-600 bg-[#16a34a1a]"
+      : todo.status === TaskState.Archived
+      ? "border-gray-500"
+      : "border-green-600";
+  const classes = [
+    "flex gap-2 items-center px-4 py-2 border-l-4 border-solid mt-0 w-full mx-0",
+    statusCls,
+  ].join(" ");
+
+  const readonly = todo.status === TaskState.Completed;
+
   return (
     <>
-      <div className="flex gap-2 items-center px-4 py-2 border-l-4 border-solid border-fuchsia-500 mt-0 w-full mx-0">
+      <div className={classes}>
         <div className="flex-[1] w-full mx-0 mt-0">
-          <TaskProjectControl onOk={() => {}} projectName="Tally" />
+          <TaskProjectControl readonly={readonly} onOk={() => {}} projectName="Tally" />
 
           <TaskTitleControl
             title={todo.title}
+            readonly={readonly}
             onOk={value => patchTask("title", value)}
           />
 
@@ -81,10 +94,14 @@ function TaskItem({ todo }: { todo: Task }) {
 
 function TaskMenu({
   id,
-  handleDelete,
+  canComplete,
+  onDelete,
+  onComplete,
 }: {
   id: number;
-  handleDelete: (id: number) => void;
+  canComplete: boolean;
+  onDelete: (id: number) => void;
+  onComplete: (id: number) => void;
 }) {
   const popupMenu = usePopupState({
     variant: "popover",
@@ -96,17 +113,23 @@ function TaskMenu({
     <>
       <IconButton
         size="small"
-        className="!absolute top-1 right-1"
+        className="!absolute top-2 right-1"
         {...bindTrigger(popupMenu)}
       >
         <MoreVertIcon fontSize="small" />
       </IconButton>
       <Menu {...bindMenu(popupMenu)} elevation={1}>
-        <MenuItem onClick={() => handleDelete(id)}>
+        <MenuItem disabled={!canComplete} onClick={() => onComplete(id)}>
           <ListItemIcon>
-            <CloseIcon fontSize="small" />
+            <CheckIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
+          <ListItemText>Complete</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => onDelete(id)}>
+          <ListItemIcon>
+            <ArchiveIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Archive</ListItemText>
         </MenuItem>
       </Menu>
     </>
@@ -127,7 +150,13 @@ export default function TodoTask() {
       },
     })
       .then(() => {
-        const result = appDispatch(deleteTaskThunk(id)).unwrap();
+        const result = appDispatch(
+          patchTaskThunk({
+            id,
+            key: "status",
+            value: TaskState.Archived,
+          })
+        ).unwrap();
 
         result.then(res => {
           res.success
@@ -138,6 +167,16 @@ export default function TodoTask() {
       .catch(() => {
         /* ignore */
       });
+  };
+
+  const handleStatusUpdate = (id: number, status: TaskState) => {
+    appDispatch(
+      patchTaskThunk({
+        id,
+        key: "status",
+        value: status,
+      })
+    );
   };
 
   return (
@@ -163,14 +202,21 @@ export default function TodoTask() {
           key={todo.id}
           className="py-2 mb-2 bg-slate-100 rounded overflow-hidden relative shadow"
         >
-          <TaskMenu id={todo.id} handleDelete={handleDelete} />
+          <TaskMenu
+            id={todo.id}
+            canComplete={todo.status !== TaskState.Completed && !todo.subTasks.some(s => s.status !== SubTaskState.Completed)}
+            onDelete={handleDelete}
+            onComplete={id => handleStatusUpdate(id, TaskState.Completed)}
+          />
           <TaskItem todo={todo} />
           <div className="mx-4 mt-2">
-            <SubTaskList
-              subtasks={todo.subTasks}
-              taskId={todo.id}
-            />
+            <SubTaskList subtasks={todo.subTasks} taskId={todo.id} readonly={todo.status === TaskState.Completed} />
           </div>
+          {todo.status === TaskState.Completed && <>
+          <div className="absolute left-0 right-0 z-20 top-[30px] flex items-center justify-center rotate-[-20deg]">
+            <div className="text-sm font-extrabold border-[3px] px-2 border-solid border-fuchsia-500 text-fuchsia-500">COMPLETED</div>
+          </div>
+          </>}
         </div>
       ))}
     </>
