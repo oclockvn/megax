@@ -64,14 +64,21 @@ internal class TaskService : ITaskService
         return new Result<TodoTaskModel>(new TodoTaskModel(task));
     }
 
-    public async Task<List<TodoTaskModel>> GetTaskListAsync(int userId, DateTimeOffset? from = null, DateTimeOffset? to = null)
+    public async Task<List<TodoTaskModel>> GetTaskListAsync(int userId, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null)
     {
-        // var from = DateTime.Today;
-        // var to = from.ToEndOfDate();
-        var predicate = PredicateBuilder.Create<TodoTask>(t => t.UserId == userId && t.Status != Enums.TaskState.Archived);
+        var from = fromDate ?? DateTime.Today;
+        var to = toDate ?? from.ToEndOfDate();
+
+        if (from > to)
+        {
+            return new List<TodoTaskModel>();
+        }
+
+        var predicate = PredicateBuilder.Create<TodoTask>(t => t.UserId == userId && (t.Status == Enums.TaskState.Todo || t.Status == Enums.TaskState.InProgress));
+        var dateRangeFilter = PredicateBuilder.Create<TodoTask>(t => t.Status == Enums.TaskState.Completed && from <= t.CreatedAt && t.CreatedAt <= to);
 
         using var db = UseDb();
-        var tasks = await db.Tasks.Where(x => x.UserId == userId && (x.Status != Enums.TaskState.Archived || x.CreatedAt >= from))
+        var tasks = await db.Tasks.Where(predicate.Or(dateRangeFilter))
             .Include(t => t.SubTasks)
             .OrderByDescending(x => x.Id)
             .Select(t => new TodoTaskModel(t))

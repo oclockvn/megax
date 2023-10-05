@@ -160,7 +160,7 @@ export default function TodoTask() {
 
         result.then(res => {
           res.success
-            ? toast.success("Task deleted successfully")
+            ? toast.success("Task archived successfully")
             : toast.error(`Something went wrong but I'm too lazy to check`);
         });
       })
