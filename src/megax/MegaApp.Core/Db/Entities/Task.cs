@@ -116,3 +116,15 @@ public class SubTaskConfiguration : IEntityTypeConfiguration<SubTask>
             .HasDefaultValueSql("sysdatetimeoffset()");
     }
 }
+
+public class ProjectConfiguration : IEntityTypeConfiguration<Project>
+{
+    public void Configure(EntityTypeBuilder<Project> builder)
+    {
+        builder.Property(x => x.CreatedAt)
+            .HasDefaultValueSql("sysdatetimeoffset()");
+
+        builder.Property(x => x.Active)
+            .HasDefaultValueSql("1");
+    }
+}

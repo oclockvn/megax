@@ -45,6 +45,7 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new FileReferenceConfiguration());
             modelBuilder.ApplyConfiguration(new TaskConfiguration());
             modelBuilder.ApplyConfiguration(new ClientConfiguration());
+            modelBuilder.ApplyConfiguration(new ProjectConfiguration());
         }
     }
 }
