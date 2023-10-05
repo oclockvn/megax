@@ -206,7 +206,7 @@ export default function TodoTask() {
 
   return (
     <>
-      <div className="pb-4">
+      {/* <div className="pb-4">
         <Grid container alignItems="center" justifyContent="center">
           <h2 className="text-[3rem] font-bold">01:15</h2>
           <Grid container alignItems="center" justifyContent="center" gap={2}>
@@ -220,9 +220,9 @@ export default function TodoTask() {
         </Grid>
 
         <TaskForm />
-      </div>
+      </div> */}
 
-      <div className="text-end mb-4">
+      <div className="text-end mb-2">
         <Button
           size="small"
           color="warning"
