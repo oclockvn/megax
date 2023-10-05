@@ -3,13 +3,14 @@
 import IconButton from "@mui/material/IconButton";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import PauseCircleIcon from "@mui/icons-material/PauseCircle";
-import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Grid from "@mui/material/Grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import LinkIcon from "@mui/icons-material/Link";
 import CheckIcon from "@mui/icons-material/Check";
-import ArchiveIcon from '@mui/icons-material/Archive';
+import ArchiveIcon from "@mui/icons-material/Archive";
+import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -23,13 +24,20 @@ import ListItemText from "@mui/material/ListItemText";
 import { useConfirm } from "material-ui-confirm";
 import { patchTaskThunk } from "@/lib/store/tasks.state";
 import toast from "react-hot-toast";
-import { SubTaskState, Task, TaskPatchKey, TaskState } from "@/lib/models/task.model";
+import {
+  SubTaskState,
+  Task,
+  TaskPatchKey,
+  TaskState,
+} from "@/lib/models/task.model";
 import SubTaskList from "./SubTaskList";
 import TaskForm from "./TaskForm";
 import Chip from "@mui/material/Chip";
 import { shortenLink } from "@/lib/string.helper";
 import TaskTitleControl from "./TaskTitleControl";
 import TaskProjectControl from "./TaskProjectControl";
+import { useState } from "react";
+import Button from "@mui/material/Button";
 
 function TaskItem({ todo }: { todo: Task }) {
   const appDispatch = useAppDispatch();
@@ -62,7 +70,11 @@ function TaskItem({ todo }: { todo: Task }) {
     <>
       <div className={classes}>
         <div className="flex-[1] w-full mx-0 mt-0">
-          <TaskProjectControl readonly={readonly} onOk={() => {}} projectName="Tally" />
+          <TaskProjectControl
+            readonly={readonly}
+            onOk={() => {}}
+            projectName="Tally"
+          />
 
           <TaskTitleControl
             title={todo.title}
@@ -140,6 +152,7 @@ export default function TodoTask() {
   const confirmation = useConfirm();
   const appDispatch = useAppDispatch();
   const { tasks, loading } = useAppSelector(s => s.tasks);
+  const [hideCompleted, setHideCompleted] = useState(false);
 
   const handleDelete = (id: number) => {
     confirmation({
@@ -179,9 +192,17 @@ export default function TodoTask() {
     ).unwrap();
 
     if (!result.success) {
-      toast.error('Beep beep! Do not try to hack the system!');
+      toast.error("Beep beep! Do not try to hack the system!");
     }
   };
+
+  const toggleHideCompleted = () => {
+    setHideCompleted(prev => !prev);
+  };
+
+  const tasksRender = hideCompleted
+    ? tasks.filter(t => t.status !== TaskState.Completed)
+    : tasks;
 
   return (
     <>
@@ -201,26 +222,58 @@ export default function TodoTask() {
         <TaskForm />
       </div>
 
-      {tasks.map(todo => (
+      <div className="text-end mb-4">
+        <Button
+          size="small"
+          color="warning"
+          variant="outlined"
+          onClick={toggleHideCompleted}
+          aria-label="Toggle hide completed"
+        >
+          {hideCompleted ? (
+            <>
+              <FilterAltOffIcon fontSize="small" className="me-2" /> Show
+              Completed
+            </>
+          ) : (
+            <>
+              <FilterAltIcon fontSize="small" className="me-2" /> Hide Completed
+            </>
+          )}
+        </Button>
+      </div>
+
+      {tasksRender.map(todo => (
         <div
           key={todo.id}
           className="py-2 mb-2 bg-slate-100 rounded overflow-hidden relative shadow"
         >
           <TaskMenu
             id={todo.id}
-            canComplete={todo.status !== TaskState.Completed && !todo.subTasks.some(s => s.status !== SubTaskState.Completed)}
+            canComplete={
+              todo.status !== TaskState.Completed &&
+              !todo.subTasks.some(s => s.status !== SubTaskState.Completed)
+            }
             onDelete={handleDelete}
             onComplete={id => handleStatusUpdate(id, TaskState.Completed)}
           />
           <TaskItem todo={todo} />
           <div className="mx-4 mt-2">
-            <SubTaskList subtasks={todo.subTasks} taskId={todo.id} readonly={todo.status === TaskState.Completed} />
+            <SubTaskList
+              subtasks={todo.subTasks}
+              taskId={todo.id}
+              readonly={todo.status === TaskState.Completed}
+            />
           </div>
-          {todo.status === TaskState.Completed && <>
-          <div className="absolute left-0 right-0 z-20 top-[30px] flex items-center justify-center rotate-[-20deg]">
-            <div className="text-sm font-extrabold border-[3px] px-2 border-solid border-fuchsia-500 text-fuchsia-500">COMPLETED</div>
-          </div>
-          </>}
+          {todo.status === TaskState.Completed && (
+            <>
+              <div className="absolute left-0 right-0 z-20 top-[30px] flex items-center justify-center rotate-[-20deg]">
+                <div className="text-sm font-extrabold border-[3px] px-2 border-solid border-fuchsia-500 text-fuchsia-500">
+                  COMPLETED
+                </div>
+              </div>
+            </>
+          )}
         </div>
       ))}
     </>
