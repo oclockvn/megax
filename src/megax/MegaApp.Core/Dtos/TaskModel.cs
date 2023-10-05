@@ -109,18 +109,6 @@ public record SubTaskModel
     public record DeleteResult(int Id, int TaskId);
 }
 
-public record ProjectModel
-{
-    public int Id { get; set; }
-
-    [MaxLength(255)]
-    public string Name { get; set; } = null!;
-    public bool Active { get; set; }
-
-    public int? ClientId { get; set; }
-    public ClientModel Client { get; set; }
-}
-
 public record ClientModel
 {
     public int Id { get; set; }

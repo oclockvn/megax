@@ -44,36 +44,6 @@ public class SubTask : ICreatedByEntity, IUpdatedByEntity
     public int? UpdatedBy { get; set; }
 }
 
-public class Project : ICreatedByEntity
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(255)]
-    public string Name { get; set; } = null!;
-    public bool Active { get; set; }
-
-    public List<TodoTask> Tasks { get; set; } = new();
-
-    public int? ClientId { get; set; }
-    public Client Client { get; set; }
-
-    public DateTimeOffset CreatedAt { get; set; }
-    public int? CreatedBy { get; set; }
-}
-
-public class Client : ICreatedByEntity
-{
-    public int Id { get; set; }
-    [Required, MaxLength(255)]
-    public string Name { get; set; } = null!;
-    public bool Active { get; set; }
-
-    public List<Project> Projects { get; set; } = new();
-
-    public DateTimeOffset CreatedAt { get; set; }
-    public int? CreatedBy { get; set; }
-}
-
 public class TaskConfiguration : IEntityTypeConfiguration<TodoTask>
 {
     public void Configure(EntityTypeBuilder<TodoTask> builder)
@@ -95,36 +65,11 @@ public class TaskConfiguration : IEntityTypeConfiguration<TodoTask>
     }
 }
 
-public class ClientConfiguration : IEntityTypeConfiguration<Client>
-{
-    public void Configure(EntityTypeBuilder<Client> builder)
-    {
-        builder.Property(x => x.CreatedAt)
-            .HasDefaultValueSql("sysdatetimeoffset()");
-
-        builder.HasMany(x => x.Projects)
-            .WithOne(p => p.Client)
-            .HasForeignKey(p => p.ClientId);
-    }
-}
-
 public class SubTaskConfiguration : IEntityTypeConfiguration<SubTask>
 {
     public void Configure(EntityTypeBuilder<SubTask> builder)
     {
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("sysdatetimeoffset()");
-    }
-}
-
-public class ProjectConfiguration : IEntityTypeConfiguration<Project>
-{
-    public void Configure(EntityTypeBuilder<Project> builder)
-    {
-        builder.Property(x => x.CreatedAt)
-            .HasDefaultValueSql("sysdatetimeoffset()");
-
-        builder.Property(x => x.Active)
-            .HasDefaultValueSql("1");
     }
 }
