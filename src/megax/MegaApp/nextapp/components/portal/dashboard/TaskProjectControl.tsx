@@ -1,20 +1,20 @@
-import TextField from "@mui/material/TextField";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Button from "@mui/material/Button";
-import Autocomplete from "@mui/material/Autocomplete";
 import { Project } from "@/lib/models/project.model";
 import {
   AutocompleteElement,
   FormContainer,
   useForm,
 } from "react-hook-form-mui";
+import TopicIcon from "@mui/icons-material/Topic";
 
 export type ProjectControlProps = {
   projectId?: number;
   readonly: boolean;
   onOk: (value: number | undefined) => void;
+  onEditing?: (yes: boolean) => void;
   projects: Project[];
 };
 
@@ -23,22 +23,18 @@ export default function TaskProjectControl({
   readonly,
   projects,
   onOk,
+  onEditing,
 }: ProjectControlProps) {
   const [isEdit, setEdit] = useState(false);
 
   const toggleEdit = () => {
-    !readonly && setEdit(prev => !prev);
+    if (readonly) {
+      return;
+    }
+
+    setEdit(prev => !prev);
+    onEditing && onEditing(!isEdit);
   };
-
-  // useEffect(() => {
-  //   if (isEdit && inputRef?.current != null) {
-  //     const input = inputRef.current;
-  //     const value = input.value;
-
-  //     input.focus();
-  //     input.setSelectionRange(value.length, value.length);
-  //   }
-  // }, [isEdit])
 
   const handleOk = () => {
     const selectedProject = formContext.getValues("projectId");
@@ -51,25 +47,28 @@ export default function TaskProjectControl({
     values: { projectId: projectId },
   });
 
-  const projectName = projects.find(p => p.id === projectId)?.name;
+  const projectName =
+    projects.find(p => p.id === projectId)?.name || "-No project-";
+  const hasProject = !!projectId;
 
   return (
-    <>
+    <div className="flex items-center gap-2">
+      <TopicIcon fontSize="small" color="info" />
       {isEdit ? (
         <>
           <FormContainer formContext={formContext}>
             <div className="relative">
               <AutocompleteElement
-                // inputRef={inputRef}
-                // autoFocus
-                // defaultValue={title}
-                // multiline
-                // size="small"
-                // variant="standard"
                 name="projectId"
                 matchId
                 options={options}
-                // className="min-w-[200px]"
+                textFieldProps={{
+                  InputProps: {
+                    className: "max-w-[200px]",
+                    size: "small",
+                  },
+                  variant: "standard",
+                }}
                 autocompleteProps={{
                   renderOption(attr, o) {
                     return (
@@ -78,14 +77,6 @@ export default function TaskProjectControl({
                       </li>
                     );
                   },
-                  // renderInput(params) {
-                  //   return <TextField
-                  //     {...params}
-                  //     variant="outlined"
-                  //     label="Project"
-                  //     className="max-w-[200px]"
-                  //   />
-                  // }
                 }}
               />
               <div className="absolute top-full left-[200px] z-10 flex gap-1 items-center py-1 ms-[-76px]">
@@ -115,14 +106,16 @@ export default function TaskProjectControl({
         <div className="flex">
           <div
             className={`${
-              readonly ? "" : "hover:bg-slate-200 cursor-pointer"
-            } mx-[-4px] px-[4px] rounded uppercase text-fuchsia-500 font-bold`}
-            onClick={toggleEdit}
+              !readonly && "hover:bg-slate-200 cursor-pointer"
+            } mx-[-4px] px-[4px] rounded uppercase ${
+              hasProject ? "text-fuchsia-500 font-bold" : "text-xs"
+            }`}
+            onClick={() => !readonly && toggleEdit()}
           >
             {projectName}
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -1,10 +1,7 @@
 "use client";
 
 import IconButton from "@mui/material/IconButton";
-import PlayCircleIcon from "@mui/icons-material/PlayCircle";
-import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Grid from "@mui/material/Grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import LinkIcon from "@mui/icons-material/Link";
 import CheckIcon from "@mui/icons-material/Check";
@@ -47,7 +44,7 @@ type TaskItemProps = {
 
 function TaskItem({ todo, projects }: TaskItemProps) {
   const appDispatch = useAppDispatch();
-  const shorten = todo.reference ? shortenLink(todo.reference) : "";
+  const [isBusy, setBusy] = useState({ project: false, title: false });
 
   const patchTask = (key: TaskPatchKey, value: string | number | any) => {
     appDispatch(
@@ -57,6 +54,13 @@ function TaskItem({ todo, projects }: TaskItemProps) {
         value,
       })
     );
+  };
+
+  const handleEditing = (project: boolean, title: boolean) => {
+    setBusy(_ => ({
+      project,
+      title
+    }));
   };
 
   const statusCls =
@@ -70,6 +74,7 @@ function TaskItem({ todo, projects }: TaskItemProps) {
     statusCls,
   ].join(" ");
 
+  const shorten = todo.reference ? shortenLink(todo.reference) : "";
   const readonly = todo.status === TaskState.Completed;
 
   return (
@@ -77,16 +82,18 @@ function TaskItem({ todo, projects }: TaskItemProps) {
       <div className={classes}>
         <div className="flex-[1] w-full mx-0 mt-0">
           <TaskProjectControl
-            readonly={readonly}
-            onOk={projectId => patchTask('projectId', projectId)}
+            readonly={readonly || isBusy['title']}
             projects={projects}
             projectId={todo.projectId}
+            onOk={projectId => patchTask("projectId", projectId)}
+            onEditing={editing => handleEditing(editing, false)}
           />
 
           <TaskTitleControl
             title={todo.title}
-            readonly={readonly}
+            readonly={readonly || isBusy['project']}
             onOk={value => patchTask("title", value)}
+            onEditing={editing => handleEditing(false, editing)}
           />
 
           {todo.reference?.length > 0 && (
@@ -103,9 +110,9 @@ function TaskItem({ todo, projects }: TaskItemProps) {
             </div>
           )}
         </div>
-        {!!todo.time && (
-          <div className="font-bold text-green-700">{todo.time.format()}</div>
-        )}
+        <div className="font-bold text-green-700 px-2">
+          {todo.time?.format() || "00:00"}
+        </div>
       </div>
     </>
   );
@@ -132,19 +139,19 @@ function TaskMenu({
     <>
       <IconButton
         size="small"
-        className="!absolute top-2 right-1"
+        className="!absolute top-0 right-0"
         {...bindTrigger(popupMenu)}
       >
         <MoreVertIcon fontSize="small" />
       </IconButton>
       <Menu {...bindMenu(popupMenu)} elevation={1}>
-        <MenuItem disabled={!canComplete} onClick={() => onComplete(id)}>
+        <MenuItem dense disabled={!canComplete} onClick={() => onComplete(id)}>
           <ListItemIcon>
             <CheckIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Complete</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => onDelete(id)}>
+        <MenuItem dense onClick={() => onDelete(id)}>
           <ListItemIcon>
             <ArchiveIcon fontSize="small" />
           </ListItemIcon>
@@ -212,45 +219,45 @@ export default function TodoTask() {
     ? tasks.filter(t => t.status !== TaskState.Completed)
     : tasks;
   const projects = pagedProjects.items || [];
+  const hasItems = tasksRender.length > 0;
 
   return (
     <>
-      {/* <div className="pb-4">
-        <Grid container alignItems="center" justifyContent="center">
-          <h2 className="text-[3rem] font-bold">01:15</h2>
-          <Grid container alignItems="center" justifyContent="center" gap={2}>
-            <IconButton color="success" size="large">
-              <PlayCircleIcon fontSize="large" />
-            </IconButton>
-            <IconButton color="secondary" size="large">
-              <PauseCircleIcon fontSize="large" />
-            </IconButton>
-          </Grid>
-        </Grid>
-
+      <div className="pb-2">
         <TaskForm />
-      </div> */}
-
-      <div className="text-end mb-2">
-        <Button
-          size="small"
-          color="warning"
-          variant="outlined"
-          onClick={toggleHideCompleted}
-          aria-label="Toggle hide completed"
-        >
-          {hideCompleted ? (
-            <>
-              <FilterAltOffIcon fontSize="small" className="me-2" /> Show
-              Completed
-            </>
-          ) : (
-            <>
-              <FilterAltIcon fontSize="small" className="me-2" /> Hide Completed
-            </>
-          )}
-        </Button>
       </div>
+
+      {!hasItems && (
+        <div className="text-center gap-4">
+          <div className="text-[2rem] font-extrabold text-green-500">
+            Hurray, enjoy task-free!
+          </div>
+        </div>
+      )}
+
+      {hasItems && (
+        <div className="text-end mb-2">
+          <Button
+            size="small"
+            color="warning"
+            variant="outlined"
+            onClick={toggleHideCompleted}
+            aria-label="Toggle hide completed"
+          >
+            {hideCompleted ? (
+              <>
+                <FilterAltOffIcon fontSize="small" className="me-2" /> Show
+                Completed
+              </>
+            ) : (
+              <>
+                <FilterAltIcon fontSize="small" className="me-2" /> Hide
+                Completed
+              </>
+            )}
+          </Button>
+        </div>
+      )}
 
       {tasksRender.map(todo => (
         <div

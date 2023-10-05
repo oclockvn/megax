@@ -1,21 +1,33 @@
 import TextField from "@mui/material/TextField";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, KeyboardEvent } from "react";
 import Button from "@mui/material/Button";
+import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 
 export type TitleControlProps = {
   title: string;
   readonly: boolean;
   onOk: (value: string) => void;
+  onEditing?: (editing: boolean) => void;
 };
 
-export default function TaskTitleControl({ title, readonly, onOk }: TitleControlProps) {
+export default function TaskTitleControl({
+  title,
+  readonly,
+  onOk,
+  onEditing,
+}: TitleControlProps) {
   const [isEdit, setEdit] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>();
 
   const toggleEdit = () => {
-    !readonly && setEdit(prev => !prev);
+    if (readonly) {
+      return;
+    }
+
+    setEdit(prev => !prev);
+    onEditing && onEditing(!isEdit);
   };
 
   useEffect(() => {
@@ -26,7 +38,7 @@ export default function TaskTitleControl({ title, readonly, onOk }: TitleControl
       input.focus();
       input.setSelectionRange(value.length, value.length);
     }
-  }, [isEdit])
+  }, [isEdit]);
 
   const handleOk = () => {
     const text = inputRef?.current?.value;
@@ -38,11 +50,18 @@ export default function TaskTitleControl({ title, readonly, onOk }: TitleControl
     toggleEdit();
   };
 
+  const handleKey = (e: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement | HTMLDivElement>) => {
+    if (e.key.toLowerCase() === 'escape') {
+      toggleEdit();
+    }
+  }
+
   return (
-    <>
+    <div className="flex items-center gap-2">
+      <FormatQuoteIcon fontSize="small" color="info" />
       {isEdit ? (
         <>
-          <div className="relative">
+          <div className="relative flex-1">
             <TextField
               inputRef={inputRef}
               autoFocus
@@ -50,6 +69,7 @@ export default function TaskTitleControl({ title, readonly, onOk }: TitleControl
               multiline
               fullWidth
               variant="standard"
+              onKeyUp={e => handleKey(e)}
             />
             <div className="absolute top-full right-0 z-10 flex gap-1 items-center py-1">
               <Button
@@ -75,12 +95,14 @@ export default function TaskTitleControl({ title, readonly, onOk }: TitleControl
         </>
       ) : (
         <div
-          className={`${readonly ? '' : 'hover:bg-slate-200 cursor-pointer'} py-1 rounded mx-[-4px] px-[4px]`}
-          onClick={toggleEdit}
+          className={`${
+            readonly ? "" : "hover:bg-slate-200 cursor-pointer flex-[1]"
+          } py-1 rounded mx-[-4px] px-[4px]`}
+          onClick={() => !readonly && toggleEdit()}
         >
           {title}
         </div>
       )}
-    </>
+    </div>
   );
 }
