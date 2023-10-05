@@ -1,10 +1,10 @@
 "use client";
 
 import TodoTask from "@/components/portal/dashboard/TodoTask";
+import { fetchProjectsThunk } from "@/lib/store/projects.state";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { fetchTaskListThunk } from "@/lib/store/tasks.state";
 import Grid from "@mui/material/Grid";
-import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 export default function TaskPage() {
@@ -12,6 +12,7 @@ export default function TaskPage() {
 
   useEffect(() => {
     appDispatch(fetchTaskListThunk());
+    appDispatch(fetchProjectsThunk())
   }, [appDispatch]);
 
   return (

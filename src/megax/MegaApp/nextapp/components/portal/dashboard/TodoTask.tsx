@@ -38,12 +38,18 @@ import TaskTitleControl from "./TaskTitleControl";
 import TaskProjectControl from "./TaskProjectControl";
 import { useState } from "react";
 import Button from "@mui/material/Button";
+import { Project } from "@/lib/models/project.model";
 
-function TaskItem({ todo }: { todo: Task }) {
+type TaskItemProps = {
+  todo: Task;
+  projects: Project[];
+};
+
+function TaskItem({ todo, projects }: TaskItemProps) {
   const appDispatch = useAppDispatch();
   const shorten = todo.reference ? shortenLink(todo.reference) : "";
 
-  const patchTask = (key: TaskPatchKey, value: string | number) => {
+  const patchTask = (key: TaskPatchKey, value: string | number | any) => {
     appDispatch(
       patchTaskThunk({
         id: todo.id,
@@ -72,8 +78,9 @@ function TaskItem({ todo }: { todo: Task }) {
         <div className="flex-[1] w-full mx-0 mt-0">
           <TaskProjectControl
             readonly={readonly}
-            onOk={() => {}}
-            projectName="Tally"
+            onOk={projectId => patchTask('projectId', projectId)}
+            projects={projects}
+            projectId={todo.projectId}
           />
 
           <TaskTitleControl
@@ -152,6 +159,7 @@ export default function TodoTask() {
   const confirmation = useConfirm();
   const appDispatch = useAppDispatch();
   const { tasks, loading } = useAppSelector(s => s.tasks);
+  const { pagedProjects } = useAppSelector(s => s.projects);
   const [hideCompleted, setHideCompleted] = useState(false);
 
   const handleDelete = (id: number) => {
@@ -203,6 +211,7 @@ export default function TodoTask() {
   const tasksRender = hideCompleted
     ? tasks.filter(t => t.status !== TaskState.Completed)
     : tasks;
+  const projects = pagedProjects.items || [];
 
   return (
     <>
@@ -257,7 +266,7 @@ export default function TodoTask() {
             onDelete={handleDelete}
             onComplete={id => handleStatusUpdate(id, TaskState.Completed)}
           />
-          <TaskItem todo={todo} />
+          <TaskItem todo={todo} projects={projects} />
           <div className="mx-4 mt-2">
             <SubTaskList
               subtasks={todo.subTasks}
