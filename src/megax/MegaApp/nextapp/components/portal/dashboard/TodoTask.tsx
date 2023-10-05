@@ -59,7 +59,7 @@ function TaskItem({ todo, projects }: TaskItemProps) {
   const handleEditing = (project: boolean, title: boolean) => {
     setBusy(_ => ({
       project,
-      title
+      title,
     }));
   };
 
@@ -82,7 +82,7 @@ function TaskItem({ todo, projects }: TaskItemProps) {
       <div className={classes}>
         <div className="flex-[1] w-full mx-0 mt-0">
           <TaskProjectControl
-            readonly={readonly || isBusy['title']}
+            readonly={readonly || isBusy["title"]}
             projects={projects}
             projectId={todo.projectId}
             onOk={projectId => patchTask("projectId", projectId)}
@@ -91,7 +91,7 @@ function TaskItem({ todo, projects }: TaskItemProps) {
 
           <TaskTitleControl
             title={todo.title}
-            readonly={readonly || isBusy['project']}
+            readonly={readonly || isBusy["project"]}
             onOk={value => patchTask("title", value)}
             onEditing={editing => handleEditing(false, editing)}
           />
@@ -132,8 +132,21 @@ function TaskMenu({
   const popupMenu = usePopupState({
     variant: "popover",
     popupId: "task-menu-" + id,
-    disableAutoFocus: true,
+    // disableAutoFocus: true,
   });
+
+  const handleAction = (action: "complete" | "archive") => {
+    switch (action) {
+      case "complete":
+        onComplete(id);
+        break;
+      case "archive":
+        onDelete(id);
+        break;
+    }
+
+    popupMenu.close();
+  };
 
   return (
     <>
@@ -145,13 +158,17 @@ function TaskMenu({
         <MoreVertIcon fontSize="small" />
       </IconButton>
       <Menu {...bindMenu(popupMenu)} elevation={1}>
-        <MenuItem dense disabled={!canComplete} onClick={() => onComplete(id)}>
+        <MenuItem
+          dense
+          disabled={!canComplete}
+          onClick={() => handleAction("complete")}
+        >
           <ListItemIcon>
             <CheckIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Complete</ListItemText>
         </MenuItem>
-        <MenuItem dense onClick={() => onDelete(id)}>
+        <MenuItem dense onClick={() => handleAction("archive")}>
           <ListItemIcon>
             <ArchiveIcon fontSize="small" />
           </ListItemIcon>
@@ -172,7 +189,7 @@ export default function TodoTask() {
   const handleDelete = (id: number) => {
     confirmation({
       title: "Are you sure?",
-      description: `Delete this record`,
+      description: `Archive this task?`,
       dialogProps: {
         maxWidth: "xs",
       },
@@ -219,7 +236,8 @@ export default function TodoTask() {
     ? tasks.filter(t => t.status !== TaskState.Completed)
     : tasks;
   const projects = pagedProjects.items || [];
-  const hasItems = tasksRender.length > 0;
+  const hasItems = tasks.length > 0;
+  const hasCompleted = tasks.some(t => t.status === TaskState.Completed);
 
   return (
     <>
@@ -243,6 +261,7 @@ export default function TodoTask() {
             variant="outlined"
             onClick={toggleHideCompleted}
             aria-label="Toggle hide completed"
+            disabled={!hasCompleted}
           >
             {hideCompleted ? (
               <>
