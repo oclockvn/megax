@@ -15,21 +15,35 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Divider } from "@mui/material";
+import Timeline from "@mui/lab/Timeline";
+import TimelineItem, { timelineItemClasses } from "@mui/lab/TimelineItem";
+import TimelineOppositeContent, {
+  timelineOppositeContentClasses,
+} from "@mui/lab/TimelineOppositeContent";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineDot from "@mui/lab/TimelineDot";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
 
 export default function LeavePage() {
   return (
-    <div className="py-4 container mx-auto">
+    <div className="p-4 md:px-0 container mx-auto">
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
           <Button
             variant="contained"
-            color="primary"
+            color="secondary"
+            size="large"
             fullWidth
             startIcon={<AddIcon />}
           >
             Request Leave
           </Button>
+        </Grid>
+      </Grid>
 
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={4}>
           <h3 className="mt-4 mb-2 text-lg font-bold">Waiting for Approval</h3>
           <LeaveCard />
           <Divider orientation="horizontal" className="my-4" />
@@ -37,8 +51,10 @@ export default function LeavePage() {
           <Divider orientation="horizontal" className="my-4" />
           <LeaveCard />
         </Grid>
+
         <Grid item xs={12} sm={8}>
-          History
+          <h3 className="mt-4 mb-2 text-lg font-bold ps-[160px]">Leave History</h3>
+          <LeaveHistory />
         </Grid>
       </Grid>
     </div>
@@ -109,6 +125,50 @@ function LeaveCard() {
           <Button color="warning">Reject</Button>
         </CardActions>
       </Card>
+    </>
+  );
+}
+
+function LeaveHistory() {
+  return (
+    <>
+      <Timeline
+        // sx={{
+        //   [`& .${timelineOppositeContentClasses.root}`]: {
+        //     flex: 0.2,
+        //   },
+        // }}
+        sx={{
+          [`& .${timelineOppositeContentClasses.root}`]: {
+            flex: 0.2,
+            maxWidth: '120px'
+          },
+        }}
+      >
+        <TimelineItem>
+          <TimelineOppositeContent color="textSecondary">
+            06/10/2023
+          </TimelineOppositeContent>
+          <TimelineSeparator>
+            <TimelineDot />
+            <TimelineConnector />
+          </TimelineSeparator>
+          <TimelineContent>
+            <LeaveCard />
+          </TimelineContent>
+        </TimelineItem>
+        <TimelineItem>
+          <TimelineOppositeContent color="textSecondary">
+            07/10/2023
+          </TimelineOppositeContent>
+          <TimelineSeparator>
+            <TimelineDot />
+          </TimelineSeparator>
+          <TimelineContent>
+            <LeaveCard />
+          </TimelineContent>
+        </TimelineItem>
+      </Timeline>
     </>
   );
 }
