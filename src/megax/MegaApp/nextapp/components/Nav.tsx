@@ -123,6 +123,9 @@ function Nav() {
                     <MenuItem onClick={() => handleClose("/profile")}>
                       Profile
                     </MenuItem>
+                    <MenuItem onClick={() => handleClose("/leave")}>
+                      Leave Request
+                    </MenuItem>
                     <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
                   </Menu>
                 </div>
