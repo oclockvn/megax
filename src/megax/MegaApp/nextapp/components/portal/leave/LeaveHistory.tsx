@@ -10,8 +10,14 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import LeaveCard from "@/components/portal/leave/LeaveCard";
+import { Leave } from "@/lib/models/leave.model";
+// import dt from "@/lib/datetime";
 
-export default function LeaveHistory() {
+export type LeaveHistoryProps = {
+  items: Leave[];
+};
+
+export default function LeaveHistory({ items }: LeaveHistoryProps) {
   return (
     <>
       <Timeline
@@ -22,29 +28,21 @@ export default function LeaveHistory() {
           },
         }}
       >
-        <TimelineItem>
-          <TimelineOppositeContent color="textSecondary">
-            06/10/2023
-          </TimelineOppositeContent>
-          <TimelineSeparator>
-            <TimelineDot />
-            <TimelineConnector />
-          </TimelineSeparator>
-          <TimelineContent>
-            <LeaveCard />
-          </TimelineContent>
-        </TimelineItem>
-        <TimelineItem>
-          <TimelineOppositeContent color="textSecondary">
-            07/10/2023
-          </TimelineOppositeContent>
-          <TimelineSeparator>
-            <TimelineDot />
-          </TimelineSeparator>
-          <TimelineContent>
-            <LeaveCard />
-          </TimelineContent>
-        </TimelineItem>
+        {items.map(leave => (
+          <TimelineItem key={leave.id}>
+            <TimelineOppositeContent color="textSecondary">
+              {/* {dt.formatDate(leave.leaveDate, 'dd/MM/yyyy')} */}
+              {leave.leaveDate?.toString()}
+            </TimelineOppositeContent>
+            <TimelineSeparator>
+              <TimelineDot />
+              <TimelineConnector />
+            </TimelineSeparator>
+            <TimelineContent>
+              <LeaveCard leave={leave} />
+            </TimelineContent>
+          </TimelineItem>
+        ))}
       </Timeline>
     </>
   );

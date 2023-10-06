@@ -7,64 +7,74 @@ export async function fetchLeaves() {
   // return res.data;
   const list = JSON.parse(`[{
     "id": 1,
-    "reason": "Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.",
-    "leaveDate": "8/11/2023",
-    "leaveDay": 3,
-    "type": "Annual"
+    "reason": "Suspendisse accumsan tortor quis turpis. Sed ante. Vivamus tortor. Duis mattis egestas metus.",
+    "leaveDate": "10/16/2022",
+    "leaveDay": 2,
+    "type": 3,
+    "status": 2
   }, {
     "id": 2,
-    "reason": "Nulla suscipit ligula in lacus. Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla.",
-    "leaveDate": "4/30/2023",
-    "leaveDay": 3,
-    "type": "Other"
+    "reason": "Donec posuere metus vitae ipsum.",
+    "leaveDate": "5/15/2023",
+    "leaveDay": 1,
+    "type": 1,
+    "status": 2
   }, {
     "id": 3,
-    "reason": "Praesent blandit lacinia erat.",
-    "leaveDate": "6/14/2023",
+    "reason": "In eleifend quam a odio. In hac habitasse platea dictumst. Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem.",
+    "leaveDate": "11/14/2022",
     "leaveDay": 1,
-    "type": "Other"
+    "type": 3,
+    "status": 2
   }, {
     "id": 4,
-    "reason": "Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio. Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo.",
-    "leaveDate": "3/5/2023",
-    "leaveDay": 3,
-    "type": "Paid"
+    "reason": "Praesent blandit lacinia erat. Vestibulum sed magna at nunc commodo placerat.",
+    "leaveDate": "10/29/2022",
+    "leaveDay": 2,
+    "type": 0,
+    "status": 2
   }, {
     "id": 5,
-    "reason": "Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus. Pellentesque at nulla. Suspendisse potenti.",
-    "leaveDate": "7/26/2023",
-    "leaveDay": 1,
-    "type": "TimeInLieu"
+    "reason": "Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est. Phasellus sit amet erat.",
+    "leaveDate": "7/2/2023",
+    "leaveDay": 2,
+    "type": 1,
+    "status": 0
   }, {
     "id": 6,
-    "reason": "Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque.",
-    "leaveDate": "1/30/2023",
+    "reason": "Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem. Sed sagittis.",
+    "leaveDate": "12/15/2022",
     "leaveDay": 1,
-    "type": "Annual"
+    "type": 1,
+    "status": 1
   }, {
     "id": 7,
-    "reason": "Nunc purus. Phasellus in felis.",
-    "leaveDate": "8/23/2023",
-    "leaveDay": 2,
-    "type": "Annual"
+    "reason": "Mauris sit amet eros. Suspendisse accumsan tortor quis turpis. Sed ante. Vivamus tortor.",
+    "leaveDate": "12/18/2022",
+    "leaveDay": 3,
+    "type": 3,
+    "status": 2
   }, {
     "id": 8,
-    "reason": "Aenean sit amet justo. Morbi ut odio. Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim.",
-    "leaveDate": "12/23/2022",
+    "reason": "Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis. Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl.",
+    "leaveDate": "3/6/2023",
     "leaveDay": 1,
-    "type": "Other"
+    "type": 3,
+    "status": 2
   }, {
     "id": 9,
-    "reason": "Suspendisse accumsan tortor quis turpis. Sed ante. Vivamus tortor. Duis mattis egestas metus.",
-    "leaveDate": "6/5/2023",
-    "leaveDay": 1,
-    "type": "Paid"
+    "reason": "Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+    "leaveDate": "8/9/2023",
+    "leaveDay": 3,
+    "type": 3,
+    "status": 0
   }, {
     "id": 10,
-    "reason": "Mauris lacinia sapien quis libero.",
-    "leaveDate": "4/15/2023",
-    "leaveDay": 3,
-    "type": "Annual"
+    "reason": "Quisque id justo sit amet sapien dignissim vestibulum.",
+    "leaveDate": "9/2/2023",
+    "leaveDay": 1,
+    "type": 0,
+    "status": 2
   }]`) as Leave[];
 
   return list;

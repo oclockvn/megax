@@ -14,7 +14,7 @@ const initialState: LeaveState = {
   loading: false,
 };
 
-export const fetchLeaveListThunk = createAsyncThunk(
+export const fetchLeavesThunk = createAsyncThunk(
   "leaves/fetch",
   async (filter: Partial<Filter> | undefined, thunkApi) => {
     thunkApi.dispatch(sSlice.actions.setLoadingState("Loading..."));
@@ -54,11 +54,11 @@ export const sSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(fetchLeaveListThunk.fulfilled, (state, action) => {
+      .addCase(fetchLeavesThunk.fulfilled, (state, action) => {
         state.items = action.payload;
         state.loading = false;
       })
-      .addCase(fetchLeaveListThunk.pending, (state, action) => {
+      .addCase(fetchLeavesThunk.pending, (state, action) => {
         state.loading = true;
       })
       .addCase(submitLeaveThunk.fulfilled, (state, action) => {

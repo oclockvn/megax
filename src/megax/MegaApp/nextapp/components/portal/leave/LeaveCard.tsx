@@ -13,8 +13,14 @@ import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Leave, LeaveTypeDescriptionMapping } from "@/lib/models/leave.model";
 
-export default function LeaveCard() {
+export type LeaveCardProps = {
+  leave: Leave;
+}
+
+export default function LeaveCard({ leave }: LeaveCardProps) {
+
   const LeaveItem = ({
     icon,
     category,
@@ -51,7 +57,7 @@ export default function LeaveCard() {
         <CardContent>
           <LeaveItem
             category="Leave Reason"
-            content="Lorem ipsum dolor sit amet"
+            content={leave.reason}
             overrideCls="!mt-0"
             icon={<CommentIcon />}
           />
@@ -62,12 +68,12 @@ export default function LeaveCard() {
           />
           <LeaveItem
             category="Leave Type"
-            content="Annual leave"
+            content={LeaveTypeDescriptionMapping[leave.type]}
             icon={<CategoryIcon />}
           />
           <LeaveItem
             category="Leave Note"
-            content="Handover work to/how to contact..."
+            content={leave.note || '(blank)'}
             icon={<FormatQuoteIcon />}
           />
         </CardContent>
