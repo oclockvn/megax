@@ -70,7 +70,13 @@ function Nav() {
                   >
                     Tasks
                   </Button>
-
+                  <Button
+                    variant="outlined"
+                    href="/report"
+                    className="!text-white"
+                  >
+                    Report
+                  </Button>
                   <Button
                     variant="outlined"
                     href="/admin/users"
