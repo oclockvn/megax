@@ -7,6 +7,7 @@ import supplierStore from "./suppliers.state";
 import bankStore from "./banks.state";
 import taskStore from "./tasks.state";
 import projectStore from "./projects.state";
+import leaveStore from "./leave.state";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     banks: bankStore,
     tasks: taskStore,
     projects: projectStore,
+    leaves: leaveStore,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
