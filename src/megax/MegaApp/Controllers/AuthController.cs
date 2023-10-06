@@ -182,7 +182,7 @@ namespace MegaApp.Controllers
 
             var user = claimResult.Data;
 
-            // we don't want to generate token everytime this api is called
+            // we don't want to generate token every time this api is called
             var validResult = await authService.IsRefreshTokenValid(user.Id, request.RefreshToken, request.Token);
             if (!validResult.Success)
             {

@@ -38,11 +38,11 @@ function Nav() {
   };
 
   const handleLogout = () => {
-    storage.delete('token');
-    storage.delete('refresh-token');
+    storage.delete("token");
+    storage.delete("refresh-token");
 
-    router.push('/login');
-  }
+    router.push("/login");
+  };
 
   const toolbarBg = isAuthenticated ? "" : "bg-white";
   const logoColor = isAuthenticated ? "text-white" : "text-blue-500";
@@ -65,8 +65,16 @@ function Nav() {
                 <div className="flex-1 flex items-center justify-center">
                   <Button
                     variant="outlined"
+                    href="/tasks"
+                    className="!text-white"
+                  >
+                    Tasks
+                  </Button>
+
+                  <Button
+                    variant="outlined"
                     href="/admin/users"
-                    className="text-white"
+                    className="!text-white"
                   >
                     Users
                   </Button>
@@ -74,7 +82,7 @@ function Nav() {
                   <Button
                     variant="outlined"
                     href="/admin/devices"
-                    className="text-white"
+                    className="!text-white"
                   >
                     Devices
                   </Button>
