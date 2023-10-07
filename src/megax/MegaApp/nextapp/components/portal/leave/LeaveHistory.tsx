@@ -1,6 +1,6 @@
 "use client";
 
-import Timeline from "@mui/lab/Timeline";
+import Timeline, { timelineClasses } from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineOppositeContent, {
   timelineOppositeContentClasses,
@@ -10,7 +10,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import LeaveCard from "@/components/portal/leave/LeaveCard";
-import { Leave } from "@/lib/models/leave.model";
+import { Leave, LeaveStatus } from "@/lib/models/leave.model";
 // import dt from "@/lib/datetime";
 
 export type LeaveHistoryProps = {
@@ -25,17 +25,17 @@ export default function LeaveHistory({ items }: LeaveHistoryProps) {
           [`& .${timelineOppositeContentClasses.root}`]: {
             flex: 0.2,
             maxWidth: "120px",
-          },
+          }
         }}
       >
         {items.map(leave => (
           <TimelineItem key={leave.id}>
-            <TimelineOppositeContent color="textSecondary">
+            <TimelineOppositeContent>
               {/* {dt.formatDate(leave.leaveDate, 'dd/MM/yyyy')} */}
               {leave.leaveDate?.toString()}
             </TimelineOppositeContent>
             <TimelineSeparator>
-              <TimelineDot />
+              <TimelineDot className={leave.status === LeaveStatus.Rejected ? `bg-fuchsia-500` : 'bg-green-500' }/>
               <TimelineConnector />
             </TimelineSeparator>
             <TimelineContent>

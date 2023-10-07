@@ -22,6 +22,7 @@ export default function LeavePage() {
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = items.filter(x => x.status !== LeaveStatus.New);
 
+
   return (
     <div className="p-4 md:px-0 container mx-auto">
       <Grid container spacing={2}>
@@ -49,7 +50,7 @@ export default function LeavePage() {
         </Grid>
 
         <Grid item xs={12} sm={8}>
-          <h3 className="mt-4 mb-2 text-lg font-bold ps-[160px]">
+          <h3 className="mt-4 text-lg font-bold ps-[160px]">
             Leave History
           </h3>
           <LeaveHistory items={pastItems} />
