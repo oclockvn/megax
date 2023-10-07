@@ -1,4 +1,3 @@
-
 "use client";
 
 import Button from "@mui/material/Button";
@@ -13,14 +12,17 @@ import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Leave, LeaveStatus, LeaveTypeDescriptionMapping } from "@/lib/models/leave.model";
+import {
+  Leave,
+  LeaveStatus,
+  LeaveTypeDescriptionMapping,
+} from "@/lib/models/leave.model";
 
 export type LeaveCardProps = {
   leave: Leave;
-}
+};
 
 export default function LeaveCard({ leave }: LeaveCardProps) {
-
   const LeaveItem = ({
     icon,
     category,
@@ -33,15 +35,16 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     overrideCls?: string;
   }) => (
     <div className={`flex gap-4 mt-4 ${overrideCls}`}>
-      <div className="pt-1 text-fuchsia-500">{icon}</div>
+      <div className="pt-1 text-lime-600">{icon}</div>
       <div>
-        <strong className="text-fuchsia-500">{category}</strong>
+        <strong className="text-lime-600">{category}</strong>
         <div>{content}</div>
       </div>
     </div>
   );
 
   const showAction = [LeaveStatus.New].includes(leave.status);
+  const labelCls = leave.status === LeaveStatus.Approved ? 'border-green-500 text-green-500' : 'border-fuchsia-500 text-fuchsia-500';
 
   return (
     <div className="relative">
@@ -75,21 +78,27 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           />
           <LeaveItem
             category="Leave Note"
-            content={leave.note || '(blank)'}
+            content={leave.note || "(blank)"}
             icon={<FormatQuoteIcon />}
           />
         </CardContent>
-        {showAction && <CardActions>
-          <Button variant="contained" color="primary">
-            Approve
-          </Button>
-          <Button color="warning">Reject</Button>
-        </CardActions> }
+        {showAction && (
+          <CardActions>
+            <Button variant="contained" color="primary">
+              Approve
+            </Button>
+            <Button color="warning">Reject</Button>
+          </CardActions>
+        )}
       </Card>
 
-      {!showAction && <div className="absolute z-10 top-10 left-0 right-0 flex justify-end text-center">
-        <div className="border-[4px] border-solid border-fuchsia-500 font-bold px-2 uppercase rotate-[45deg] text-fuchsia-500">{LeaveStatus[leave.status]}</div>
-      </div> }
+      {!showAction && (
+        <div className="absolute z-10 top-[50%] left-0 right-10 flex justify-end text-center">
+          <div className={ `border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}` }>
+            {LeaveStatus[leave.status]}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
