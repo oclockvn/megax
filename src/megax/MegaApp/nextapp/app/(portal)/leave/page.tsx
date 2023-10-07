@@ -3,29 +3,51 @@
 import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import Drawer from "@mui/material/Drawer";
 import { Divider } from "@mui/material";
 import LeaveCard from "@/components/portal/leave/LeaveCard";
 import LeaveHistory from "@/components/portal/leave/LeaveHistory";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchLeavesThunk } from "@/lib/store/leave.state";
-import { LeaveStatus } from "@/lib/models/leave.model";
+import { Leave, LeaveStatus } from "@/lib/models/leave.model";
 import LeaveSlot from "@/components/portal/leave/LeaveSlot";
+import LeaveForm from "@/components/portal/leave/LeaveForm";
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
   const { items, loading } = useAppSelector(s => s.leaves);
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [leave, setLeave] = useState<Partial<Leave> | null>(null);
 
   useEffect(() => {
     appDispatch(fetchLeavesThunk());
   }, []);
+
+  const handleCloseDrawer = () => {
+    setShowDrawer(false);
+    // appDispatch(setLoading({ loading: false }));
+  };
+
+  const handleOpenLeave = (contact: Partial<Leave>) => {
+    setLeave(contact);
+    setShowDrawer(true);
+    // appDispatch(setLoading({ loading: false }));
+  };
+
+  const handleSave = () => {};
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = items.filter(x => x.status !== LeaveStatus.New);
 
   return (
     <div className="p-4 md:px-0 container mx-auto">
-      <Grid container spacing={2} alignItems={"center"} className="sticky top-0 z-30">
+      <Grid
+        container
+        spacing={2}
+        alignItems={"center"}
+        className="sticky top-0 z-30"
+      >
         <Grid item xs={12} sm={4}>
           <Button
             variant="contained"
@@ -33,13 +55,16 @@ export default function LeavePage() {
             size="large"
             fullWidth
             startIcon={<AddIcon />}
+            onClick={() => handleOpenLeave({})}
           >
             Request Leave
           </Button>
         </Grid>
         <Grid item xs={12} sm={8}>
           <div className="sm:flex items-center">
-            <div className="flex-[.2] max-w-[160px] pe-4 font-bold text-end">Availability</div>
+            <div className="flex-[.2] max-w-[160px] pe-4 font-bold text-end">
+              Availability
+            </div>
             <div className="flex-[1] sm:me-[30px]">
               <LeaveSlot total={15} taken={5} />
             </div>
@@ -62,6 +87,17 @@ export default function LeavePage() {
           <LeaveHistory items={pastItems} />
         </Grid>
       </Grid>
+
+      <Drawer anchor="right" open={showDrawer} onClose={handleCloseDrawer}>
+        {leave && (
+          <LeaveForm
+            leave={leave!}
+            loading={loading}
+            handleClose={handleCloseDrawer}
+            handleSave={handleSave}
+          />
+        )}
+      </Drawer>
     </div>
   );
 }
