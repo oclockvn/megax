@@ -90,6 +90,10 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
     });
   };
 
+  const shouldDisableDate = (id: number, selected: Date) => {
+    return state.some(leave => leave.id !== id && dt.isSameDay(selected, leave.date));
+  }
+
   useEffect(() => {
     props.onChange(state);
   }, [state]);
@@ -118,7 +122,7 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
                 format="dd/MM/yyyy"
                 maxDate={maxRequestDate}
                 minDate={minRequestDate}
-                shouldDisableDate={d => dt.isWeekend(d)}
+                shouldDisableDate={d => dt.isWeekend(d) || shouldDisableDate(item.id, d)}
                 value={item.date}
                 onChange={date =>
                   handleUpdate(item, date || item.date, item.time)

@@ -23,8 +23,7 @@ import {
   endOfYear,
   addYears,
   isWeekend,
-  nextDay,
-  Day,
+  isSameDay,
 } from "date-fns";
 
 const startOfDay = (date: Date): Date => {
@@ -125,6 +124,7 @@ export default {
   addYears,
   isWeekend,
   getNextWeekDay,
+  isSameDay,
 };
 
 // export function handleDates(body: any) {
