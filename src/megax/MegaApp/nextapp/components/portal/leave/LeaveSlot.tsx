@@ -19,11 +19,11 @@ export default function LeaveSlot({ total, taken }: LeaveSlotProps) {
           {items.map((i, index) => (
             <div
               key={i}
-              className={`min-h-[30px] flex-[1] flex items-center text-lime-500 justify-center text-center ${
-                i < taken ? "bg-lime-500" : "bg-lime-50"
+              className={`min-h-[30px] flex-[1] flex items-center justify-center text-center ${
+                i < taken ? "bg-lime-500" : "text-black"
               } ${index > 0 ? "border-l border-solid border-lime-600" : ""}`}
             >
-              {i < taken ? <CloseIcon className="text-black" /> : i + 1}
+              {i < taken ? <CloseIcon className="text-slate-800" /> : i + 1}
             </div>
           ))}
         </div>

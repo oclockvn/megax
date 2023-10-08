@@ -56,7 +56,7 @@ export default function LeaveForm(props: LeaveFormProps) {
               name="leaveType"
               options={leaveTypes}
               InputProps={{
-                startAdornment: <CategoryIcon className="me-2 text-lime-500" />,
+                startAdornment: <CategoryIcon className="me-2 text-blue-500" />,
               }}
             />
           </div>
@@ -73,7 +73,7 @@ export default function LeaveForm(props: LeaveFormProps) {
               multiline
               minRows={3}
               InputProps={{
-                startAdornment: <CommentIcon className="text-lime-500 me-2" />,
+                startAdornment: <CommentIcon className="text-blue-500 me-2" />,
                 className: "items-start",
               }}
             />
@@ -89,7 +89,7 @@ export default function LeaveForm(props: LeaveFormProps) {
               minRows={3}
               InputProps={{
                 startAdornment: (
-                  <FormatQuoteIcon className="text-lime-500 me-2" />
+                  <FormatQuoteIcon className="text-blue-500 me-2" />
                 ),
                 className: "items-start",
               }}
