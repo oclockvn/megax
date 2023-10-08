@@ -13,6 +13,7 @@ import Close from "@mui/icons-material/Close";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
+import client from "@/lib/helpers/client"
 
 type LeaveDatePickerProps = {
   onChange: (items: LeaveDate[]) => void;
@@ -44,7 +45,7 @@ function reducer(state: LeaveDate[], action: _Action) {
 
       return [
         ...state,
-        { id: suggestDate.getTime(), date: suggestDate, time: LeaveTime.All },
+        { id: client.uid(), date: suggestDate, time: LeaveTime.All },
       ];
     case "update":
       const { id, date, time } = action.payload;
