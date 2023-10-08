@@ -2,32 +2,37 @@
 
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import { LeaveTime } from "@/lib/models/leave.model";
+import { LeaveDate, LeaveTime } from "@/lib/models/leave.model";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Add from "@mui/icons-material/Add";
 import dt from "@/lib/datetime";
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import IconButton from "@mui/material/IconButton";
 import Close from "@mui/icons-material/Close";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
-type LeaveDatePickerProps = {};
+type LeaveDatePickerProps = {
+  onChange: (items: LeaveDate[]) => void;
+};
 
-type LeaveDate = {
+type _AddPayload = {};
+type _UpdatePayload = {
   id: number;
   date: Date;
   time: LeaveTime;
 };
+type _DeletePayload = {
+  id: number;
+};
+type _Action =
+  | { type: "add"; payload: _AddPayload }
+  | { type: "update"; payload: _UpdatePayload }
+  | { type: "delete"; payload: _DeletePayload };
 
-type _ActionType = "add" | "update" | "remove";
-
-function reducer(
-  state: LeaveDate[],
-  action: { type: _ActionType; payload?: any }
-) {
+function reducer(state: LeaveDate[], action: _Action) {
   switch (action.type) {
     case "add":
       const maxDate =
@@ -43,49 +48,56 @@ function reducer(
       ];
     case "update":
       const { id, date, time } = action.payload;
-      return state.map(
-        s =>
-          ({
-            ...s,
-            date: s.date,
-            time: s.id === id ? time : s.time,
-          } as LeaveDate)
+      return state.map(s =>
+        s.id === id
+          ? {
+              ...s,
+              date,
+              time,
+            }
+          : s
       );
-    case "remove":
-      return state.filter(s => s.id !== Number(action.payload));
+    case "delete":
+      return state.filter(s => s.id !== Number(action.payload.id));
   }
-
-  return state;
 }
 
-export default function LeaveDatePicker() {
+export default function LeaveDatePicker(props: LeaveDatePickerProps) {
   const initState: LeaveDate[] = [
     { id: 0, date: dt.getNextWeekDay(new Date()), time: LeaveTime.All },
   ];
 
   const [state, dispatch] = useReducer(reducer, initState);
-  const maxRequestDate = new Date();
-  maxRequestDate.setMonth(maxRequestDate.getMonth() + 3); // max request is up to 3 months
 
   const handleAdd = () => {
     dispatch({
       type: "add",
+      payload: {},
     });
   };
 
-  const handleUpdateTime = (leave: LeaveDate, time: LeaveTime) => {
+  const handleUpdate = (leave: LeaveDate, date: Date, time: LeaveTime) => {
     dispatch({
       type: "update",
-      payload: { id: leave.id, date: leave.date, time },
+      payload: { id: leave.id, date, time },
     });
   };
 
   const handleRemove = (id: number) => {
     dispatch({
-      type: "remove",
-      payload: id,
+      type: "delete",
+      payload: { id },
     });
   };
+
+  useEffect(() => {
+    props.onChange(state);
+  }, [state]);
+
+  const maxRequestDate = new Date();
+  maxRequestDate.setMonth(maxRequestDate.getMonth() + 3); // max request is up to 3 months
+  const minRequestDate = new Date();
+  minRequestDate.setDate(minRequestDate.getDate() - 14); // min to 2 week past
 
   const maxRequest = state.length >= 5;
 
@@ -103,13 +115,14 @@ export default function LeaveDatePicker() {
             <Grid item md={6}>
               <DatePicker
                 label="Leave date"
-                // name={`leaveDate_${item.id}`}
                 format="dd/MM/yyyy"
                 maxDate={maxRequestDate}
-                minDate={new Date(1950, 0, 1)}
+                minDate={minRequestDate}
                 shouldDisableDate={d => dt.isWeekend(d)}
-                // defaultValue={item.date}
                 value={item.date}
+                onChange={date =>
+                  handleUpdate(item, date || item.date, item.time)
+                }
               />
             </Grid>
             <Grid item md={5}>
@@ -117,7 +130,7 @@ export default function LeaveDatePicker() {
                 exclusive
                 color="secondary"
                 value={item.time}
-                onChange={(_, time) => handleUpdateTime(item, time)}
+                onChange={(_, time) => handleUpdate(item, item.date, time)}
               >
                 {/* <ToggleButton value={LeaveTime.All}>All day</ToggleButton> */}
                 <ToggleButton value={LeaveTime.AM}>AM</ToggleButton>

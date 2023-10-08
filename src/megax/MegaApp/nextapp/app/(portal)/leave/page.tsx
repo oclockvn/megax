@@ -4,13 +4,12 @@ import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
-import { Divider } from "@mui/material";
 import LeaveCard from "@/components/portal/leave/LeaveCard";
 import LeaveHistory from "@/components/portal/leave/LeaveHistory";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { useEffect, useState } from "react";
 import { fetchLeavesThunk } from "@/lib/store/leave.state";
-import { Leave, LeaveStatus } from "@/lib/models/leave.model";
+import { Leave, LeaveStatus, LeaveType } from "@/lib/models/leave.model";
 import LeaveSlot from "@/components/portal/leave/LeaveSlot";
 import LeaveForm from "@/components/portal/leave/LeaveForm";
 
@@ -29,8 +28,8 @@ export default function LeavePage() {
     // appDispatch(setLoading({ loading: false }));
   };
 
-  const handleOpenLeave = (contact: Partial<Leave>) => {
-    setLeave(contact);
+  const handleOpenLeave = (leave: Partial<Leave>) => {
+    setLeave(leave);
     setShowDrawer(true);
     // appDispatch(setLoading({ loading: false }));
   };
@@ -55,7 +54,7 @@ export default function LeavePage() {
             size="large"
             fullWidth
             startIcon={<AddIcon />}
-            onClick={() => handleOpenLeave({})}
+            onClick={() => handleOpenLeave({ type: LeaveType.Annual })}
           >
             Request Leave
           </Button>

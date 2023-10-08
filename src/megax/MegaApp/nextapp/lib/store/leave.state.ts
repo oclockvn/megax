@@ -17,7 +17,7 @@ const initialState: LeaveState = {
 export const fetchLeavesThunk = createAsyncThunk(
   "leaves/fetch",
   async (filter: Partial<Filter> | undefined, thunkApi) => {
-    thunkApi.dispatch(sSlice.actions.setLoadingState("Loading..."));
+    thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
     return await fetchLeaves();
   }
 );
@@ -29,7 +29,7 @@ export const submitLeaveThunk = createAsyncThunk(
   }
 );
 
-export const sSlice = createSlice({
+export const leaveSlice = createSlice({
   name: "leaves",
   initialState,
   reducers: {
@@ -68,6 +68,6 @@ export const sSlice = createSlice({
   },
 });
 
-export const { setLoading, setLoadingState } = sSlice.actions;
+export const { setLoading, setLoadingState } = leaveSlice.actions;
 
-export default sSlice.reducer;
+export default leaveSlice.reducer;

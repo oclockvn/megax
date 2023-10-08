@@ -33,6 +33,12 @@ export enum LeaveTime {
   PM = 2,
 }
 
+export type LeaveDate = {
+  id: number;
+  date: Date;
+  time: LeaveTime;
+};
+
 export const LeaveTypeDescriptionMapping = {
   [LeaveType.Annual]: 'Annual leave',
   [LeaveType.Paid]: 'Paid leave',

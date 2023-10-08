@@ -1,21 +1,15 @@
 "use client";
 
 import {
-  DatePickerElement,
   FormContainer,
   SelectElement,
   TextFieldElement,
 } from "react-hook-form-mui";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
 import CommentIcon from "@mui/icons-material/Comment";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import CategoryIcon from "@mui/icons-material/Category";
-import { Leave, LeaveType } from "@/lib/models/leave.model";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import ToggleButton from "@mui/material/ToggleButton";
-import Add from "@mui/icons-material/Add";
-import dt from "@/lib/datetime";
+import { Leave, LeaveDate, LeaveType } from "@/lib/models/leave.model";
 import LeaveDatePicker from "./LeaveDatePicker";
 
 type LeaveFormProps = {
@@ -32,10 +26,14 @@ export default function LeaveForm(props: LeaveFormProps) {
     handleSave(request);
   };
 
+  const dateChange = (items: LeaveDate[]) => {
+    console.log(items);
+  }
+
   const leaveTypes = Object.keys(LeaveType)
     .filter(x => Number(x) >= 0)
     .map(id => ({
-      id: id,
+      id: Number(id),
       label: LeaveType[Number(id)].replace(/[A-Z]/g, x => " " + x).trim(),
     }));
 
@@ -53,7 +51,7 @@ export default function LeaveForm(props: LeaveFormProps) {
               fullWidth
               required
               label="Leave type"
-              name="leaveType"
+              name="type"
               options={leaveTypes}
               InputProps={{
                 startAdornment: <CategoryIcon className="me-2 text-blue-500" />,
@@ -62,7 +60,7 @@ export default function LeaveForm(props: LeaveFormProps) {
           </div>
 
           <div className="mb-4">
-            <LeaveDatePicker />
+            <LeaveDatePicker onChange={dateChange} />
           </div>
 
           <div className="mb-4">
@@ -71,6 +69,7 @@ export default function LeaveForm(props: LeaveFormProps) {
               label="Reason"
               name="reason"
               multiline
+              required
               minRows={3}
               InputProps={{
                 startAdornment: <CommentIcon className="text-blue-500 me-2" />,
@@ -84,7 +83,7 @@ export default function LeaveForm(props: LeaveFormProps) {
               fullWidth
               label="Note"
               name="note"
-              placeholder="Additional note: approved by who? / handover work to who?"
+              placeholder="Additional note: who approved? or, who did you handover work to?"
               multiline
               minRows={3}
               InputProps={{
