@@ -27,6 +27,12 @@ export enum LeaveStatus {
   Cancelled = 3,
 }
 
+export enum LeaveTime {
+  All = 0,
+  AM = 1,
+  PM = 2,
+}
+
 export const LeaveTypeDescriptionMapping = {
   [LeaveType.Annual]: 'Annual leave',
   [LeaveType.Paid]: 'Paid leave',

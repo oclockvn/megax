@@ -15,7 +15,8 @@ import { Leave, LeaveType } from "@/lib/models/leave.model";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Add from "@mui/icons-material/Add";
-import dt from '@/lib/datetime';
+import dt from "@/lib/datetime";
+import LeaveDatePicker from "./LeaveDatePicker";
 
 type LeaveFormProps = {
   leave: Partial<Leave>;
@@ -37,11 +38,6 @@ export default function LeaveForm(props: LeaveFormProps) {
       id: id,
       label: LeaveType[Number(id)].replace(/[A-Z]/g, x => " " + x).trim(),
     }));
-
-  const leaveDays = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map(x => ({
-    id: x,
-    label: x,
-  }));
 
   const maxRequestDate = new Date();
   maxRequestDate.setMonth(maxRequestDate.getMonth() + 3); // max request is up to 3 months
@@ -66,28 +62,7 @@ export default function LeaveForm(props: LeaveFormProps) {
           </div>
 
           <div className="mb-4">
-            <Grid container spacing={2} alignItems={"center"}>
-              <Grid item md={6}>
-                <DatePickerElement
-                  label="Leave date"
-                  name="leaveDate"
-                  format="dd/MM/yyyy"
-                  maxDate={maxRequestDate}
-                  minDate={new Date(1950, 0, 1)}
-                  shouldDisableDate={d => dt.isWeekend(d)}
-                />
-              </Grid>
-              <Grid item md={6}>
-                <ToggleButtonGroup color="secondary" value={0}>
-                  <ToggleButton value={0}>All day</ToggleButton>
-                  <ToggleButton value={1}>AM</ToggleButton>
-                  <ToggleButton value={2}>PM</ToggleButton>
-                </ToggleButtonGroup>
-              </Grid>
-            </Grid>
-            <Button size="small" startIcon={<Add />}>
-              Add date
-            </Button>
+            <LeaveDatePicker />
           </div>
 
           <div className="mb-4">

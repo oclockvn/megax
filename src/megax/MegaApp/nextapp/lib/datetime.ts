@@ -23,6 +23,8 @@ import {
   endOfYear,
   addYears,
   isWeekend,
+  nextDay,
+  Day,
 } from "date-fns";
 
 const startOfDay = (date: Date): Date => {
@@ -87,6 +89,15 @@ const setTime = (date: Date, hour: number, minute: number): Date => {
   return setSeconds(setMinutes(setHoursFns(date, hour), minute), 0);
 };
 
+const getNextWeekDay = (from: Date) => {
+  let next = addDays(from, 1);
+  while (isWeekend(next)) {
+    next = addDays(next, 1);
+  }
+
+  return next;
+};
+
 export default {
   todayAt,
   formatDate,
@@ -113,6 +124,7 @@ export default {
   endOfYear,
   addYears,
   isWeekend,
+  getNextWeekDay,
 };
 
 // export function handleDates(body: any) {
