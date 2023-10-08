@@ -22,6 +22,7 @@ import {
   startOfYear,
   endOfYear,
   addYears,
+  isWeekend,
 } from "date-fns";
 
 const startOfDay = (date: Date): Date => {
@@ -111,6 +112,7 @@ export default {
   startOfYear,
   endOfYear,
   addYears,
+  isWeekend,
 };
 
 // export function handleDates(body: any) {

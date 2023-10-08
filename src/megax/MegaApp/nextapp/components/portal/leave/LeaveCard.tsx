@@ -35,7 +35,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     overrideCls?: string;
   }) => (
     <div className={`flex gap-4 mt-4 ${overrideCls}`}>
-      <div className="pt-1 text-lime-600">{icon}</div>
+      <div className="text-lime-600">{icon}</div>
       <div>
         <strong className="text-lime-600">{category}</strong>
         <div>{content}</div>
