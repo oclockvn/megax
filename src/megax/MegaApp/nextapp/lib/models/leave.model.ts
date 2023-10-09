@@ -10,6 +10,7 @@ export interface Leave {
   status: LeaveStatus;
   feedback: string;
   approvedBy?: string;
+  isOwner: boolean;
 }
 
 export type LeaveRequest = Pick<Leave, 'reason' | 'leaveDates' | 'type' | 'note'>;

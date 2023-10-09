@@ -76,7 +76,7 @@ export default function LeaveForm(props: LeaveFormProps) {
           </div>
 
           <div className="mb-4">
-            <LeaveDatePicker onChange={dateChange} />
+            <LeaveDatePicker value={leave.leaveDates} onChange={dateChange} />
           </div>
 
           <div className="mb-4">

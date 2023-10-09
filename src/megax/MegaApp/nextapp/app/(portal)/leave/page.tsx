@@ -75,7 +75,7 @@ export default function LeavePage() {
           <h3 className="mt-4 mb-2 text-lg font-bold">Your Requests</h3>
           {queueItems.map((i, index) => (
             <div key={i.id} className={index === 0 ? "" : "mt-4"}>
-              <LeaveCard leave={i} />
+              <LeaveCard leave={i} onEdit={handleOpenLeave} />
             </div>
           ))}
         </Grid>

@@ -77,7 +77,7 @@ export async function fetchLeaves() {
     "status": 2
   }]`) as Leave[];
 
-  return list;
+  return list.map(x => ({...x, isOwner: true}));
 }
 
 export async function submitLeave(request: Partial<LeaveRequest>) {

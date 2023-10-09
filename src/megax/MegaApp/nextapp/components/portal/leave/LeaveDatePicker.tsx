@@ -16,6 +16,7 @@ import AlertTitle from "@mui/material/AlertTitle";
 import client from "@/lib/helpers/client"
 
 type LeaveDatePickerProps = {
+  value?: LeaveDate[];
   onChange: (items: LeaveDate[]) => void;
 };
 
@@ -64,7 +65,7 @@ function reducer(state: LeaveDate[], action: _Action) {
 }
 
 export default function LeaveDatePicker(props: LeaveDatePickerProps) {
-  const initState: LeaveDate[] = [
+  const initState: LeaveDate[] = props.value || [
     { id: 0, date: dt.getNextWeekDay(new Date()), time: LeaveTime.All },
   ];
 

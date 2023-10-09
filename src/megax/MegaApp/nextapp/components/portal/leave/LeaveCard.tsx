@@ -19,12 +19,15 @@ import {
   LeaveTypeDescriptionMapping,
 } from "@/lib/models/leave.model";
 import dt from "@/lib/datetime";
+import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 
 export type LeaveCardProps = {
   leave: Leave;
+  onEdit: (leave: Leave) => void;
 };
 
-export default function LeaveCard({ leave }: LeaveCardProps) {
+export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
   const LeaveItem = ({
     icon,
     category,
@@ -56,6 +59,23 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     }
   };
 
+  const CardAction = () => {
+    return (
+      <div className="flex items-center gap-2">
+        <Button
+          size="small"
+          startIcon={<EditIcon fontSize="small" />}
+          onClick={() => onEdit(leave)}
+        >
+          Edit
+        </Button>
+        <IconButton color="warning" size="small" aria-label="Cancel leave">
+          <CloseIcon />
+        </IconButton>
+      </div>
+    );
+  };
+
   const showAction = [LeaveStatus.New].includes(leave.status);
   const labelCls =
     leave.status === LeaveStatus.Approved
@@ -67,11 +87,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
       <Card>
         <CardHeader
           avatar={<Avatar aria-label="recipe">QP</Avatar>}
-          action={
-            <IconButton aria-label="settings">
-              <MoreVertIcon />
-            </IconButton>
-          }
+          action={showAction && <CardAction />}
           title="Quang Phan"
           subheader="Submitted at September 14, 2016"
         />
@@ -88,7 +104,8 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
               <>
                 {leave.leaveDates?.map((d, index) => (
                   <div key={d.id}>
-                    {index + 1}. {dt.formatDate(d.date, "dd/MM/yyyy")} {displayTime(d.time)}
+                    {index + 1}. {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
+                    {displayTime(d.time)}
                   </div>
                 ))}
               </>
@@ -106,7 +123,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
             icon={<FormatQuoteIcon />}
           />
         </CardContent>
-        {showAction && (
+        {showAction && !leave.isOwner && (
           <CardActions>
             <Button variant="contained" color="primary">
               Approve
