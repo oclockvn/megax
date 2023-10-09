@@ -9,25 +9,41 @@ import Button from "@mui/material/Button";
 import CommentIcon from "@mui/icons-material/Comment";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import CategoryIcon from "@mui/icons-material/Category";
-import { Leave, LeaveDate, LeaveType } from "@/lib/models/leave.model";
+import { Leave, LeaveDate, LeaveRequest, LeaveType } from "@/lib/models/leave.model";
 import LeaveDatePicker from "./LeaveDatePicker";
+import { useAppDispatch } from "@/lib/store/state.hook";
+import { submitLeaveThunk } from "@/lib/store/leave.state";
 
 type LeaveFormProps = {
   leave: Partial<Leave>;
-  handleSave: (contact: Partial<Leave>) => void;
+  // handleSave: (contact: Partial<Leave>) => void;
   handleClose: () => void;
   loading?: boolean;
 };
 
 export default function LeaveForm(props: LeaveFormProps) {
-  const { leave, handleSave, handleClose, loading } = props;
+  const appDispatch = useAppDispatch()
+  const { leave, handleClose, loading } = props;
+  let leaveDates: LeaveDate[] = []
 
-  const handleSubmit = (request: Partial<Leave>) => {
-    handleSave(request);
+  const handleSubmit = async (request: Partial<Leave>) => {
+    // request.lea
+    const payload = {
+      ...request,
+      leaveDates
+    }
+
+    const result = await appDispatch(submitLeaveThunk(payload)).unwrap();
+    if (result?.success) {
+      handleClose();
+    }
+
+    // handleSave(payload);
   };
 
   const dateChange = (items: LeaveDate[]) => {
-    console.log(items);
+    // console.log(items);
+    leaveDates = items
   }
 
   const leaveTypes = Object.keys(LeaveType)

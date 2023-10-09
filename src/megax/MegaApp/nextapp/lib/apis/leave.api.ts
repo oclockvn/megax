@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 import { Result } from "@/lib/models/common.model";
-import { Leave, LeaveRequest } from "../models/leave.model";
+import { Leave, LeaveRequest, LeaveStatus } from "../models/leave.model";
 
 export async function fetchLeaves() {
   // const res = await api.get<Leave[]>("api/leaves");
@@ -80,12 +80,12 @@ export async function fetchLeaves() {
   return list;
 }
 
-export async function submitLeave(request: LeaveRequest) {
+export async function submitLeave(request: Partial<LeaveRequest>) {
   // const res = await api.delete<Result<boolean>>(`api/todos/${id}`);
   // return res.data;
   return Promise.resolve({
     code: "",
-    data: {...request, id: Date.now() },
+    data: {...request, id: Date.now(), status: LeaveStatus.New },
     success: true,
   } as Result<Leave>);
 }

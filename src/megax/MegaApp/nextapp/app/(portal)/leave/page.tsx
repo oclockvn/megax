@@ -34,7 +34,6 @@ export default function LeavePage() {
     // appDispatch(setLoading({ loading: false }));
   };
 
-  const handleSave = () => {};
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = items.filter(x => x.status !== LeaveStatus.New);
@@ -93,7 +92,6 @@ export default function LeavePage() {
             leave={leave!}
             loading={loading}
             handleClose={handleCloseDrawer}
-            handleSave={handleSave}
           />
         )}
       </Drawer>

@@ -1,8 +1,9 @@
 export interface Leave {
   id: number;
   reason: string;
-  leaveDate: Date;
-  leaveDay: number;
+  // leaveDate: Date;
+  // leaveDay: number;
+  leaveDates: LeaveDate[];
   type: LeaveType;
   note: string;
   submittedDate: Date;
@@ -11,7 +12,7 @@ export interface Leave {
   approvedBy?: string;
 }
 
-export type LeaveRequest = Pick<Leave, 'reason' | 'leaveDate' | 'leaveDay' | 'type' | 'note'>;
+export type LeaveRequest = Pick<Leave, 'reason' | 'leaveDates' | 'type' | 'note'>;
 
 export enum LeaveType {
   Annual = 0,

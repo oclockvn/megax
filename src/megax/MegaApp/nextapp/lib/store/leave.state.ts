@@ -24,7 +24,7 @@ export const fetchLeavesThunk = createAsyncThunk(
 
 export const submitLeaveThunk = createAsyncThunk(
   "leaves/submit",
-  async (request: LeaveRequest, _thunkApi) => {
+  async (request: Partial<LeaveRequest>, _thunkApi) => {
     return await submitLeave(request);
   }
 );
