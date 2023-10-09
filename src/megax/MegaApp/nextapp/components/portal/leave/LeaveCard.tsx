@@ -15,8 +15,10 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Leave,
   LeaveStatus,
+  LeaveTime,
   LeaveTypeDescriptionMapping,
 } from "@/lib/models/leave.model";
+import dt from "@/lib/datetime";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -31,7 +33,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
   }: {
     icon: React.ReactNode;
     category: string;
-    content: string;
+    content: string | React.ReactNode;
     overrideCls?: string;
   }) => (
     <div className={`flex gap-4 mt-4 ${overrideCls}`}>
@@ -43,8 +45,22 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     </div>
   );
 
+  const displayTime = (time: LeaveTime) => {
+    switch (time) {
+      case LeaveTime.All:
+        return "All day";
+      case LeaveTime.AM:
+        return "Morning";
+      case LeaveTime.PM:
+        return "Afternoon";
+    }
+  };
+
   const showAction = [LeaveStatus.New].includes(leave.status);
-  const labelCls = leave.status === LeaveStatus.Approved ? 'border-green-500 text-green-500' : 'border-fuchsia-500 text-fuchsia-500';
+  const labelCls =
+    leave.status === LeaveStatus.Approved
+      ? "border-green-500 text-green-500"
+      : "border-fuchsia-500 text-fuchsia-500";
 
   return (
     <div className="relative">
@@ -68,7 +84,15 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           />
           <LeaveItem
             category="Leave Date"
-            content="06/10/2023 - 07/10/2023 (1 day)"
+            content={
+              <>
+                {leave.leaveDates?.map((d, index) => (
+                  <div key={d.id}>
+                    {index + 1}. {dt.formatDate(d.date, "dd/MM/yyyy")} {displayTime(d.time)}
+                  </div>
+                ))}
+              </>
+            }
             icon={<DateRangeIcon />}
           />
           <LeaveItem
@@ -94,7 +118,9 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
 
       {!showAction && (
         <div className="absolute z-10 top-[50%] left-0 right-10 flex justify-end text-center">
-          <div className={ `border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}` }>
+          <div
+            className={`border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}`}
+          >
             {LeaveStatus[leave.status]}
           </div>
         </div>
