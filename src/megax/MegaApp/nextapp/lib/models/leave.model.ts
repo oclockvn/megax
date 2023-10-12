@@ -19,7 +19,6 @@ export enum LeaveType {
   Annual = 0,
   Paid = 1,
   TimeInLieu = 2,
-  Other = 3,
 }
 
 export enum LeaveStatus {
