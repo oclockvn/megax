@@ -31,6 +31,7 @@ builder.Services
     .AddNextJs(builder.Configuration)
     .AddSwaggerGen(o =>
     {
+        o.CustomSchemaIds(type => type.FullName);
         o.SwaggerDoc("v1", new()
         {
             Version = "v1",
