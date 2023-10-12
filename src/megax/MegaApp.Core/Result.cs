@@ -27,6 +27,7 @@ namespace MegaApp.Core
         public static readonly string SERIAL_NUMBER_ALREADY_EXIST = "SERIAL_NUMBER_ALREADY_EXIST";
         public static readonly string USER_CODE_ALREADY_EXIST = "USER_CODE_ALREADY_EXIST";
         public static readonly string COMPLETE_SUBTASK_REQUIRED = "COMPLETE_SUBTASK_REQUIRED";
+        public static readonly string OUT_OF_AVAILABLE_ANNUAL_LEAVE = "OUT_OF_AVAILABLE_ANNUAL_LEAVE";
     }
 
     public record Result<T>(T Data) : Result

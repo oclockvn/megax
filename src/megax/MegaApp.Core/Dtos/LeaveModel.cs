@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
 
-public record LeaveModel
+public record LeaveModel : IValidatableObject
 {
     public int Id { get; set; }
 
@@ -62,7 +62,21 @@ public record LeaveModel
 
     public LeaveModel(Db.Entities.Leave leave, List<LeaveDate> dates) : this(leave)
     {
-        LeaveDates.AddRange(dates.Select(d=>new LeaveDateModel(d)));
+        LeaveDates.AddRange(dates.Select(d => new LeaveDateModel(d)));
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (LeaveDates == null || LeaveDates.Count == 0)
+        {
+            yield return new ValidationResult("Requires at least 1 date leave");
+        }
+
+        var duplicatedDate = LeaveDates.GroupBy(x => x.Date).Any(d => d.Count() > 1);
+        if (duplicatedDate)
+        {
+            yield return new ValidationResult("Duplicated leave date found");
+        }
     }
 }
 
@@ -87,7 +101,7 @@ public record LeaveDateModel
     public LeaveDateModel(Db.Entities.LeaveDate d)
     {
         Id = d.Id;
-        Date  = d.Date;
+        Date = d.Date;
         Time = d.Time;
         LeaveId = d.LeaveId;
     }

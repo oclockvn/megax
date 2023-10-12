@@ -55,6 +55,16 @@ internal class LeaveService : ILeaveService
             UserId = request.UserId,
         };
 
+        if (leave.Type == Enums.LeaveType.Annual)
+        {
+            // check for available leave remain
+            var takenDays = await db.Leaves.CountAsync(x => x.Status == Enums.LeaveStatus.Approved && x.UserId == request.UserId);
+            if (takenDays < request.LeaveDates.Count)
+            {
+                return Result<LeaveModel>.Fail(Result.OUT_OF_AVAILABLE_ANNUAL_LEAVE);
+            }
+        }
+
         leave.LeaveDates.AddRange(request.LeaveDates.Select(x => new LeaveDate
         {
             Date = x.Date,
