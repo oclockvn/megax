@@ -34,7 +34,8 @@ internal class LeaveService : ILeaveService
             .OrderByDescending(x => x.Id)
             .Select(x => new LeaveModel(x)
             {
-                LeaveDates = x.LeaveDates.Select(d => new LeaveDateModel(d)).ToList()
+                LeaveDates = x.LeaveDates.Select(d => new LeaveDateModel(d)).ToList(),
+                IsOwner = x.UserId == userId
             })
             .ToListAsync();
 
@@ -74,7 +75,10 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
-        var model = new LeaveModel(leave);
+        var model = new LeaveModel(leave)
+        {
+            IsOwner = request.UserId == leave.UserId
+        };
         return new Result<LeaveModel>(model);
     }
 

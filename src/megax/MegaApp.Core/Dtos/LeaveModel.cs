@@ -25,6 +25,7 @@ public record LeaveModel : IValidatableObject
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+    public bool IsOwner { get; set; }
 
     public List<LeaveDateModel> LeaveDates { get; set; } = new();
 
