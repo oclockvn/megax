@@ -30,6 +30,7 @@ namespace MegaApp.Core.Db
         public DbSet<Client> Clients { get; set; }
 
         public DbSet<Leave> Leaves { get; set; }
+        public DbSet<LeaveDate> LeaveDates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

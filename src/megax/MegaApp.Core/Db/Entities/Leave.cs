@@ -38,7 +38,7 @@ public class Leave : ICreatedByEntity, IUpdatedByEntity
 public class LeaveDate
 {
     public int Id { get; set; }
-    public DateOnly Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public LeaveTime Time { get; set; }
 
     public int LeaveId { get; set; }
