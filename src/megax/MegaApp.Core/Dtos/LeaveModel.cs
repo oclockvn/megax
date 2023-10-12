@@ -83,13 +83,13 @@ public record LeaveModel : IValidatableObject
 public record LeaveDateModel
 {
     public int Id { get; set; }
-    public DateOnly Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public LeaveTime Time { get; set; }
     public int LeaveId { get; set; }
 
     public record Add
     {
-        public DateOnly Date { get; set; }
+        public DateTimeOffset Date { get; set; }
         public LeaveTime Time { get; set; }
     }
 
