@@ -24,6 +24,9 @@ public class Leave : ICreatedByEntity, IUpdatedByEntity
     public int ApprovedBy { get; set; }
     public DateTimeOffset? ApprovedAt { get; set; }
 
+    public int UserId { get; set; }
+    public User User { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
@@ -51,5 +54,8 @@ public class LeaveConfiguration : IEntityTypeConfiguration<Leave>
         builder.HasMany(x => x.LeaveDates)
             .WithOne(x => x.Leave)
             .HasForeignKey(x => x.LeaveId);
+        builder.HasOne(x=>x.User)
+            .WithMany(x=>x.Leaves)
+            .HasForeignKey(x=>x.UserId);
     }
 }
