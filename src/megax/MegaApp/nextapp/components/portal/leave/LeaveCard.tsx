@@ -26,7 +26,6 @@ import { getInitial } from "@/lib/string.helper";
 
 export type LeaveCardProps = {
   leave: Leave;
-  onEdit: (leave: Leave) => void;
 };
 
 const timeDic = {
@@ -35,7 +34,7 @@ const timeDic = {
   [LeaveTime.PM]: "PM",
 };
 
-export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
+export default function LeaveCard({ leave }: LeaveCardProps) {
   const LeaveItem = ({
     icon,
     category,
@@ -65,13 +64,13 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
   const CardAction = () => {
     return (
       <div className="flex items-center gap-2">
-        <Button
+        {/* <Button
           size="small"
           startIcon={<EditIcon fontSize="small" />}
           onClick={() => onEdit(leave)}
         >
           Edit
-        </Button>
+        </Button> */}
         <IconButton color="warning" size="small" aria-label="Cancel leave">
           <CloseIcon />
         </IconButton>
