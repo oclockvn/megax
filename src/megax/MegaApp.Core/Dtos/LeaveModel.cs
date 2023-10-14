@@ -27,6 +27,9 @@ public record LeaveModel : IValidatableObject
     public int? CreatedBy { get; set; }
     public bool IsOwner { get; set; }
 
+    public int UserId { get; set; }
+    public string UserName { get; set; }
+
     public List<LeaveDateModel> LeaveDates { get; set; } = new();
 
     public record Add

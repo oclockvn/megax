@@ -17,10 +17,12 @@ public interface ILeaveService
 internal class LeaveService : ILeaveService
 {
     private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly IUserResolver userResolver;
 
-    public LeaveService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public LeaveService(IDbContextFactory<ApplicationDbContext> dbContextFactory, IUserResolver userResolver)
     {
         this.dbContextFactory = dbContextFactory;
+        this.userResolver = userResolver;
     }
 
     public Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId)
@@ -36,6 +38,8 @@ internal class LeaveService : ILeaveService
             .Select(x => new LeaveModel(x)
             {
                 LeaveDates = x.LeaveDates.Select(d => new LeaveDateModel(d)).ToList(),
+                UserId = x.UserId,
+                UserName = x.User.FullName,
                 IsOwner = x.UserId == userId
             })
             .ToListAsync();
@@ -105,9 +109,13 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
+        var currentUser = userResolver.Resolve();
+
         var model = new LeaveModel(leave, leave.LeaveDates)
         {
-            IsOwner = request.UserId == leave.UserId
+            IsOwner = request.UserId == leave.UserId,
+            UserId = currentUser.Id,
+            UserName = currentUser.Name,
         };
         return new Result<LeaveModel>(model);
     }

@@ -1,3 +1,4 @@
+using MegaApp.Core.Services;
 using MegaApp.Infrastructure.Http;
 using MegaApp.Resolvers;
 using MegaApp.Services;
@@ -17,7 +18,8 @@ namespace MegaApp
             return services
                 .AddHttpContextAccessor()
                 .AddScoped<ITokenService, TokenService>()
-                .AddScoped<IHttpOriginResolver, HttpOriginResolver>();
+                .AddScoped<IHttpOriginResolver, HttpOriginResolver>()
+                .AddScoped<IUserResolver, HttpContextUserResolver>()
                 ;
         }
     }

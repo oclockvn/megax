@@ -11,6 +11,9 @@ export interface Leave {
   feedback: string;
   approvedBy?: string;
   isOwner: boolean;
+  createdAt: Date;
+  userId: number;
+  userName: string;
 }
 
 export type LeaveRequest = Pick<Leave, 'reason' | 'leaveDates' | 'type' | 'note'>;
@@ -44,5 +47,5 @@ export const LeaveTypeDescriptionMapping = {
   [LeaveType.Annual]: 'Annual leave',
   [LeaveType.Paid]: 'Paid leave',
   [LeaveType.TimeInLieu]: 'Time off in lieu',
-  [LeaveType.Other]: 'Other'
+  // [LeaveType.Other]: 'Other'
 }

@@ -14,4 +14,9 @@ public class ApplicationControllerBase : ControllerBase
     {
         return int.TryParse(HttpContext.User?.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : 0;
     }
+
+    protected string GetCurrentUserName()
+    {
+        return HttpContext.User?.FindFirstValue(ClaimTypes.Name);
+    }
 }

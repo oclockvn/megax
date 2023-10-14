@@ -89,8 +89,8 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
         <CardHeader
           avatar={<Avatar aria-label="recipe">QP</Avatar>}
           action={showAction && <CardAction />}
-          title="Quang Phan"
-          subheader="Submitted at September 14, 2016"
+          title={leave.userName}
+          subheader={`Requested at ${dt.formatDate(leave.createdAt, 'MMMM dd, yyyy')}`}
         />
         <CardContent>
           <LeaveItem
