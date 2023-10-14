@@ -11,7 +11,6 @@ import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Leave,
   LeaveStatus,
@@ -21,10 +20,17 @@ import {
 import dt from "@/lib/datetime";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
+import Chip from "@mui/material/Chip";
 
 export type LeaveCardProps = {
   leave: Leave;
   onEdit: (leave: Leave) => void;
+};
+
+const timeDic = {
+  [LeaveTime.All]: "All day",
+  [LeaveTime.AM]: "AM",
+  [LeaveTime.PM]: "PM",
 };
 
 export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
@@ -49,14 +55,9 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
   );
 
   const displayTime = (time: LeaveTime) => {
-    switch (time) {
-      case LeaveTime.All:
-        return "All day";
-      case LeaveTime.AM:
-        return "Morning";
-      case LeaveTime.PM:
-        return "Afternoon";
-    }
+    const text = timeDic[time];
+
+    return <Chip label={text} size="small" color="info" />;
   };
 
   const CardAction = () => {
@@ -103,9 +104,9 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
             content={
               <>
                 {leave.leaveDates?.map((d, index) => (
-                  <div key={d.id}>
-                    {index + 1}. {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
+                  <div key={d.id} className="flex items-center gap-1 mt-1" title={dt.formatDate(d.date, 'dd/MM/yyyy')}>
                     {displayTime(d.time)}
+                    {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
                   </div>
                 ))}
               </>

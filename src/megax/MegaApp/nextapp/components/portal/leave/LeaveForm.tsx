@@ -9,10 +9,17 @@ import Button from "@mui/material/Button";
 import CommentIcon from "@mui/icons-material/Comment";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import CategoryIcon from "@mui/icons-material/Category";
-import { Leave, LeaveDate, LeaveRequest, LeaveType } from "@/lib/models/leave.model";
+import {
+  Leave,
+  LeaveDate,
+  LeaveRequest,
+  LeaveType,
+} from "@/lib/models/leave.model";
 import LeaveDatePicker from "./LeaveDatePicker";
-import { useAppDispatch } from "@/lib/store/state.hook";
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { submitLeaveThunk } from "@/lib/store/leave.state";
+import { useState } from "react";
+import Alert from "@mui/material/Alert";
 
 type LeaveFormProps = {
   leave: Partial<Leave>;
@@ -22,29 +29,35 @@ type LeaveFormProps = {
 };
 
 export default function LeaveForm(props: LeaveFormProps) {
-  const appDispatch = useAppDispatch()
+  const appDispatch = useAppDispatch();
   const { leave, handleClose, loading } = props;
-  let leaveDates: LeaveDate[] = []
+  const [error, setError] = useState<string | undefined>();
+  let leaveDates: LeaveDate[] = [];
 
   const handleSubmit = async (request: Partial<Leave>) => {
     // request.lea
     const payload = {
       ...request,
-      leaveDates
-    }
+      leaveDates,
+    };
 
     const result = await appDispatch(submitLeaveThunk(payload)).unwrap();
     if (result?.success) {
       handleClose();
+    } else {
     }
+
+    setError(
+      result.success ? undefined : `Request failed. Error code: ${result.code}`
+    );
 
     // handleSave(payload);
   };
 
   const dateChange = (items: LeaveDate[]) => {
     // console.log(items);
-    leaveDates = items
-  }
+    leaveDates = items;
+  };
 
   const leaveTypes = Object.keys(LeaveType)
     .filter(x => Number(x) >= 0)
@@ -110,6 +123,8 @@ export default function LeaveForm(props: LeaveFormProps) {
               }}
             />
           </div>
+
+          {!!error && <Alert variant="standard" color="error" className="mb-4">{error}</Alert>}
 
           <div className="flex items-center gap-2">
             <Button

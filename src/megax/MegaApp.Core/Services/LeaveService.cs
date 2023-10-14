@@ -1,6 +1,7 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Dtos;
+using MegaApp.Core.Exceptions;
 using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +45,26 @@ internal class LeaveService : ILeaveService
 
     public async Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request)
     {
+        if (request.LeaveDates == null || request.LeaveDates.Count == 0)
+        {
+            throw new BusinessRuleViolationException("Requires at least 1 leave date");
+        }
+
+        var duplicateRequestDate = request.LeaveDates.GroupBy(x => x.Date.Date).Any(d => d.Count() > 1);
+        if (duplicateRequestDate)
+        {
+            throw new BusinessRuleViolationException("Duplicated leave date found");
+        }
+
         using var db = UseDb();
+
+        var dates = request.LeaveDates.Select(x => x.Date.Date).ToList();
+        var requestedDates = await db.LeaveDates.Where(l => l.Leave.UserId == request.UserId && dates.Contains(l.Date.Date)).Select(x => new { x.Date, x.Time }).ToListAsync();
+        var overlapDate = requestedDates.Any(requested => request.LeaveDates.Any(x => x.Date.Date == requested.Date.Date && (x.Time == Enums.LeaveTime.All || requested.Time == Enums.LeaveTime.All || x.Time == requested.Time)));
+        if (overlapDate)
+        {
+            return Result<LeaveModel>.Fail(Result.OVERLAP_LEAVE_REQUEST);
+        }
 
         var leave = new Leave
         {
@@ -59,8 +79,18 @@ internal class LeaveService : ILeaveService
         if (leave.Type == Enums.LeaveType.Annual)
         {
             // check for available leave remain
-            var takenDays = await db.Leaves.CountAsync(x => x.Status == Enums.LeaveStatus.Approved && x.UserId == request.UserId);
-            if (takenDays < request.LeaveDates.Count)
+            var takenDates = await db.LeaveDates
+                .Where(x => x.Leave.Status == Enums.LeaveStatus.Approved && x.Leave.UserId == request.UserId)
+                .Select(x => new { x.Date, x.Time })
+                .ToListAsync();
+
+            var takenDays = takenDates.Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1); // half date = 1 point
+
+            // todo: store available leave in user
+            var totalAvailable = 30; // half date = 1 point => 15 days
+            var requestingDays = request.LeaveDates.Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1);
+
+            if (takenDays + requestingDays > totalAvailable)
             {
                 return Result<LeaveModel>.Fail(Result.OUT_OF_AVAILABLE_ANNUAL_LEAVE);
             }
@@ -75,7 +105,7 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
-        var model = new LeaveModel(leave)
+        var model = new LeaveModel(leave, leave.LeaveDates)
         {
             IsOwner = request.UserId == leave.UserId
         };

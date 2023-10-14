@@ -28,6 +28,7 @@ namespace MegaApp.Core
         public static readonly string USER_CODE_ALREADY_EXIST = "USER_CODE_ALREADY_EXIST";
         public static readonly string COMPLETE_SUBTASK_REQUIRED = "COMPLETE_SUBTASK_REQUIRED";
         public static readonly string OUT_OF_AVAILABLE_ANNUAL_LEAVE = "OUT_OF_AVAILABLE_ANNUAL_LEAVE";
+        public static readonly string OVERLAP_LEAVE_REQUEST = "OVERLAP_LEAVE_REQUEST";
     }
 
     public record Result<T>(T Data) : Result

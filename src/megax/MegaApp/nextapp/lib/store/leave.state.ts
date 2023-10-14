@@ -7,6 +7,7 @@ import { fetchLeaves, submitLeave } from "../apis/leave.api";
 export interface LeaveState {
   items: Leave[];
   loading: boolean;
+  error?: string;
 }
 
 const initialState: LeaveState = {
@@ -62,8 +63,13 @@ export const leaveSlice = createSlice({
         state.loading = true;
       })
       .addCase(submitLeaveThunk.fulfilled, (state, action) => {
-        const leave = action.payload.data;
-        state.items.unshift(leave);
+        const { data, success, code } = action.payload;
+        if (success) {
+          state.items.unshift(data);
+          // state.error = undefined;
+        } else {
+          // state.error = `Request failed. Error code: ${code}`;
+        }
       });
   },
 });

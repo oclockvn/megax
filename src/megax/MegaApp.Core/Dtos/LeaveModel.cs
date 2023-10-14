@@ -73,7 +73,7 @@ public record LeaveModel : IValidatableObject
             yield return new ValidationResult("Requires at least 1 date leave");
         }
 
-        var duplicatedDate = LeaveDates.GroupBy(x => x.Date).Any(d => d.Count() > 1);
+        var duplicatedDate = LeaveDates.GroupBy(x => x.Date.Date).Any(d => d.Count() > 1);
         if (duplicatedDate)
         {
             yield return new ValidationResult("Duplicated leave date found");
