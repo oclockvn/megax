@@ -21,6 +21,7 @@ import dt from "@/lib/datetime";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import Chip from "@mui/material/Chip";
+import TimeAgo from 'react-timeago';
 import { getInitial } from "@/lib/string.helper";
 
 export type LeaveCardProps = {
@@ -91,10 +92,7 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
           avatar={<Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>}
           action={showAction && <CardAction />}
           title={leave.userName}
-          subheader={`Requested at ${dt.formatDate(
-            leave.createdAt,
-            "MMMM dd, yyyy"
-          )}`}
+          subheader={<TimeAgo date={leave.createdAt} />}
         />
         <CardContent>
           <LeaveItem

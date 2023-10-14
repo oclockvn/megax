@@ -604,6 +604,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-timeago@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@types/react-timeago/-/react-timeago-4.1.4.tgz#083e56b803b7960095b2d35e6de5d11b5b836df7"
+  integrity sha512-2ja12wesBR/n2VMLaYmuHoLB1s9wSUBzPyT1FuWQF4mmvNZYi+OMnx/cJdyFiDoGIMHodN4ZrLNOW9bVxAn8eQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-transition-group@^4.4.6":
   version "4.4.6"
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.4.6.tgz#18187bcda5281f8e10dfc48f0943e2fdf4f75e2e"
@@ -2310,6 +2317,11 @@ react-redux@^8.1.2:
     hoist-non-react-statics "^3.3.2"
     react-is "^18.0.0"
     use-sync-external-store "^1.0.0"
+
+react-timeago@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/react-timeago/-/react-timeago-7.2.0.tgz#ae929d7423a63cbc3dc228e49d22fbf586d459ca"
+  integrity sha512-2KsBEEs+qRhKx/kekUVNSTIpop3Jwd7SRBm0R4Eiq3mPeswRGSsftY9FpKsE/lXLdURyQFiHeHFrIUxLYskG5g==
 
 react-transition-group@^4.4.5:
   version "4.4.5"
