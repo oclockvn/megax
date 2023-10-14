@@ -8,19 +8,21 @@ import LeaveCard from "@/components/portal/leave/LeaveCard";
 import LeaveHistory from "@/components/portal/leave/LeaveHistory";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { useEffect, useState } from "react";
-import { fetchLeavesThunk } from "@/lib/store/leave.state";
+import { fetchLeaveSummaryThunk } from "@/lib/store/leave.state";
 import { Leave, LeaveStatus, LeaveType } from "@/lib/models/leave.model";
 import LeaveSlot from "@/components/portal/leave/LeaveSlot";
 import LeaveForm from "@/components/portal/leave/LeaveForm";
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
-  const { items, loading } = useAppSelector(s => s.leaves);
+  const { items, capacity, loading, approvedDates } = useAppSelector(
+    s => s.leaves
+  );
   const [showDrawer, setShowDrawer] = useState(false);
   const [leave, setLeave] = useState<Partial<Leave> | null>(null);
 
   useEffect(() => {
-    appDispatch(fetchLeavesThunk());
+    appDispatch(fetchLeaveSummaryThunk());
   }, []);
 
   const handleCloseDrawer = () => {
@@ -33,7 +35,6 @@ export default function LeavePage() {
     setShowDrawer(true);
     // appDispatch(setLoading({ loading: false }));
   };
-
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = items.filter(x => x.status !== LeaveStatus.New);
@@ -64,7 +65,7 @@ export default function LeavePage() {
               Availability
             </div>
             <div className="flex-[1] sm:me-[30px]">
-              <LeaveSlot total={15} taken={5} />
+              <LeaveSlot total={capacity} approved={approvedDates} />
             </div>
           </div>
         </Grid>

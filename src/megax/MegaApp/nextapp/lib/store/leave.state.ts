@@ -1,17 +1,21 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
-import { Leave, LeaveRequest, LeaveStatus } from "../models/leave.model";
-import { fetchLeaves, submitLeave } from "../apis/leave.api";
+import { Leave, LeaveDate, LeaveRequest, LeaveStatus } from "../models/leave.model";
+import { fetchLeaveSummary, fetchLeaves, submitLeave } from "../apis/leave.api";
 // import { fetchTodo } from "../apis/s.api";
 
 export interface LeaveState {
   items: Leave[];
+  approvedDates: LeaveDate[];
+  capacity: number;
   loading: boolean;
   error?: string;
 }
 
 const initialState: LeaveState = {
   items: [],
+  approvedDates: [],
+  capacity: 0,
   loading: false,
 };
 
@@ -20,6 +24,14 @@ export const fetchLeavesThunk = createAsyncThunk(
   async (filter: Partial<Filter> | undefined, thunkApi) => {
     thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
     return await fetchLeaves();
+  }
+);
+
+export const fetchLeaveSummaryThunk = createAsyncThunk(
+  "leaves/summary",
+  async (filter: Partial<Filter> | undefined, thunkApi) => {
+    thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
+    return await fetchLeaveSummary();
   }
 );
 
@@ -40,21 +52,16 @@ export const leaveSlice = createSlice({
     setLoadingState: (state, action: PayloadAction<string>) => {
       state.loading = true;
     },
-    // toggleEditSubLeave: (state, action: PayloadAction<EditSubLeaveType>) => {
-    //   const task = state.items.find(t => t.id === action.payload.taskId);
-    //   if (!task || !task.subLeaves) {
-    //     throw new Error("500");
-    //   }
-
-    //   const { id } = action.payload;
-    //   task.subLeaves = task.subLeaves.map(t => ({
-    //     ...t,
-    //     isEdit: t.id === id ? !t.isEdit : false,
-    //   }));
-    // },
   },
   extraReducers(builder) {
     builder
+      .addCase(fetchLeaveSummaryThunk.fulfilled, (state, action) => {
+        const { leaves, capacity, approvedDates } = action.payload;
+        state.items = leaves;
+        state.approvedDates = approvedDates;
+        state.capacity = capacity;
+        state.loading = false;
+      })
       .addCase(fetchLeavesThunk.fulfilled, (state, action) => {
         state.items = action.payload;
         state.loading = false;

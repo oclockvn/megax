@@ -17,6 +17,19 @@ public class LeavesController : ApplicationControllerBase
     }
 
     /// <summary>
+    /// Get leave status current user
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("summary")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(PagedResult<LeaveModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetLeaveSummary()
+    {
+        var leaves = await leaveService.GetLeaveSummaryAsync(GetCurrentUserId());
+        return Ok(leaves);
+    }
+
+    /// <summary>
     /// Get all leaves of current user
     /// </summary>
     /// <returns></returns>

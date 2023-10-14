@@ -2,13 +2,13 @@
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Exceptions;
-using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
 
 public interface ILeaveService
 {
+    Task<LeaveState> GetLeaveSummaryAsync(int userId);
     Task<List<LeaveModel>> GetLeavesAsync(int userId);
     Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request);
     Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId);
@@ -45,6 +45,18 @@ internal class LeaveService : ILeaveService
             .ToListAsync();
 
         return leaves;
+    }
+
+    public async Task<LeaveState> GetLeaveSummaryAsync(int userId)
+    {
+        var leaves = await GetLeavesAsync(userId);
+        var leaveCapacity = 15; // todo: get capacity from user
+
+        return new LeaveState
+        {
+            Leaves = leaves,
+            Capacity = leaveCapacity,
+        };
     }
 
     public async Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request)

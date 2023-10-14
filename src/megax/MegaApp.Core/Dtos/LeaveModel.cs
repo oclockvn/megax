@@ -4,6 +4,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
 
+public record LeaveState
+{
+    public List<LeaveModel> Leaves { get; set; } = new();
+    public IEnumerable<LeaveDateModel> ApprovedDates => Leaves
+        .Where(l => l.Status == LeaveStatus.Approved)
+        .SelectMany(x => x.LeaveDates)
+        .OrderBy(x => x.Date);
+    public int Capacity { get; set; }
+}
+
 public record LeaveModel : IValidatableObject
 {
     public int Id { get; set; }
