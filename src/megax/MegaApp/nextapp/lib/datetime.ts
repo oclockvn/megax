@@ -24,6 +24,10 @@ import {
   addYears,
   isWeekend,
   isSameDay,
+  isPast,
+  isFuture,
+  isAfter,
+  isBefore,
 } from "date-fns";
 
 const startOfDay = (date: Date): Date => {
@@ -125,6 +129,10 @@ export default {
   isWeekend,
   getNextWeekDay,
   isSameDay,
+  isPast,
+  isFuture,
+  isAfter,
+  isBefore,
 };
 
 // export function handleDates(body: any) {

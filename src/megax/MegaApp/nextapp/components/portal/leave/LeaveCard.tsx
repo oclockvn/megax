@@ -21,7 +21,7 @@ import dt from "@/lib/datetime";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import Chip from "@mui/material/Chip";
-import TimeAgo from 'react-timeago';
+import TimeAgo from "react-timeago";
 import { getInitial } from "@/lib/string.helper";
 
 export type LeaveCardProps = {
@@ -85,11 +85,21 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
       ? "border-green-500 text-green-500"
       : "border-fuchsia-500 text-fuchsia-500";
 
+  // check if the last leave was in the past
+  const ascDate = [...leave.leaveDates].sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  );
+  const pastLeave = ascDate.length
+    ? dt.isPast(ascDate.at(-1)?.date || new Date())
+    : false;
+
   return (
     <div className="relative">
-      <Card>
+      <Card className={pastLeave ? "bg-gray-200" : ""}>
         <CardHeader
-          avatar={<Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>}
+          avatar={
+            <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
+          }
           action={showAction && <CardAction />}
           title={leave.userName}
           subheader={<TimeAgo date={leave.createdAt} />}
