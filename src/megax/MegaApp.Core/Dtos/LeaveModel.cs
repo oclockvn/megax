@@ -14,8 +14,6 @@ public record LeaveModel : IValidatableObject
 
     [MaxLength(255)]
     public string Note { get; set; }
-
-    public DateTimeOffset SubmittedDate { get; set; }
     public LeaveStatus Status { get; set; }
 
     [MaxLength(255)]

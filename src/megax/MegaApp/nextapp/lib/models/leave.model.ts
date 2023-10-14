@@ -6,7 +6,6 @@ export interface Leave {
   leaveDates: LeaveDate[];
   type: LeaveType;
   note: string;
-  submittedDate: Date;
   status: LeaveStatus;
   feedback: string;
   approvedBy?: string;

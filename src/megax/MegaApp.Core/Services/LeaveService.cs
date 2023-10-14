@@ -75,7 +75,6 @@ internal class LeaveService : ILeaveService
             Type = request.Type,
             Reason = request.Reason,
             Note = request.Note,
-            SubmittedDate = DateTimeOffset.Now,
             Status = Enums.LeaveStatus.New,
             UserId = request.UserId,
         };
