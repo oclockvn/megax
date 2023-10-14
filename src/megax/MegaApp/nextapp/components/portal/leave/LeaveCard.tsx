@@ -21,6 +21,7 @@ import dt from "@/lib/datetime";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import Chip from "@mui/material/Chip";
+import { getInitial } from "@/lib/string.helper";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -87,10 +88,13 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
     <div className="relative">
       <Card>
         <CardHeader
-          avatar={<Avatar aria-label="recipe">QP</Avatar>}
+          avatar={<Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>}
           action={showAction && <CardAction />}
           title={leave.userName}
-          subheader={`Requested at ${dt.formatDate(leave.createdAt, 'MMMM dd, yyyy')}`}
+          subheader={`Requested at ${dt.formatDate(
+            leave.createdAt,
+            "MMMM dd, yyyy"
+          )}`}
         />
         <CardContent>
           <LeaveItem
@@ -104,7 +108,11 @@ export default function LeaveCard({ leave, onEdit }: LeaveCardProps) {
             content={
               <>
                 {leave.leaveDates?.map((d, index) => (
-                  <div key={d.id} className="flex items-center gap-1 mt-1" title={dt.formatDate(d.date, 'dd/MM/yyyy')}>
+                  <div
+                    key={d.id}
+                    className="flex items-center gap-1 mt-1"
+                    title={dt.formatDate(d.date, "dd/MM/yyyy")}
+                  >
                     {displayTime(d.time)}
                     {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
                   </div>
