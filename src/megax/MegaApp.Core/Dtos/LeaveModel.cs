@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
 
-public record LeaveState
+public record LeaveSummary
 {
     public List<LeaveModel> Leaves { get; set; } = new();
     public IEnumerable<LeaveDateModel> ApprovedDates => Leaves

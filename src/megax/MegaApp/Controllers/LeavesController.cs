@@ -22,7 +22,7 @@ public class LeavesController : ApplicationControllerBase
     /// <returns></returns>
     [HttpGet("summary")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(PagedResult<LeaveModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LeaveSummary), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLeaveSummary()
     {
         var leaves = await leaveService.GetLeaveSummaryAsync(GetCurrentUserId());
@@ -35,7 +35,7 @@ public class LeavesController : ApplicationControllerBase
     /// <returns></returns>
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(PagedResult<LeaveModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<LeaveModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLeaves()
     {
         var leaves = await leaveService.GetLeavesAsync(GetCurrentUserId());
@@ -49,7 +49,7 @@ public class LeavesController : ApplicationControllerBase
     /// <returns></returns>
     [HttpPost]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(PagedResult<LeaveModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<LeaveModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> RequestLeave(LeaveModel.Add request)
     {
         if (!ModelState.IsValid)
@@ -59,6 +59,20 @@ public class LeavesController : ApplicationControllerBase
 
         request.UserId = GetCurrentUserId(); // enhance when do allow teammate to request
         var result = await leaveService.RequestLeaveAsync(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Cancel leave request
+    /// </summary>
+    /// <param name="id">Leave id</param>
+    /// <returns></returns>
+    [HttpDelete("{id}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CancelLeave(int id)
+    {
+        var result = await leaveService.CancelLeaveAsync(id);
         return Ok(result);
     }
 }

@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
 import { Leave, LeaveDate, LeaveRequest, LeaveStatus } from "../models/leave.model";
-import { fetchLeaveSummary, fetchLeaves, submitLeave } from "../apis/leave.api";
+import { cancelLeave, fetchLeaveSummary, fetchLeaves, submitLeave } from "../apis/leave.api";
 // import { fetchTodo } from "../apis/s.api";
 
 export interface LeaveState {
@@ -42,6 +42,13 @@ export const submitLeaveThunk = createAsyncThunk(
   }
 );
 
+export const cancelLeaveThunk = createAsyncThunk(
+  "leaves/cancel",
+  async (id: number, _thunkApi) => {
+    return await cancelLeave(id);
+  }
+);
+
 export const leaveSlice = createSlice({
   name: "leaves",
   initialState,
@@ -76,6 +83,11 @@ export const leaveSlice = createSlice({
           // state.error = undefined;
         } else {
           // state.error = `Request failed. Error code: ${code}`;
+        }
+      })
+      .addCase(cancelLeaveThunk.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          state.items = state.items.filter(x => x.id !== action.payload.data);
         }
       });
   },

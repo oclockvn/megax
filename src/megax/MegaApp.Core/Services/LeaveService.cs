@@ -8,10 +8,11 @@ namespace MegaApp.Core.Services;
 
 public interface ILeaveService
 {
-    Task<LeaveState> GetLeaveSummaryAsync(int userId);
+    Task<LeaveSummary> GetLeaveSummaryAsync(int userId);
     Task<List<LeaveModel>> GetLeavesAsync(int userId);
     Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request);
     Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId);
+    Task<Result<int>> CancelLeaveAsync(int id);
 }
 
 internal class LeaveService : ILeaveService
@@ -28,6 +29,27 @@ internal class LeaveService : ILeaveService
     public Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<Result<int>> CancelLeaveAsync(int id)
+    {
+        using var db = UseDb();
+        var leave = await db.Leaves.Include(x => x.LeaveDates).Where(x => x.Id == id).SingleOrDefaultAsync() ?? throw new EntityNotFoundException("Are you hacking? Stop!");
+        if (leave.Status == Enums.LeaveStatus.Approved)
+        {
+            return Result<int>.Fail(Result.LEAVE_WAS_APPROVED);
+        }
+
+        var hasPastLeave = leave.LeaveDates.Any(d => d.Date <= DateTimeOffset.Now);
+        if (hasPastLeave)
+        {
+            return Result<int>.Fail(Result.LEAVE_WAS_PASSED);
+        }
+
+        db.Leaves.Remove(leave);
+        await db.SaveChangesAsync();
+
+        return new Result<int>(id);
     }
 
     public async Task<List<LeaveModel>> GetLeavesAsync(int userId)
@@ -47,12 +69,12 @@ internal class LeaveService : ILeaveService
         return leaves;
     }
 
-    public async Task<LeaveState> GetLeaveSummaryAsync(int userId)
+    public async Task<LeaveSummary> GetLeaveSummaryAsync(int userId)
     {
         var leaves = await GetLeavesAsync(userId);
         var leaveCapacity = 15; // todo: get capacity from user
 
-        return new LeaveState
+        return new LeaveSummary
         {
             Leaves = leaves,
             Capacity = leaveCapacity,

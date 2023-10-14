@@ -17,6 +17,7 @@ import {
 import Popover from "@mui/material/Popover";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { addTaskThunk } from "@/lib/store/tasks.state";
+import { TaskState } from "@/lib/models/task.model";
 
 type TaskModel = {
   title: string;
@@ -50,6 +51,7 @@ export default function TaskForm() {
           clientId: form.clientId,
           projectId: form.projectId,
           title: form.title,
+          status: TaskState.Todo,
         })
       ).unwrap();
 

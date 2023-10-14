@@ -19,10 +19,14 @@ import {
 } from "@/lib/models/leave.model";
 import dt from "@/lib/datetime";
 import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
+// import EditIcon from "@mui/icons-material/Edit";
 import Chip from "@mui/material/Chip";
 import TimeAgo from "react-timeago";
 import { getInitial } from "@/lib/string.helper";
+import { useAppDispatch } from "@/lib/store/state.hook";
+import { useConfirm } from "material-ui-confirm";
+import { cancelLeaveThunk } from "@/lib/store/leave.state";
+import toast from "react-hot-toast";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -35,6 +39,36 @@ const timeDic = {
 };
 
 export default function LeaveCard({ leave }: LeaveCardProps) {
+  const appDispatch = useAppDispatch();
+  const confirmation = useConfirm();
+
+  const handleCancel = () => {
+    confirmation({
+      title: "Are you sure?",
+      description: "Cancelling this leave request...",
+      dialogProps: {
+        maxWidth: "xs",
+      },
+    })
+      .then(() => {
+        appDispatch(cancelLeaveThunk(leave.id))
+          .unwrap()
+          .then(res => {
+            if (res.success) {
+              toast.success(`Leave is cancelled successfully`);
+              return;
+            }
+
+            toast.error(
+              `Could not cancel leave request. Error code: ${res.code}`
+            );
+          });
+      })
+      .catch(() => {
+        /*ignore*/
+      });
+  };
+
   const LeaveItem = ({
     icon,
     category,
@@ -71,7 +105,12 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         >
           Edit
         </Button> */}
-        <IconButton color="warning" size="small" aria-label="Cancel leave">
+        <IconButton
+          color="warning"
+          size="small"
+          aria-label="Cancel leave"
+          onClick={handleCancel}
+        >
           <CloseIcon />
         </IconButton>
       </div>

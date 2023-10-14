@@ -29,6 +29,8 @@ namespace MegaApp.Core
         public static readonly string COMPLETE_SUBTASK_REQUIRED = "COMPLETE_SUBTASK_REQUIRED";
         public static readonly string OUT_OF_AVAILABLE_ANNUAL_LEAVE = "OUT_OF_AVAILABLE_ANNUAL_LEAVE";
         public static readonly string OVERLAP_LEAVE_REQUEST = "OVERLAP_LEAVE_REQUEST";
+        public static readonly string LEAVE_WAS_PASSED = "LEAVE_WAS_PASSED";
+        public static readonly string LEAVE_WAS_APPROVED = "LEAVE_WAS_APPROVED";
     }
 
     public record Result<T>(T Data) : Result
