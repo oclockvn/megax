@@ -21,7 +21,6 @@ export default function SignInPage() {
     // flow: "auth-code",
     flow: 'implicit',
     onSuccess: async codeResponse => {
-      // console.log(codeResponse);
       // const { code } = codeResponse;
       const resp = await googleSignIn(codeResponse.access_token);
       if (resp.success) {

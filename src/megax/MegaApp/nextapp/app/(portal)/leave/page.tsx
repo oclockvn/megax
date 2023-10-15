@@ -35,12 +35,20 @@ export default function LeavePage() {
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = items.filter(x => x.status !== LeaveStatus.New);
-  const taken = items.filter(x => x.status === LeaveStatus.Approved).length;
+  const taken = items
+    .filter(x => x.status === LeaveStatus.Approved)
+    .reduce(
+      (prev: Date[], { leaveDates }) => [
+        ...prev,
+        ...leaveDates.map(d => d.date),
+      ],
+      []
+    ).length;
+
   const requestedDates = items.reduce(
     (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
     []
   );
-  console.log({ requestedDates });
 
   return (
     <div className="p-4 md:px-0 container mx-auto">

@@ -10,7 +10,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
-import IconButton from "@mui/material/IconButton";
+// import IconButton from "@mui/material/IconButton";
 import {
   Leave,
   LeaveStatus,
@@ -105,14 +105,15 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         >
           Edit
         </Button> */}
-        <IconButton
+        <Button
           color="warning"
           size="small"
           aria-label="Cancel leave"
           onClick={handleCancel}
+          startIcon={<CloseIcon />}
         >
-          <CloseIcon />
-        </IconButton>
+          Cancel
+        </Button>
       </div>
     );
   };

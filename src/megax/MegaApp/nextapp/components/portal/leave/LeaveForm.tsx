@@ -56,7 +56,6 @@ export default function LeaveForm(props: LeaveFormProps) {
   };
 
   const dateChange = (items: LeaveDate[]) => {
-    // console.log(items);
     leaveDates = items;
   };
 
