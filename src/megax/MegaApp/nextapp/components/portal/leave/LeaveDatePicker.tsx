@@ -13,7 +13,7 @@ import Close from "@mui/icons-material/Close";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
-import client from "@/lib/helpers/client"
+import client from "@/lib/helpers/client";
 
 type LeaveDatePickerProps = {
   value?: LeaveDate[];
@@ -21,7 +21,10 @@ type LeaveDatePickerProps = {
   onChange: (items: LeaveDate[]) => void;
 };
 
-type _AddPayload = {};
+type _AddPayload = {
+  taken: Date[];
+};
+
 type _UpdatePayload = {
   id: number;
   date: Date;
@@ -35,15 +38,20 @@ type _Action =
   | { type: "update"; payload: _UpdatePayload }
   | { type: "delete"; payload: _DeletePayload };
 
+const smartDateSuggestion = (taken: Date[]) => {
+  let suggestion = dt.getNextWeekDay(new Date());
+  while (taken.some(d => dt.isSameDay(d, suggestion))) {
+    suggestion = dt.getNextWeekDay(suggestion);
+  }
+
+  return suggestion;
+};
+
 function reducer(state: LeaveDate[], action: _Action) {
   switch (action.type) {
     case "add":
-      const maxDate =
-        state
-          .map(s => s.date)
-          .sort((a, b) => a.getTime() - b.getTime())
-          .at(-1) || new Date();
-      const suggestDate = dt.getNextWeekDay(maxDate);
+      const { taken } = action.payload;
+      const suggestDate = smartDateSuggestion(taken);
 
       return [
         ...state,
@@ -67,7 +75,11 @@ function reducer(state: LeaveDate[], action: _Action) {
 
 export default function LeaveDatePicker(props: LeaveDatePickerProps) {
   const initState: LeaveDate[] = props.value || [
-    { id: 0, date: dt.getNextWeekDay(new Date()), time: LeaveTime.All },
+    {
+      id: 0,
+      date: smartDateSuggestion(props.requestedDates || []),
+      time: LeaveTime.All,
+    },
   ];
 
   const [dates, dispatch] = useReducer(reducer, initState);
@@ -75,7 +87,9 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
   const handleAdd = () => {
     dispatch({
       type: "add",
-      payload: {},
+      payload: {
+        taken: [...(props.requestedDates || []), ...dates.map(d => d.date)],
+      },
     });
   };
 
@@ -94,8 +108,12 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
   };
 
   const shouldDisableDate = (id: number, selected: Date) => {
-    return dates.some(leave => leave.id !== id && dt.isSameDay(selected, leave.date));
-  }
+    return (
+      dates.some(
+        leave => leave.id !== id && dt.isSameDay(selected, leave.date)
+      ) || props.requestedDates?.some(d => dt.isSameDay(d, selected)) === true
+    );
+  };
 
   useEffect(() => {
     props.onChange(dates);
@@ -125,7 +143,9 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
                 format="dd/MM/yyyy"
                 maxDate={maxRequestDate}
                 minDate={minRequestDate}
-                shouldDisableDate={d => dt.isWeekend(d) || shouldDisableDate(item.id, d)}
+                shouldDisableDate={d =>
+                  dt.isWeekend(d) || shouldDisableDate(item.id, d)
+                }
                 value={item.date}
                 onChange={date =>
                   handleUpdate(item, date || item.date, item.time)

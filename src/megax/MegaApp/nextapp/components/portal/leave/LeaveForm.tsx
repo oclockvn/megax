@@ -90,7 +90,11 @@ export default function LeaveForm(props: LeaveFormProps) {
           </div>
 
           <div className="mb-4">
-            <LeaveDatePicker value={leave.leaveDates} onChange={dateChange} />
+            <LeaveDatePicker
+              value={leave.leaveDates}
+              onChange={dateChange}
+              requestedDates={props.requestedDates}
+            />
           </div>
 
           <div className="mb-4">
@@ -125,7 +129,11 @@ export default function LeaveForm(props: LeaveFormProps) {
             />
           </div>
 
-          {!!error && <Alert variant="standard" color="error" className="mb-4">{error}</Alert>}
+          {!!error && (
+            <Alert variant="standard" color="error" className="mb-4">
+              {error}
+            </Alert>
+          )}
 
           <div className="flex items-center gap-2">
             <Button

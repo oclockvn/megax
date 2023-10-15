@@ -14,9 +14,7 @@ import LeaveForm from "@/components/portal/leave/LeaveForm";
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
-  const { items, capacity, loading } = useAppSelector(
-    s => s.leaves
-  );
+  const { items, capacity, loading } = useAppSelector(s => s.leaves);
   const [showDrawer, setShowDrawer] = useState(false);
   const [leave, setLeave] = useState<Partial<Leave> | null>(null);
 
@@ -38,6 +36,11 @@ export default function LeavePage() {
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = items.filter(x => x.status !== LeaveStatus.New);
   const taken = items.filter(x => x.status === LeaveStatus.Approved).length;
+  const requestedDates = items.reduce(
+    (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
+    []
+  );
+  console.log({ requestedDates });
 
   return (
     <div className="p-4 md:px-0 container mx-auto">
@@ -88,6 +91,7 @@ export default function LeavePage() {
             leave={leave!}
             loading={loading}
             handleClose={handleCloseDrawer}
+            requestedDates={requestedDates}
           />
         )}
       </Drawer>
