@@ -26,6 +26,7 @@ type LeaveFormProps = {
   // handleSave: (contact: Partial<Leave>) => void;
   handleClose: () => void;
   loading?: boolean;
+  requestedDates?: Date[];
 };
 
 export default function LeaveForm(props: LeaveFormProps) {

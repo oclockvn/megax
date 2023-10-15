@@ -1,5 +1,7 @@
 ﻿using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Enums;
+using MegaApp.Core.Validators;
+using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
@@ -14,7 +16,7 @@ public record LeaveSummary
     public int Capacity { get; set; }
 }
 
-public record LeaveModel : IValidatableObject
+public record LeaveModel
 {
     public int Id { get; set; }
 
@@ -40,7 +42,7 @@ public record LeaveModel : IValidatableObject
 
     public List<LeaveDateModel> LeaveDates { get; set; } = new();
 
-    public record Add
+    public record Add : IValidatableObject
     {
         [MaxLength(255)]
         public string Reason { get; set; }
@@ -52,6 +54,15 @@ public record LeaveModel : IValidatableObject
         public int UserId { get; set; }
 
         public List<LeaveDateModel.Add> LeaveDates { get; set; } = new();
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var valid = new LeaveRequestValidator(this).IsValid(out var error);
+            if (!valid)
+            {
+                yield return new ValidationResult(error);
+            }
+        }
     }
 
     public LeaveModel()
@@ -75,20 +86,6 @@ public record LeaveModel : IValidatableObject
     public LeaveModel(Db.Entities.Leave leave, List<LeaveDate> dates) : this(leave)
     {
         LeaveDates.AddRange(dates.Select(d => new LeaveDateModel(d)));
-    }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (LeaveDates == null || LeaveDates.Count == 0)
-        {
-            yield return new ValidationResult("Requires at least 1 date leave");
-        }
-
-        var duplicatedDate = LeaveDates.GroupBy(x => x.Date.Date).Any(d => d.Count() > 1);
-        if (duplicatedDate)
-        {
-            yield return new ValidationResult("Duplicated leave date found");
-        }
     }
 }
 

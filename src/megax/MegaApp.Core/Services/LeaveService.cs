@@ -3,7 +3,9 @@ using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Enums;
 using MegaApp.Core.Exceptions;
+using MegaApp.Core.Validators;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace MegaApp.Core.Services;
 
@@ -94,15 +96,10 @@ internal class LeaveService : ILeaveService
 
     public async Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request)
     {
-        if (request.LeaveDates == null || request.LeaveDates.Count == 0)
+        var valid = new LeaveRequestValidator(request).IsValid(out var error);
+        if (!valid)
         {
-            throw new BusinessRuleViolationException("Requires at least 1 leave date");
-        }
-
-        var duplicateRequestDate = request.LeaveDates.GroupBy(x => x.Date.Date).Any(d => d.Count() > 1);
-        if (duplicateRequestDate)
-        {
-            throw new BusinessRuleViolationException("Duplicated leave date found");
+            throw new BusinessRuleViolationException(error);
         }
 
         using var db = UseDb();

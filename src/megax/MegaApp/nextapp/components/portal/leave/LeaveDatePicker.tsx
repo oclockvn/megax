@@ -17,6 +17,7 @@ import client from "@/lib/helpers/client"
 
 type LeaveDatePickerProps = {
   value?: LeaveDate[];
+  requestedDates?: Date[];
   onChange: (items: LeaveDate[]) => void;
 };
 
@@ -69,7 +70,7 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
     { id: 0, date: dt.getNextWeekDay(new Date()), time: LeaveTime.All },
   ];
 
-  const [state, dispatch] = useReducer(reducer, initState);
+  const [dates, dispatch] = useReducer(reducer, initState);
 
   const handleAdd = () => {
     dispatch({
@@ -93,24 +94,24 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
   };
 
   const shouldDisableDate = (id: number, selected: Date) => {
-    return state.some(leave => leave.id !== id && dt.isSameDay(selected, leave.date));
+    return dates.some(leave => leave.id !== id && dt.isSameDay(selected, leave.date));
   }
 
   useEffect(() => {
-    props.onChange(state);
-  }, [state]);
+    props.onChange(dates);
+  }, [dates]);
 
   const maxRequestDate = new Date();
   maxRequestDate.setMonth(maxRequestDate.getMonth() + 3); // max request is up to 3 months
   const minRequestDate = new Date();
   minRequestDate.setDate(minRequestDate.getDate() - 14); // min to 2 week past
 
-  const maxRequest = state.length >= 5;
+  const maxRequest = dates.length >= 5;
 
   return (
     <>
       <div>
-        {state.map(item => (
+        {dates.map(item => (
           <Grid
             container
             spacing={2}
@@ -148,7 +149,7 @@ export default function LeaveDatePicker(props: LeaveDatePickerProps) {
                 size="small"
                 color="warning"
                 onClick={() => handleRemove(item.id)}
-                disabled={state.length === 1}
+                disabled={dates.length === 1}
               >
                 <Close fontSize="small" />
               </IconButton>
