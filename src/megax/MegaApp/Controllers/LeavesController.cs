@@ -1,5 +1,6 @@
 ﻿using MegaApp.Core;
 using MegaApp.Core.Dtos;
+using MegaApp.Core.Enums;
 using MegaApp.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -69,7 +70,7 @@ public class LeavesController : ApplicationControllerBase
     /// <returns></returns>
     [HttpDelete("{id}")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelLeave(int id)
     {
         var result = await leaveService.CancelLeaveAsync(id);

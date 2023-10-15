@@ -10,12 +10,11 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { useEffect, useState } from "react";
 import { fetchLeaveSummaryThunk } from "@/lib/store/leave.state";
 import { Leave, LeaveStatus, LeaveType } from "@/lib/models/leave.model";
-import LeaveSlot from "@/components/portal/leave/LeaveSlot";
 import LeaveForm from "@/components/portal/leave/LeaveForm";
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
-  const { items, capacity, loading, approvedDates } = useAppSelector(
+  const { items, capacity, loading } = useAppSelector(
     s => s.leaves
   );
   const [showDrawer, setShowDrawer] = useState(false);
@@ -38,6 +37,7 @@ export default function LeavePage() {
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = items.filter(x => x.status !== LeaveStatus.New);
+  const taken = items.filter(x => x.status === LeaveStatus.Approved).length;
 
   return (
     <div className="p-4 md:px-0 container mx-auto">
@@ -59,21 +59,16 @@ export default function LeavePage() {
             Request Leave
           </Button>
         </Grid>
-        <Grid item xs={12} sm={8}>
-          <div className="sm:flex items-center">
-            <div className="flex-[.2] max-w-[160px] pe-4 font-bold text-end">
-              Availability
-            </div>
-            <div className="flex-[1] sm:me-[30px]">
-              <LeaveSlot total={capacity} approved={approvedDates} />
-            </div>
-          </div>
-        </Grid>
       </Grid>
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <h3 className="mt-4 mb-2 text-lg font-bold">Your Requests</h3>
+          <div className="flex items-center justify-between mt-4 mb-2 font-bold">
+            <h3 className="text-lg">Your Requests</h3>
+            <div>
+              (Taken {taken} / {capacity} total)
+            </div>
+          </div>
           {queueItems.map((i, index) => (
             <div key={i.id} className={index === 0 ? "" : "mt-4"}>
               <LeaveCard leave={i} />

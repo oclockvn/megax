@@ -1,6 +1,7 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Dtos;
+using MegaApp.Core.Enums;
 using MegaApp.Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ public interface ILeaveService
     Task<List<LeaveModel>> GetLeavesAsync(int userId);
     Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request);
     Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId);
-    Task<Result<int>> CancelLeaveAsync(int id);
+    Task<Result<LeaveStatus>> CancelLeaveAsync(int id);
 }
 
 internal class LeaveService : ILeaveService
@@ -31,25 +32,35 @@ internal class LeaveService : ILeaveService
         throw new NotImplementedException();
     }
 
-    public async Task<Result<int>> CancelLeaveAsync(int id)
+    public async Task<Result<LeaveStatus>> CancelLeaveAsync(int id)
     {
         using var db = UseDb();
         var leave = await db.Leaves.Include(x => x.LeaveDates).Where(x => x.Id == id).SingleOrDefaultAsync() ?? throw new EntityNotFoundException("Are you hacking? Stop!");
-        if (leave.Status == Enums.LeaveStatus.Approved)
+
+        if (leave.Status == LeaveStatus.Cancelled)
         {
-            return Result<int>.Fail(Result.LEAVE_WAS_APPROVED);
+            throw new Exception("Are you trying to do some dirty hacks? Stop it");
         }
 
         var hasPastLeave = leave.LeaveDates.Any(d => d.Date <= DateTimeOffset.Now);
         if (hasPastLeave)
         {
-            return Result<int>.Fail(Result.LEAVE_WAS_PASSED);
+            return Result<LeaveStatus>.Fail(Result.LEAVE_WAS_PASSED);
         }
 
-        db.Leaves.Remove(leave);
+        if (leave.Status == Enums.LeaveStatus.Approved)
+        {
+            // return Result<int>.Fail(Result.LEAVE_WAS_APPROVED);
+            leave.Status = Enums.LeaveStatus.Cancelled;
+        }
+        else // no need to keep it if it's not approved yet
+        {
+            db.Leaves.Remove(leave);
+        }
+
         await db.SaveChangesAsync();
 
-        return new Result<int>(id);
+        return new Result<LeaveStatus>(leave.Status);
     }
 
     public async Task<List<LeaveModel>> GetLeavesAsync(int userId)
@@ -97,7 +108,12 @@ internal class LeaveService : ILeaveService
         using var db = UseDb();
 
         var dates = request.LeaveDates.Select(x => x.Date.Date).ToList();
-        var requestedDates = await db.LeaveDates.Where(l => l.Leave.UserId == request.UserId && dates.Contains(l.Date.Date)).Select(x => new { x.Date, x.Time }).ToListAsync();
+        var requestedDates = await db.LeaveDates
+            .Where(l => l.Leave.UserId == request.UserId
+                && !new[] { LeaveStatus.Approved, LeaveStatus.New }.Contains(l.Leave.Status)
+                && dates.Contains(l.Date.Date))
+            .Select(x => new { x.Date, x.Time })
+            .ToListAsync();
         var overlapDate = requestedDates.Any(requested => request.LeaveDates.Any(x => x.Date.Date == requested.Date.Date && (x.Time == Enums.LeaveTime.All || requested.Time == Enums.LeaveTime.All || x.Time == requested.Time)));
         if (overlapDate)
         {

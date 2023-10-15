@@ -1,7 +1,17 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
-import { Leave, LeaveDate, LeaveRequest, LeaveStatus } from "../models/leave.model";
-import { cancelLeave, fetchLeaveSummary, fetchLeaves, submitLeave } from "../apis/leave.api";
+import {
+  Leave,
+  LeaveDate,
+  LeaveRequest,
+  LeaveStatus,
+} from "../models/leave.model";
+import {
+  cancelLeave,
+  fetchLeaveSummary,
+  fetchLeaves,
+  submitLeave,
+} from "../apis/leave.api";
 // import { fetchTodo } from "../apis/s.api";
 
 export interface LeaveState {
@@ -86,7 +96,15 @@ export const leaveSlice = createSlice({
         }
       })
       .addCase(cancelLeaveThunk.fulfilled, (state, action) => {
-        if (action.payload.success) {
+        const { success, data } = action.payload;
+        if (!success) {
+          return;
+        }
+
+        if (data === LeaveStatus.Cancelled) {
+          const leave = state.items.find(x => x.id === action.meta.arg);
+          leave!.status = data;
+        } else {
           state.items = state.items.filter(x => x.id !== action.payload.data);
         }
       });

@@ -44,8 +44,8 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
 
   const handleCancel = () => {
     confirmation({
-      title: "Are you sure?",
-      description: "Cancelling this leave request...",
+      title: "Are you sure? No regret?",
+      description: "Look like your party was cancelled right?",
       dialogProps: {
         maxWidth: "xs",
       },
@@ -117,12 +117,6 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     );
   };
 
-  const showAction = [LeaveStatus.New].includes(leave.status);
-  const labelCls =
-    leave.status === LeaveStatus.Approved
-      ? "border-green-500 text-green-500"
-      : "border-fuchsia-500 text-fuchsia-500";
-
   // check if the last leave was in the past
   const ascDate = [...leave.leaveDates].sort(
     (a, b) => a.date.getTime() - b.date.getTime()
@@ -131,6 +125,13 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     ? dt.isPast(ascDate.at(-1)?.date || new Date())
     : false;
 
+  const showAction = [LeaveStatus.New].includes(leave.status);
+  const canCancel = leave.status === LeaveStatus.Approved && !pastLeave;
+  const labelCls =
+    leave.status === LeaveStatus.Approved
+      ? "border-green-500 text-green-500"
+      : "border-fuchsia-500 text-fuchsia-500";
+
   return (
     <div className="relative">
       <Card className={pastLeave ? "bg-gray-200" : ""}>
@@ -138,7 +139,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           avatar={
             <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
           }
-          action={showAction && <CardAction />}
+          action={(showAction || canCancel) && <CardAction />}
           title={leave.userName}
           subheader={<TimeAgo date={leave.createdAt} />}
         />

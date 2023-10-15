@@ -31,6 +31,6 @@ export async function submitLeave(request: Partial<LeaveRequest>) {
 }
 
 export async function cancelLeave(id: number) {
-  const res = await api.delete<Result<number>>(`api/leaves/${id}`);
+  const res = await api.delete<Result<LeaveStatus>>(`api/leaves/${id}`);
   return res.data;
 }
