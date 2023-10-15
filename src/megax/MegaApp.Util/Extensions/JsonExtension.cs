@@ -7,7 +7,7 @@ public static class JsonExtension
         return System.Text.Json.JsonSerializer.Serialize<T>(obj);
     }
 
-    public static T FromJson<T>(this string s)
+    public static T? FromJson<T>(this string s)
     {
         if (string.IsNullOrWhiteSpace(s))
         {
@@ -17,7 +17,7 @@ public static class JsonExtension
         return System.Text.Json.JsonSerializer.Deserialize<T>(s);
     }
 
-    public static async Task<T> FromJsonAsync<T>(this Stream s)
+    public static async Task<T?> FromJsonAsync<T>(this Stream s)
     {
         if (s == null || s.Length == 0)
         {

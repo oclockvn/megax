@@ -5,7 +5,7 @@ namespace MegaApp.Infrastructure.GoogleClient
 {
     public class GoogleClientOption
     {
-        public string ClientId { get; set; }
+        public string ClientId { get; set; } = null!;
     }
 
     public record GoogleClaim(string Name, string Email);
@@ -13,8 +13,8 @@ namespace MegaApp.Infrastructure.GoogleClient
 
     public interface IGoogleAuthenticateClient
     {
-        Task<(bool valid, GoogleClaim claim)> ValidateAsync(string idToken);
-        Task<(bool valid, GoogleClaim claim)> ValidateAccessTokenAsync(string accessToken);
+        Task<(bool valid, GoogleClaim? claim)> ValidateAsync(string idToken);
+        Task<(bool valid, GoogleClaim? claim)> ValidateAccessTokenAsync(string accessToken);
     }
 
     internal class GoogleAuthenticateClient : IGoogleAuthenticateClient
@@ -30,7 +30,7 @@ namespace MegaApp.Infrastructure.GoogleClient
             this.httpClientFactory = httpClientFactory;
         }
 
-        public async Task<(bool valid, GoogleClaim claim)> ValidateAsync(string idToken)
+        public async Task<(bool valid, GoogleClaim? claim)> ValidateAsync(string idToken)
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings
             {
@@ -53,7 +53,7 @@ namespace MegaApp.Infrastructure.GoogleClient
             }
         }
 
-        public async Task<(bool valid, GoogleClaim claim)> ValidateAccessTokenAsync(string accessToken)
+        public async Task<(bool valid, GoogleClaim? claim)> ValidateAccessTokenAsync(string accessToken)
         {
             using var httpClient = httpClientFactory.CreateClient();
             var req = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/userinfo/v2/me");
@@ -67,7 +67,7 @@ namespace MegaApp.Infrastructure.GoogleClient
                 {
                     PropertyNameCaseInsensitive = true,
                 });
-                return (true, new GoogleClaim(userInfo.Name, userInfo.Email));
+                return (true, new GoogleClaim(userInfo!.Name, userInfo.Email));
             }
 
             return (false, null);
