@@ -5,7 +5,7 @@ export default function useAuth() {
   const token = storage.get('token');
   if (token) {
     const jwt = jwt_decode<Record<string, any>>(token);
-    console.log(jwt, { expired: expired(Number(jwt["exp"]))});
+    // console.log(jwt, { expired: expired(Number(jwt["exp"]))});
     if (jwt && typeof jwt === "object") {
       if (!expired(Number(jwt["exp"]))) {
         const name =

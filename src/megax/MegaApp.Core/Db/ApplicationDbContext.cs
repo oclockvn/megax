@@ -29,6 +29,9 @@ namespace MegaApp.Core.Db
         public DbSet<Project> Projects { get; set; }
         public DbSet<Client> Clients { get; set; }
 
+        public DbSet<Leave> Leaves { get; set; }
+        public DbSet<LeaveDate> LeaveDates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -46,6 +49,8 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new TaskConfiguration());
             modelBuilder.ApplyConfiguration(new ClientConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
+            modelBuilder.ApplyConfiguration(new LeaveConfiguration());
+
         }
     }
 }

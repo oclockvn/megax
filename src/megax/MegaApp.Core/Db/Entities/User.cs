@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Db.Entities;
@@ -110,7 +111,8 @@ public class User : ICreatedByEntity
     public List<Account> Accounts { get; set; } = new();
     public List<UserDocument> Documents { get; set; } = new();
     public List<Contact> Contacts { get; set; } = new();
-    public List<TodoTask> Tasks {get;set;} = new();
+    public List<TodoTask> Tasks { get; set; } = new();
+    public List<Leave> Leaves { get; set; } = new();
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }

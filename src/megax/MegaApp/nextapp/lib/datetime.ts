@@ -22,6 +22,12 @@ import {
   startOfYear,
   endOfYear,
   addYears,
+  isWeekend,
+  isSameDay,
+  isPast,
+  isFuture,
+  isAfter,
+  isBefore,
 } from "date-fns";
 
 const startOfDay = (date: Date): Date => {
@@ -86,6 +92,15 @@ const setTime = (date: Date, hour: number, minute: number): Date => {
   return setSeconds(setMinutes(setHoursFns(date, hour), minute), 0);
 };
 
+const getNextWeekDay = (from: Date) => {
+  let next = addDays(from, 1);
+  while (isWeekend(next)) {
+    next = addDays(next, 1);
+  }
+
+  return next;
+};
+
 export default {
   todayAt,
   formatDate,
@@ -111,6 +126,13 @@ export default {
   startOfYear,
   endOfYear,
   addYears,
+  isWeekend,
+  getNextWeekDay,
+  isSameDay,
+  isPast,
+  isFuture,
+  isAfter,
+  isBefore,
 };
 
 // export function handleDates(body: any) {

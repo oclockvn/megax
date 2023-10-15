@@ -13,7 +13,6 @@ declare type FileUploadProps = {
 
 export default function DropzoneWrapper(props: FileUploadProps) {
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    // console.log(acceptedFiles);
     if (acceptedFiles.length) {
       props.fileSelected(acceptedFiles);
     }

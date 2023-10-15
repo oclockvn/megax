@@ -26,6 +26,7 @@ public static class ServiceCollectionExtension
             .AddScoped<IFileService, FileService>()
             .AddScoped<ITaskService, TaskService>()
             .AddScoped<IProjectService, ProjectService>()
+            .AddScoped<ILeaveService, LeaveService>()
             .AddSettings(configuration)
             ;
     }

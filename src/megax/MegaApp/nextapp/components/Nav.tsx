@@ -70,7 +70,13 @@ function Nav() {
                   >
                     Tasks
                   </Button>
-
+                  <Button
+                    variant="outlined"
+                    href="/report"
+                    className="!text-white"
+                  >
+                    Report
+                  </Button>
                   <Button
                     variant="outlined"
                     href="/admin/users"
@@ -116,6 +122,9 @@ function Nav() {
                   >
                     <MenuItem onClick={() => handleClose("/profile")}>
                       Profile
+                    </MenuItem>
+                    <MenuItem onClick={() => handleClose("/leave")}>
+                      Leave Request
                     </MenuItem>
                     <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
                   </Menu>
