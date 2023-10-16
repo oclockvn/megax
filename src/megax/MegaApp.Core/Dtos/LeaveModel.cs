@@ -77,6 +77,7 @@ public record LeaveModel
         Reason = leave.Reason;
         Note = leave.Note;
         Status = leave.Status;
+        UserId = leave.UserId;
         Feedback = leave.Feedback;
         ApprovedAt = leave.ApprovedAt;
         ApprovedBy = leave.ApprovedBy;

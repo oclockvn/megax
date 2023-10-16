@@ -27,6 +27,7 @@ import { useAppDispatch } from "@/lib/store/state.hook";
 import { useConfirm } from "material-ui-confirm";
 import { cancelLeaveThunk } from "@/lib/store/leave.state";
 import toast from "react-hot-toast";
+import ButtonGroup from "@mui/material/ButtonGroup";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -182,10 +183,12 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         </CardContent>
         {showAction && !leave.isOwner && (
           <CardActions>
-            <Button variant="contained" color="primary">
-              Approve
-            </Button>
-            <Button color="warning">Reject</Button>
+            <ButtonGroup fullWidth>
+              <Button variant="outlined" color="warning">Reject</Button>
+              <Button variant="contained" color="primary">
+                Approve
+              </Button>
+            </ButtonGroup>
           </CardActions>
         )}
       </Card>

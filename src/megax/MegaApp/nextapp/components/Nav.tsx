@@ -65,6 +65,13 @@ function Nav() {
                 <div className="flex-1 flex items-center justify-center">
                   <Button
                     variant="outlined"
+                    href="/requests"
+                    className="!text-white"
+                  >
+                  Requests
+                  </Button>
+                  <Button
+                    variant="outlined"
                     href="/tasks"
                     className="!text-white"
                   >

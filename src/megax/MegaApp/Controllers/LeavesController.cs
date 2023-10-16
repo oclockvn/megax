@@ -44,6 +44,19 @@ public class LeavesController : ApplicationControllerBase
     }
 
     /// <summary>
+    /// Get all leaves of current user
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("requesting")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(List<LeaveModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetRequestingLeaves()
+    {
+        var leaves = await leaveService.GetRequestingLeavesAsync();
+        return Ok(leaves);
+    }
+
+    /// <summary>
     /// Request a leave
     /// </summary>
     /// <param name="request"><see cref="LeaveModel.Add"/></param>

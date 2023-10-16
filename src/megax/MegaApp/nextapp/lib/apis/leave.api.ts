@@ -19,6 +19,11 @@ export async function fetchLeaves() {
   return res.data;
 }
 
+export async function fetchRequestingLeaves() {
+  const res = await api.get<Leave[]>("api/leaves/requesting");
+  return res.data;
+}
+
 export async function submitLeave(request: Partial<LeaveRequest>) {
   const res = await api.post<Result<Leave>>(`api/leaves`, {
     ...request,

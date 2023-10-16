@@ -10,12 +10,14 @@ import {
   cancelLeave,
   fetchLeaveSummary,
   fetchLeaves,
+  fetchRequestingLeaves,
   submitLeave,
 } from "../apis/leave.api";
 // import { fetchTodo } from "../apis/s.api";
 
 export interface LeaveState {
   items: Leave[];
+  requesting: Leave[];
   approvedDates: LeaveDate[];
   capacity: number;
   loading: boolean;
@@ -24,6 +26,7 @@ export interface LeaveState {
 
 const initialState: LeaveState = {
   items: [],
+  requesting: [],
   approvedDates: [],
   capacity: 0,
   loading: false,
@@ -34,6 +37,14 @@ export const fetchLeavesThunk = createAsyncThunk(
   async (filter: Partial<Filter> | undefined, thunkApi) => {
     thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
     return await fetchLeaves();
+  }
+);
+
+export const fetchRequestingLeavesThunk = createAsyncThunk(
+  "leaves/requesting",
+  async (filter: Partial<Filter> | undefined, thunkApi) => {
+    thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
+    return await fetchRequestingLeaves();
   }
 );
 
@@ -81,6 +92,10 @@ export const leaveSlice = createSlice({
       })
       .addCase(fetchLeavesThunk.fulfilled, (state, action) => {
         state.items = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchRequestingLeavesThunk.fulfilled, (state, action) => {
+        state.requesting = action.payload;
         state.loading = false;
       })
       .addCase(fetchLeavesThunk.pending, (state, action) => {

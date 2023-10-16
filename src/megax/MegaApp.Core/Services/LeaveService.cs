@@ -6,6 +6,7 @@ using MegaApp.Core.Exceptions;
 using MegaApp.Core.Validators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MegaApp.Core.Services;
 
@@ -13,6 +14,7 @@ public interface ILeaveService
 {
     Task<LeaveSummary> GetLeaveSummaryAsync(int userId);
     Task<List<LeaveModel>> GetLeavesAsync(int userId);
+    Task<List<LeaveModel>> GetRequestingLeavesAsync();
     Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request);
     Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId);
     Task<Result<LeaveStatus>> CancelLeaveAsync(int id);
@@ -92,6 +94,20 @@ internal class LeaveService : ILeaveService
             Leaves = leaves,
             Capacity = leaveCapacity,
         };
+    }
+
+    public async Task<List<LeaveModel>> GetRequestingLeavesAsync()
+    {
+        using var db = UseDb();
+        var leaves = await db.Leaves.Where(x => x.Status == LeaveStatus.New)
+            .OrderByDescending(x => x.Id)
+            .Select(x => new LeaveModel(x, x.LeaveDates)
+            {
+                UserName = x.User.FullName,
+            })
+            .ToListAsync();
+
+        return leaves;
     }
 
     public async Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request)
