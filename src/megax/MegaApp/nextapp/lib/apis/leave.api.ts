@@ -24,6 +24,11 @@ export async function fetchRequestingLeaves() {
   return res.data;
 }
 
+export async function approveLeave(id: number) {
+  const res = await api.post<Result<LeaveStatus>>(`api/leaves/${id}/approve`);
+  return res.data;
+}
+
 export async function submitLeave(request: Partial<LeaveRequest>) {
   const res = await api.post<Result<Leave>>(`api/leaves`, {
     ...request,

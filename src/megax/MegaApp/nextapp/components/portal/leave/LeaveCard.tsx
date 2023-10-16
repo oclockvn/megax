@@ -25,7 +25,7 @@ import TimeAgo from "react-timeago";
 import { getInitial } from "@/lib/string.helper";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { useConfirm } from "material-ui-confirm";
-import { cancelLeaveThunk } from "@/lib/store/leave.state";
+import { approveLeaveThunk, cancelLeaveThunk } from "@/lib/store/leave.state";
 import toast from "react-hot-toast";
 import ButtonGroup from "@mui/material/ButtonGroup";
 
@@ -62,6 +62,33 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
 
             toast.error(
               `Could not cancel leave request. Error code: ${res.code}`
+            );
+          });
+      })
+      .catch(() => {
+        /*ignore*/
+      });
+  };
+
+  const handleApprove = () => {
+    confirmation({
+      title: "Are you sure?",
+      description: "No turning back, still approve?",
+      dialogProps: {
+        maxWidth: "xs",
+      },
+    })
+      .then(() => {
+        appDispatch(approveLeaveThunk(leave.id))
+          .unwrap()
+          .then(res => {
+            if (res.success) {
+              toast.success(`Leave is approved successfully`);
+              return;
+            }
+
+            toast.error(
+              `Could not approve leave request. Error code: ${res.code}`
             );
           });
       })
@@ -184,8 +211,10 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         {showAction && !leave.isOwner && (
           <CardActions>
             <ButtonGroup fullWidth>
-              <Button variant="outlined" color="warning">Reject</Button>
-              <Button variant="contained" color="primary">
+              <Button variant="outlined" color="warning">
+                Reject
+              </Button>
+              <Button variant="contained" color="primary" onClick={handleApprove}>
                 Approve
               </Button>
             </ButtonGroup>

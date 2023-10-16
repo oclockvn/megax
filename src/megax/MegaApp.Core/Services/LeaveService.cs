@@ -5,8 +5,6 @@ using MegaApp.Core.Enums;
 using MegaApp.Core.Exceptions;
 using MegaApp.Core.Validators;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MegaApp.Core.Services;
 
@@ -16,7 +14,7 @@ public interface ILeaveService
     Task<List<LeaveModel>> GetLeavesAsync(int userId);
     Task<List<LeaveModel>> GetRequestingLeavesAsync();
     Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request);
-    Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId);
+    Task<Result<LeaveStatus>> ApproveLeaveAsync(int id);
     Task<Result<LeaveStatus>> CancelLeaveAsync(int id);
 }
 
@@ -31,9 +29,23 @@ internal class LeaveService : ILeaveService
         this.userResolver = userResolver;
     }
 
-    public Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId)
+    public async Task<Result<LeaveStatus>> ApproveLeaveAsync(int id)
     {
-        throw new NotImplementedException();
+        using var db = UseDb();
+        var leave = await db.Leaves
+            // .Include(x => x.LeaveDates)
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync() ?? throw new EntityNotFoundException($"Leave id {id} could not be found");
+
+        if (leave.Status != LeaveStatus.New)
+        {
+            return Result<LeaveStatus>.Fail($"Leave was updated to {leave.Status}");
+        }
+
+        leave.Status = LeaveStatus.Approved;
+        await db.SaveChangesAsync();
+
+        return new Result<LeaveStatus>(leave.Status);
     }
 
     public async Task<Result<LeaveStatus>> CancelLeaveAsync(int id)

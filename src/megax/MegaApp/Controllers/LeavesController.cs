@@ -44,7 +44,7 @@ public class LeavesController : ApplicationControllerBase
     }
 
     /// <summary>
-    /// Get all leaves of current user
+    /// Get all requesting leaves
     /// </summary>
     /// <returns></returns>
     [HttpGet("requesting")]
@@ -54,6 +54,19 @@ public class LeavesController : ApplicationControllerBase
     {
         var leaves = await leaveService.GetRequestingLeavesAsync();
         return Ok(leaves);
+    }
+
+    /// <summary>
+    /// Approve a leave
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("{id}/approve")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ApproveLeave(int id)
+    {
+        var result = await leaveService.ApproveLeaveAsync(id);
+        return Ok(result);
     }
 
     /// <summary>

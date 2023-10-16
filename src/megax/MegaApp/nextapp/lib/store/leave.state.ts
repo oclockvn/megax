@@ -7,6 +7,7 @@ import {
   LeaveStatus,
 } from "../models/leave.model";
 import {
+  approveLeave,
   cancelLeave,
   fetchLeaveSummary,
   fetchLeaves,
@@ -70,6 +71,13 @@ export const cancelLeaveThunk = createAsyncThunk(
   }
 );
 
+export const approveLeaveThunk = createAsyncThunk(
+  "leaves/approve",
+  async (id: number, _thunkApi) => {
+    return await approveLeave(id);
+  }
+);
+
 export const leaveSlice = createSlice({
   name: "leaves",
   initialState,
@@ -108,6 +116,13 @@ export const leaveSlice = createSlice({
           // state.error = undefined;
         } else {
           // state.error = `Request failed. Error code: ${code}`;
+        }
+      })
+      .addCase(approveLeaveThunk.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          state.requesting = state.requesting.filter(
+            x => x.id !== action.meta.arg
+          );
         }
       })
       .addCase(cancelLeaveThunk.fulfilled, (state, action) => {
