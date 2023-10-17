@@ -10,7 +10,6 @@ import CategoryIcon from "@mui/icons-material/Category";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
-// import IconButton from "@mui/material/IconButton";
 import {
   Leave,
   LeaveStatus,
@@ -19,7 +18,6 @@ import {
 } from "@/lib/models/leave.model";
 import dt from "@/lib/datetime";
 import CloseIcon from "@mui/icons-material/Close";
-// import EditIcon from "@mui/icons-material/Edit";
 import Chip from "@mui/material/Chip";
 import TimeAgo from "react-timeago";
 import { getInitial } from "@/lib/string.helper";
@@ -27,7 +25,6 @@ import { useAppDispatch } from "@/lib/store/state.hook";
 import { useConfirm } from "material-ui-confirm";
 import { approveLeaveThunk, cancelLeaveThunk } from "@/lib/store/leave.state";
 import toast from "react-hot-toast";
-import ButtonGroup from "@mui/material/ButtonGroup";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -73,7 +70,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
   const handleApprove = () => {
     confirmation({
       title: "Are you sure?",
-      description: "No turning back, still approve?",
+      description: "Confirm that you approve this request",
       dialogProps: {
         maxWidth: "xs",
       },
@@ -159,7 +156,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
   const labelCls =
     leave.status === LeaveStatus.Approved
       ? "border-green-500 text-green-500"
-      : "border-fuchsia-500 text-fuchsia-500";
+      : "border-orange-500 text-orange-500";
 
   return (
     <div className="relative">
@@ -168,7 +165,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           avatar={
             <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
           }
-          action={(showAction || canCancel) && <CardAction />}
+          action={((showAction || canCancel) && leave.isOwner) && <CardAction />}
           title={leave.userName}
           subheader={<TimeAgo date={leave.createdAt} />}
         />
@@ -209,15 +206,13 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           />
         </CardContent>
         {showAction && !leave.isOwner && (
-          <CardActions>
-            <ButtonGroup fullWidth>
-              <Button variant="outlined" color="warning">
-                Reject
-              </Button>
-              <Button variant="contained" color="primary" onClick={handleApprove}>
-                Approve
-              </Button>
-            </ButtonGroup>
+          <CardActions className="grid grid-cols-2">
+            <Button variant="text" color="warning">
+              Reject
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleApprove}>
+              Approve
+            </Button>
           </CardActions>
         )}
       </Card>

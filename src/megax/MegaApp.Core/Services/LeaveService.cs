@@ -31,11 +31,18 @@ internal class LeaveService : ILeaveService
 
     public async Task<Result<LeaveStatus>> ApproveLeaveAsync(int id)
     {
+        var currentUser = userResolver.Resolve();
+
         using var db = UseDb();
         var leave = await db.Leaves
             // .Include(x => x.LeaveDates)
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync() ?? throw new EntityNotFoundException($"Leave id {id} could not be found");
+
+        if (leave.UserId == currentUser.Id)
+        {
+            return Result<LeaveStatus>.Fail(ResultCode.SELF_APPROVAL_IS_NOT_ALLOWED);
+        }
 
         if (leave.Status != LeaveStatus.New)
         {
@@ -110,12 +117,14 @@ internal class LeaveService : ILeaveService
 
     public async Task<List<LeaveModel>> GetRequestingLeavesAsync()
     {
+        var currentUser = userResolver.Resolve();
         using var db = UseDb();
         var leaves = await db.Leaves.Where(x => x.Status == LeaveStatus.New)
             .OrderByDescending(x => x.Id)
             .Select(x => new LeaveModel(x, x.LeaveDates)
             {
                 UserName = x.User.FullName,
+                IsOwner = x.UserId == currentUser.Id,
             })
             .ToListAsync();
 

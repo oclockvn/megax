@@ -48,3 +48,10 @@ export const LeaveTypeDescriptionMapping = {
   [LeaveType.TimeInLieu]: 'Time off in lieu',
   // [LeaveType.Other]: 'Other'
 }
+
+export const LeaveStatusMapping = {
+  [LeaveStatus.New]: 'Requested',
+  [LeaveStatus.Approved]: 'Approved',
+  [LeaveStatus.Cancelled]: 'Cancelled',
+  [LeaveStatus.Rejected]: 'Rejected',
+}
