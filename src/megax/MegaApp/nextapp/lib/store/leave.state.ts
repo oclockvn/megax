@@ -131,11 +131,12 @@ export const leaveSlice = createSlice({
           return;
         }
 
+        const id = action.meta.arg;
         if (data === LeaveStatus.Cancelled) {
-          const leave = state.items.find(x => x.id === action.meta.arg);
+          const leave = state.items.find(x => x.id === id);
           leave!.status = data;
         } else {
-          state.items = state.items.filter(x => x.id !== action.payload.data);
+          state.items = state.items.filter(x => x.id !== id);
         }
       });
   },

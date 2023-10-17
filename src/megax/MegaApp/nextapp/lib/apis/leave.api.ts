@@ -2,6 +2,7 @@ import api from "@/lib/api";
 import { Result } from "@/lib/models/common.model";
 import { Leave, LeaveDate, LeaveRequest, LeaveStatus } from "../models/leave.model";
 import dt from "@/lib/datetime";
+import { delay } from "../util";
 
 type _LeaveSummary = {
   leaves: Leave[],
@@ -10,11 +11,13 @@ type _LeaveSummary = {
 }
 
 export async function fetchLeaveSummary() {
+  await delay(2000);
   const res = await api.get<_LeaveSummary>("api/leaves/summary");
   return res.data;
 }
 
 export async function fetchLeaves() {
+  await delay(2000);
   const res = await api.get<Leave[]>("api/leaves");
   return res.data;
 }
@@ -30,6 +33,7 @@ export async function approveLeave(id: number) {
 }
 
 export async function submitLeave(request: Partial<LeaveRequest>) {
+  await delay(2000);
   const res = await api.post<Result<Leave>>(`api/leaves`, {
     ...request,
     leaveDates: request.leaveDates?.map(d => ({
@@ -41,6 +45,6 @@ export async function submitLeave(request: Partial<LeaveRequest>) {
 }
 
 export async function cancelLeave(id: number) {
-  const res = await api.delete<Result<LeaveStatus>>(`api/leaves/${id}`);
+  const res = await api.post<Result<LeaveStatus>>(`api/leaves/${id}/cancel`);
   return res.data;
 }

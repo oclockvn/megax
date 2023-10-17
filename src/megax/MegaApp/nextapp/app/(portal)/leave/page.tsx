@@ -13,6 +13,7 @@ import { Leave, LeaveStatus, LeaveType } from "@/lib/models/leave.model";
 import LeaveForm from "@/components/portal/leave/LeaveForm";
 import Skeleton from "@mui/material/Skeleton";
 import { makeArr, makeArrOf } from "@/lib/helpers/array";
+import dt from "@/lib/datetime";
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
@@ -40,14 +41,14 @@ export default function LeavePage() {
     ? makeArrOf(5, i => ({ id: i, status: LeaveStatus.New } as Leave))
     : items.filter(x => x.status !== LeaveStatus.New);
   const taken = items
-    .filter(x => x.status === LeaveStatus.Approved)
     .reduce(
       (prev: Date[], { leaveDates }) => [
         ...prev,
         ...leaveDates.map(d => d.date),
       ],
       []
-    ).length;
+    )
+    .filter(d => dt.isPast(d)).length;
 
   const requestedDates = items.reduce(
     (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
@@ -99,7 +100,7 @@ export default function LeavePage() {
           <div className="flex items-center justify-between mt-4 mb-2 font-bold">
             <h3 className="text-lg">Your Requests</h3>
             <div>
-              (Taken {taken} / {capacity} total)
+              (Taken {taken} / {capacity} total days)
             </div>
           </div>
           {loading ? (

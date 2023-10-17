@@ -6,6 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import CommentIcon from "@mui/icons-material/Comment";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
+import CheckIcon from "@mui/icons-material/Check";
 import CategoryIcon from "@mui/icons-material/Category";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
@@ -106,9 +107,11 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     overrideCls?: string;
   }) => (
     <div className={`flex gap-4 mt-4 ${overrideCls}`}>
-      <div className="text-lime-600">{icon}</div>
+      <div className={pastLeave ? "text-gray-700" : "text-lime-600"}>{icon}</div>
       <div>
-        <strong className="text-lime-600">{category}</strong>
+        <strong className={pastLeave ? "text-gray-700" : "text-lime-600"}>
+          {category}
+        </strong>
         <div>{content}</div>
       </div>
     </div>
@@ -123,13 +126,6 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
   const CardAction = () => {
     return (
       <div className="flex items-center gap-2">
-        {/* <Button
-          size="small"
-          startIcon={<EditIcon fontSize="small" />}
-          onClick={() => onEdit(leave)}
-        >
-          Edit
-        </Button> */}
         <Button
           color="warning"
           size="small"
@@ -159,13 +155,13 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
       : "border-orange-500 text-orange-500";
 
   return (
-    <div className="relative">
+    <div className="relative" data-id={leave.id}>
       <Card className={pastLeave ? "bg-gray-200" : ""}>
         <CardHeader
           avatar={
             <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
           }
-          action={((showAction || canCancel) && leave.isOwner) && <CardAction />}
+          action={(showAction || canCancel) && leave.isOwner && <CardAction />}
           title={leave.userName}
           subheader={<TimeAgo date={leave.createdAt} />}
         />
@@ -177,10 +173,10 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
             icon={<CommentIcon />}
           />
           <LeaveItem
-            category="Leave Date"
+            category={`Leave Date`}
             content={
               <>
-                {leave.leaveDates?.map((d, index) => (
+                {leave.leaveDates?.map((d) => (
                   <div
                     key={d.id}
                     className="flex items-center gap-1 mt-1"
@@ -192,7 +188,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
                 ))}
               </>
             }
-            icon={<DateRangeIcon />}
+            icon={pastLeave ? <CheckIcon /> : <DateRangeIcon />}
           />
           <LeaveItem
             category="Leave Type"

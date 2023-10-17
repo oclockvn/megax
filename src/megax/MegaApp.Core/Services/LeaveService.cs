@@ -5,6 +5,7 @@ using MegaApp.Core.Enums;
 using MegaApp.Core.Exceptions;
 using MegaApp.Core.Validators;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace MegaApp.Core.Services;
 
@@ -139,6 +140,9 @@ internal class LeaveService : ILeaveService
             throw new BusinessRuleViolationException(error);
         }
 
+        var endDate = request.LeaveDates.OrderByDescending(x => x.Date).First();
+        var isPastLeave = endDate.Date < DateTimeOffset.Now;
+
         using var db = UseDb();
 
         var dates = request.LeaveDates.Select(x => x.Date.Date).ToList();
@@ -159,15 +163,15 @@ internal class LeaveService : ILeaveService
             Type = request.Type,
             Reason = request.Reason,
             Note = request.Note,
-            Status = Enums.LeaveStatus.New,
+            Status = isPastLeave ? LeaveStatus.Approved : Enums.LeaveStatus.New, // past leave auto set as Approved
             UserId = request.UserId,
         };
 
-        if (leave.Type == Enums.LeaveType.Annual)
+        if (!isPastLeave && leave.Type == Enums.LeaveType.Annual)
         {
             // check for available leave remain
             var takenDates = await db.LeaveDates
-                .Where(x => x.Leave.Status == Enums.LeaveStatus.Approved && x.Leave.UserId == request.UserId)
+                .Where(x => new[] { Enums.LeaveStatus.Approved, LeaveStatus.New }.Contains(x.Leave.Status) && x.Leave.UserId == request.UserId)
                 .Select(x => new { x.Date, x.Time })
                 .ToListAsync();
 

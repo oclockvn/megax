@@ -94,7 +94,7 @@ public class LeavesController : ApplicationControllerBase
     /// </summary>
     /// <param name="id">Leave id</param>
     /// <returns></returns>
-    [HttpDelete("{id}")]
+    [HttpPost("{id}/cancel")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelLeave(int id)

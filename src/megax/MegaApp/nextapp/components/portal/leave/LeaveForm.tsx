@@ -12,47 +12,48 @@ import CategoryIcon from "@mui/icons-material/Category";
 import {
   Leave,
   LeaveDate,
-  LeaveRequest,
   LeaveType,
 } from "@/lib/models/leave.model";
 import LeaveDatePicker from "./LeaveDatePicker";
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import { useAppDispatch } from "@/lib/store/state.hook";
 import { submitLeaveThunk } from "@/lib/store/leave.state";
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
+import toast from "react-hot-toast";
 
 type LeaveFormProps = {
   leave: Partial<Leave>;
-  // handleSave: (contact: Partial<Leave>) => void;
   handleClose: () => void;
   loading?: boolean;
   requestedDates?: Date[];
 };
 
+let leaveDates: LeaveDate[] = [];
+
 export default function LeaveForm(props: LeaveFormProps) {
   const appDispatch = useAppDispatch();
-  const { leave, handleClose, loading } = props;
+  const { leave, handleClose } = props;
   const [error, setError] = useState<string | undefined>();
-  let leaveDates: LeaveDate[] = [];
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (request: Partial<Leave>) => {
-    // request.lea
+    setLoading(true);
+
     const payload = {
       ...request,
       leaveDates,
     };
 
     const result = await appDispatch(submitLeaveThunk(payload)).unwrap();
+    setLoading(false);
     if (result?.success) {
+      toast.success(`Requested successfully`);
       handleClose();
-    } else {
     }
 
     setError(
       result.success ? undefined : `Request failed. Error code: ${result.code}`
     );
-
-    // handleSave(payload);
   };
 
   const dateChange = (items: LeaveDate[]) => {
