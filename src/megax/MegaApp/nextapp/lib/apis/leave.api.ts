@@ -1,23 +1,27 @@
 import api from "@/lib/api";
 import { Result } from "@/lib/models/common.model";
-import { Leave, LeaveDate, LeaveRequest, LeaveStatus } from "../models/leave.model";
+import {
+  Leave,
+  LeaveDate,
+  LeaveRequest,
+  LeaveStatus,
+} from "../models/leave.model";
 import dt from "@/lib/datetime";
-import { delay } from "../util";
+import { AxiosError } from "axios";
+import { extractErrors } from '@/lib/helpers/response';
 
 type _LeaveSummary = {
-  leaves: Leave[],
-  approvedDates: LeaveDate[],
-  capacity: number,
-}
+  leaves: Leave[];
+  approvedDates: LeaveDate[];
+  capacity: number;
+};
 
 export async function fetchLeaveSummary() {
-  await delay(2000);
   const res = await api.get<_LeaveSummary>("api/leaves/summary");
   return res.data;
 }
 
 export async function fetchLeaves() {
-  await delay(2000);
   const res = await api.get<Leave[]>("api/leaves");
   return res.data;
 }
@@ -31,17 +35,26 @@ export async function approveLeave(id: number) {
   const res = await api.post<Result<LeaveStatus>>(`api/leaves/${id}/approve`);
   return res.data;
 }
-
 export async function submitLeave(request: Partial<LeaveRequest>) {
-  await delay(2000);
-  const res = await api.post<Result<Leave>>(`api/leaves`, {
-    ...request,
-    leaveDates: request.leaveDates?.map(d => ({
-      ...d,
-      date: dt.formatToServer(d.date),
-    })),
-  });
-  return res.data;
+  return api
+    .post<Result<Leave>>(`api/leaves`, {
+      ...request,
+      leaveDates: request.leaveDates?.map(d => ({
+        ...d,
+        date: dt.formatToServer(d.date),
+      })),
+    })
+    .then(res => res.data)
+    .catch((error: AxiosError) => {
+      let err = error?.response?.data
+        ? extractErrors(error.response.data)
+        : "Something went wrong";
+
+      return {
+        success: false,
+        code: err,
+      } as Result<Leave>;
+    });
 }
 
 export async function cancelLeave(id: number) {

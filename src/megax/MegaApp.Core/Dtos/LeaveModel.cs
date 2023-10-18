@@ -16,7 +16,7 @@ public record LeaveSummary
     public int Capacity { get; set; }
 }
 
-public record LeaveModel
+public record LeaveModel : Creator, IOwner
 {
     public int Id { get; set; }
 
@@ -34,13 +34,12 @@ public record LeaveModel
     public DateTimeOffset? ApprovedAt { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
-    public int? CreatedBy { get; set; }
-    public bool IsOwner { get; set; }
-
     public int UserId { get; set; }
     public string UserName { get; set; }
 
     public List<LeaveDateModel> LeaveDates { get; set; } = new();
+
+    public bool IsOwner => CreatedBy == UserId;
 
     public record Add : IValidatableObject
     {
@@ -82,6 +81,7 @@ public record LeaveModel
         ApprovedAt = leave.ApprovedAt;
         ApprovedBy = leave.ApprovedBy;
         CreatedAt = leave.CreatedAt;
+        CreatedBy = leave.CreatedBy.GetValueOrDefault();
     }
 
     public LeaveModel(Db.Entities.Leave leave, List<LeaveDate> dates) : this(leave)

@@ -9,7 +9,13 @@ import LeaveHistory from "@/components/portal/leave/LeaveHistory";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { useEffect, useState } from "react";
 import { fetchLeaveSummaryThunk } from "@/lib/store/leave.state";
-import { Leave, LeaveStatus, LeaveType } from "@/lib/models/leave.model";
+import {
+  Leave,
+  LeaveDate,
+  LeaveStatus,
+  LeaveTime,
+  LeaveType,
+} from "@/lib/models/leave.model";
 import LeaveForm from "@/components/portal/leave/LeaveForm";
 import Skeleton from "@mui/material/Skeleton";
 import { makeArr, makeArrOf } from "@/lib/helpers/array";
@@ -40,15 +46,11 @@ export default function LeavePage() {
   const pastItems = loading
     ? makeArrOf(5, i => ({ id: i, status: LeaveStatus.New } as Leave))
     : items.filter(x => x.status !== LeaveStatus.New);
+
   const taken = items
-    .reduce(
-      (prev: Date[], { leaveDates }) => [
-        ...prev,
-        ...leaveDates.map(d => d.date),
-      ],
-      []
-    )
-    .filter(d => dt.isPast(d)).length;
+    .reduce((prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates], [])
+    .filter(d => dt.isPast(d.date))
+    .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) / 2;
 
   const requestedDates = items.reduce(
     (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
@@ -100,7 +102,7 @@ export default function LeavePage() {
           <div className="flex items-center justify-between mt-4 mb-2 font-bold">
             <h3 className="text-lg">Your Requests</h3>
             <div>
-              (Taken {taken} / {capacity} total days)
+              (Taken {taken}/{capacity} total days)
             </div>
           </div>
           {loading ? (

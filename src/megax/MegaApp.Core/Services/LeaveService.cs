@@ -5,7 +5,6 @@ using MegaApp.Core.Enums;
 using MegaApp.Core.Exceptions;
 using MegaApp.Core.Validators;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
 
 namespace MegaApp.Core.Services;
 
@@ -72,10 +71,10 @@ internal class LeaveService : ILeaveService
             return Result<LeaveStatus>.Fail(Result.LEAVE_WAS_PASSED);
         }
 
-        if (leave.Status == Enums.LeaveStatus.Approved)
+        if (leave.Status == LeaveStatus.Approved)
         {
             // return Result<int>.Fail(Result.LEAVE_WAS_APPROVED);
-            leave.Status = Enums.LeaveStatus.Cancelled;
+            leave.Status = LeaveStatus.Cancelled;
         }
         else // no need to keep it if it's not approved yet
         {
@@ -92,13 +91,7 @@ internal class LeaveService : ILeaveService
         using var db = UseDb();
         var leaves = await db.Leaves.Where(x => x.UserId == userId)
             .OrderByDescending(x => x.Id)
-            .Select(x => new LeaveModel(x)
-            {
-                LeaveDates = x.LeaveDates.Select(d => new LeaveDateModel(d)).ToList(),
-                UserId = x.UserId,
-                UserName = x.User.FullName,
-                IsOwner = x.UserId == userId
-            })
+            .Select(x => new LeaveModel(x, x.LeaveDates))
             .ToListAsync();
 
         return leaves;
@@ -125,7 +118,6 @@ internal class LeaveService : ILeaveService
             .Select(x => new LeaveModel(x, x.LeaveDates)
             {
                 UserName = x.User.FullName,
-                IsOwner = x.UserId == currentUser.Id,
             })
             .ToListAsync();
 
@@ -163,19 +155,16 @@ internal class LeaveService : ILeaveService
             Type = request.Type,
             Reason = request.Reason,
             Note = request.Note,
-            Status = isPastLeave ? LeaveStatus.Approved : Enums.LeaveStatus.New, // past leave auto set as Approved
+            Status = isPastLeave ? LeaveStatus.Approved : LeaveStatus.New, // past leave auto set as Approved
             UserId = request.UserId,
         };
 
-        if (!isPastLeave && leave.Type == Enums.LeaveType.Annual)
+        if (!isPastLeave && leave.Type == LeaveType.Annual)
         {
             // check for available leave remain
-            var takenDates = await db.LeaveDates
-                .Where(x => new[] { Enums.LeaveStatus.Approved, LeaveStatus.New }.Contains(x.Leave.Status) && x.Leave.UserId == request.UserId)
-                .Select(x => new { x.Date, x.Time })
-                .ToListAsync();
-
-            var takenDays = takenDates.Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1); // half date = 1 point
+            var takenDays = await db.LeaveDates
+                .Where(x => new[] { LeaveStatus.Approved, LeaveStatus.New }.Contains(x.Leave.Status) && x.Leave.UserId == request.UserId)
+                .SumAsync(l => l.Time == LeaveTime.All ? 2 : 1); // half date = 1 point
 
             // todo: store available leave in user
             var totalAvailable = 30; // half date = 1 point => 15 days
@@ -196,14 +185,7 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
-        var currentUser = userResolver.Resolve();
-
-        var model = new LeaveModel(leave, leave.LeaveDates)
-        {
-            IsOwner = request.UserId == leave.UserId,
-            UserId = currentUser.Id,
-            UserName = currentUser.Name,
-        };
+        var model = new LeaveModel(leave, leave.LeaveDates);
         return new Result<LeaveModel>(model);
     }
 
