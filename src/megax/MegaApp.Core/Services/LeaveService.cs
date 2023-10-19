@@ -20,10 +20,10 @@ public interface ILeaveService
 
 internal class LeaveService : ILeaveService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
     private readonly IUserResolver userResolver;
 
-    public LeaveService(IDbContextFactory<ApplicationDbContext> dbContextFactory, IUserResolver userResolver)
+    public LeaveService(ApplicationDbContextFactory dbContextFactory, IUserResolver userResolver)
     {
         this.dbContextFactory = dbContextFactory;
         this.userResolver = userResolver;

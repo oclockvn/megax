@@ -17,9 +17,9 @@ public interface IAuthService
 
 internal class AuthService : IAuthService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public AuthService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public AuthService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

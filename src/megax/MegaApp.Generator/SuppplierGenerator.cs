@@ -1,7 +1,6 @@
 ﻿using Bogus;
 using MegaApp.Core.Db;
 using MegaApp.Core.Db.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Generator;
 
@@ -12,9 +11,9 @@ public interface ISupplierGenerator
 
 public class SupplierGenerator : ISupplierGenerator
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public SupplierGenerator(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public SupplierGenerator(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

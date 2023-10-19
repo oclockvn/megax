@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Db.Entities;

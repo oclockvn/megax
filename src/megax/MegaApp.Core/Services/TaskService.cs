@@ -1,5 +1,4 @@
-﻿using Humanizer;
-using MegaApp.Core.Db;
+﻿using MegaApp.Core.Db;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Exceptions;
@@ -20,9 +19,9 @@ public interface ITaskService
 
 internal class TaskService : ITaskService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public TaskService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public TaskService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

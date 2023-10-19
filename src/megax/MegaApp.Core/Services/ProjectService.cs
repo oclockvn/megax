@@ -12,9 +12,9 @@ public interface IProjectService
 
 internal class ProjectService : IProjectService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public ProjectService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public ProjectService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

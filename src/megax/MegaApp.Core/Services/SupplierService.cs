@@ -12,9 +12,9 @@ public interface ISupplierService
 
 internal class SupplierService : ISupplierService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public SupplierService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public SupplierService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

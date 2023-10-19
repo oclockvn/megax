@@ -1,5 +1,3 @@
-using System.Data.SqlTypes;
-
 namespace MegaApp.Infrastructure.Storages;
 
 public record FileUploadResult(string FileName, string Url);

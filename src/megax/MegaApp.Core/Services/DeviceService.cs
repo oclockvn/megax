@@ -20,9 +20,9 @@ public interface IDeviceService
 
 internal class DeviceService : IDeviceService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public DeviceService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public DeviceService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }
