@@ -1,10 +1,11 @@
 "use client";
 
+import LeaveCardLoading from "@/components/common/skeletons/LeaveCardLoading";
 import LeaveCard from "@/components/portal/leave/LeaveCard";
 import { fetchRequestingLeavesThunk } from "@/lib/store/leave.state";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import Grid from "@mui/material/Grid";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function RequestPage() {
   const appDispatch = useAppDispatch();
@@ -20,7 +21,7 @@ export default function RequestPage() {
         <Grid container>
           <Grid item xs={12} sm={4}>
             <h3 className="font-bold text-lg">Leave requests ({requesting.length})</h3>
-            {requesting.length > 0 &&
+            {loading ? <LeaveCardLoading count={3} /> : requesting.length > 0 &&
               requesting.map(l => (
                 <div key={l.id} className="mt-4">
                   <LeaveCard leave={l} />
