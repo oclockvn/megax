@@ -14,7 +14,9 @@ public interface ILeaveService
     Task<List<LeaveModel>> GetLeavesAsync(int userId);
     Task<List<LeaveModel>> GetRequestingLeavesAsync();
     Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request);
-    Task<Result<LeaveStatus>> ApproveLeaveAsync(int id);
+    Task<Result<LeaveStatus>> HandleLeaveActionAsync(int id, LeaveActionRequest request);
+    Task<Result<LeaveStatus>> ApproveLeaveAsync(int id, string comment);
+    Task<Result<LeaveStatus>> RejectLeaveAsync(int id, string comment);
     Task<Result<LeaveStatus>> CancelLeaveAsync(int id);
 }
 
@@ -29,7 +31,18 @@ internal class LeaveService : ILeaveService
         this.userResolver = userResolver;
     }
 
-    public async Task<Result<LeaveStatus>> ApproveLeaveAsync(int id)
+    public async Task<Result<LeaveStatus>> HandleLeaveActionAsync(int id, LeaveActionRequest request)
+    {
+        return request.Action switch
+        {
+            LeaveAction.Approve => await ApproveLeaveAsync(id, request.Comment),
+            LeaveAction.Reject => await RejectLeaveAsync(id, request.Comment),
+            LeaveAction.Cancel => await CancelLeaveAsync(id),
+            _ => throw new NotSupportedException("this action is not supported yet"),
+        };
+    }
+
+    public async Task<Result<LeaveStatus>> ApproveLeaveAsync(int id, string comment)
     {
         var currentUser = userResolver.Resolve();
 
@@ -50,6 +63,34 @@ internal class LeaveService : ILeaveService
         }
 
         leave.Status = LeaveStatus.Approved;
+        leave.Comment = comment;
+        await db.SaveChangesAsync();
+
+        return new Result<LeaveStatus>(leave.Status);
+    }
+
+    public async Task<Result<LeaveStatus>> RejectLeaveAsync(int id, string comment)
+    {
+        var currentUser = userResolver.Resolve();
+
+        using var db = UseDb();
+        var leave = await db.Leaves
+            // .Include(x => x.LeaveDates)
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync() ?? throw new EntityNotFoundException($"Leave id {id} could not be found");
+
+        if (leave.IsCreator(currentUser))
+        {
+            return Result<LeaveStatus>.Fail(ResultCode.SELF_REJECTION_IS_NOT_ALLOWED);
+        }
+
+        if (leave.Status != LeaveStatus.New)
+        {
+            return Result<LeaveStatus>.Fail($"Leave was updated to {leave.Status}");
+        }
+
+        leave.Status = LeaveStatus.Rejected;
+        leave.Comment = comment;
         await db.SaveChangesAsync();
 
         return new Result<LeaveStatus>(leave.Status);
@@ -152,13 +193,14 @@ internal class LeaveService : ILeaveService
             return Result<LeaveModel>.Fail(Result.OVERLAP_LEAVE_REQUEST);
         }
 
+        var (userId, userName) = userResolver.Resolve();
         var leave = new Leave
         {
             Type = request.Type,
             Reason = request.Reason,
             Note = request.Note,
             Status = isPastLeave ? LeaveStatus.Approved : LeaveStatus.New, // past leave auto set as Approved
-            UserId = request.UserId,
+            UserId = userId,
         };
 
         if (!isPastLeave && leave.Type == LeaveType.Annual)
@@ -187,7 +229,6 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
-        var (userId, userName) = userResolver.Resolve();
         var model = new LeaveModel(leave, leave.LeaveDates)
         {
             UserName = userName,

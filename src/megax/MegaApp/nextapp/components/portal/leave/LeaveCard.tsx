@@ -8,11 +8,13 @@ import DateRangeIcon from "@mui/icons-material/DateRange";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import CheckIcon from "@mui/icons-material/Check";
 import CategoryIcon from "@mui/icons-material/Category";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
 import {
   Leave,
+  LeaveAction,
   LeaveStatus,
   LeaveTime,
   LeaveTypeDescriptionMapping,
@@ -24,8 +26,22 @@ import TimeAgo from "react-timeago";
 import { getInitial } from "@/lib/string.helper";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { useConfirm } from "material-ui-confirm";
-import { approveLeaveThunk, cancelLeaveThunk } from "@/lib/store/leave.state";
+import {
+  cancelLeaveThunk,
+  handleLeaveActionThunk,
+} from "@/lib/store/leave.state";
 import toast from "react-hot-toast";
+import {
+  usePopupState,
+  bindTrigger,
+  bindDialog,
+} from "material-ui-popup-state/hooks";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import { useRef } from "react";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -40,6 +56,11 @@ const timeDic = {
 export default function LeaveCard({ leave }: LeaveCardProps) {
   const appDispatch = useAppDispatch();
   const confirmation = useConfirm();
+  const commentRef = useRef<HTMLInputElement>(null);
+
+  const popupState = usePopupState({
+    variant: "dialog",
+  });
 
   const handleCancel = () => {
     confirmation({
@@ -68,30 +89,26 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
       });
   };
 
-  const handleApprove = () => {
-    confirmation({
-      title: "Are you sure?",
-      description: "Confirm that you approve this request",
-      dialogProps: {
-        maxWidth: "xs",
-      },
-    })
-      .then(() => {
-        appDispatch(approveLeaveThunk(leave.id))
-          .unwrap()
-          .then(res => {
-            if (res.success) {
-              toast.success(`Leave is approved successfully`);
-              return;
-            }
-
-            toast.error(
-              `Could not approve leave request. Error code: ${res.code}`
-            );
-          });
+  const handleAction = (actionType: LeaveAction) => {
+    appDispatch(
+      handleLeaveActionThunk({
+        id: leave.id,
+        request: { action: actionType, comment: commentRef?.current?.value },
       })
-      .catch(() => {
-        /*ignore*/
+    )
+      .unwrap()
+      .then(res => {
+        if (res.success) {
+          toast.success(
+            `Leave is ${
+              actionType == LeaveAction.Approve ? "approved" : "rejected"
+            } successfully`
+          );
+
+          popupState.close();
+        } else {
+          toast.error(`Could not handle leave action. Error code: ${res.code}`);
+        }
       });
   };
 
@@ -107,7 +124,9 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     overrideCls?: string;
   }) => (
     <div className={`flex gap-4 mt-4 ${overrideCls}`}>
-      <div className={pastLeave ? "text-gray-700" : "text-lime-600"}>{icon}</div>
+      <div className={pastLeave ? "text-gray-700" : "text-lime-600"}>
+        {icon}
+      </div>
       <div>
         <strong className={pastLeave ? "text-gray-700" : "text-lime-600"}>
           {category}
@@ -155,73 +174,129 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
       : "border-orange-500 text-orange-500";
 
   return (
-    <div className="relative" data-id={leave.id}>
-      <Card className={pastLeave ? "bg-gray-200" : ""}>
-        <CardHeader
-          avatar={
-            <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
-          }
-          action={(showAction || canCancel) && leave.isCreator && <CardAction />}
-          title={leave.userName}
-          subheader={<TimeAgo date={leave.createdAt} />}
-        />
-        <CardContent>
-          <LeaveItem
-            category="Leave Reason"
-            content={leave.reason}
-            overrideCls="!mt-0"
-            icon={<CommentIcon />}
-          />
-          <LeaveItem
-            category={`Leave Date`}
-            content={
-              <>
-                {leave.leaveDates?.map((d) => (
-                  <div
-                    key={d.id}
-                    className="flex items-center gap-1 mt-1"
-                    title={dt.formatDate(d.date, "dd/MM/yyyy")}
-                  >
-                    {displayTime(d.time)}
-                    {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
-                  </div>
-                ))}
-              </>
+    <>
+      <div className="relative" data-id={leave.id}>
+        <Card className={pastLeave ? "bg-gray-200" : ""}>
+          <CardHeader
+            avatar={
+              <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
             }
-            icon={pastLeave ? <CheckIcon /> : <DateRangeIcon />}
+            action={
+              (showAction || canCancel) && leave.isCreator && <CardAction />
+            }
+            title={leave.userName}
+            subheader={<TimeAgo date={leave.createdAt} />}
           />
-          <LeaveItem
-            category="Leave Type"
-            content={LeaveTypeDescriptionMapping[leave.type]}
-            icon={<CategoryIcon />}
-          />
-          <LeaveItem
-            category="Leave Note"
-            content={leave.note || "(blank)"}
-            icon={<FormatQuoteIcon />}
-          />
-        </CardContent>
-        {showAction && !leave.isCreator && (
-          <CardActions className="grid grid-cols-2">
-            <Button variant="text" color="warning">
-              Reject
-            </Button>
-            <Button variant="contained" color="primary" onClick={handleApprove}>
-              Approve
-            </Button>
-          </CardActions>
-        )}
-      </Card>
+          <CardContent>
+            <LeaveItem
+              category="Leave Reason"
+              content={leave.reason}
+              overrideCls="!mt-0"
+              icon={<EditNoteIcon />}
+            />
+            <LeaveItem
+              category={`Leave Date`}
+              content={
+                <>
+                  {leave.leaveDates?.map(d => (
+                    <div
+                      key={d.id}
+                      className="flex items-center gap-1 mt-1"
+                      title={dt.formatDate(d.date, "dd/MM/yyyy")}
+                    >
+                      {displayTime(d.time)}
+                      {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
+                    </div>
+                  ))}
+                </>
+              }
+              icon={pastLeave ? <CheckIcon /> : <DateRangeIcon />}
+            />
+            <LeaveItem
+              category="Leave Type"
+              content={LeaveTypeDescriptionMapping[leave.type]}
+              icon={<CategoryIcon />}
+            />
+            <LeaveItem
+              category="Leave Note"
+              content={leave.note || "(blank)"}
+              icon={<FormatQuoteIcon />}
+            />
+            {Number(leave.comment?.length) > 0 &&
 
-      {!showAction && (
-        <div className="absolute z-10 top-[50%] left-0 right-10 flex justify-end text-center">
-          <div
-            className={`border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}`}
-          >
-            {LeaveStatus[leave.status]}
+            <LeaveItem
+              category="Comment"
+              content={leave.comment}
+              icon={<CommentIcon />}
+            />
+            }
+          </CardContent>
+          {showAction && !leave.isCreator && (
+            <CardActions>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                {...bindTrigger(popupState)}
+              >
+                Response
+              </Button>
+              {/* <Button
+                variant="contained"
+                color="primary"
+                onClick={handleApprove}
+              >
+                Approve
+              </Button> */}
+            </CardActions>
+          )}
+        </Card>
+
+        {!showAction && (
+          <div className="absolute z-10 top-[50%] left-0 right-10 flex justify-end text-center">
+            <div
+              className={`border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}`}
+            >
+              {LeaveStatus[leave.status]}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      <Dialog
+        {...bindDialog(popupState)}
+        aria-labelledby="approval-popup"
+        aria-describedby="approval-popup"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="approval-popup">{"Are you sure?"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            fullWidth
+            variant="standard"
+            placeholder="What's your comment?"
+            // ref={commentRef}
+            inputRef={commentRef}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={popupState.close}>Close</Button>
+          <div className="flex-[1]"></div>
+          <Button color="warning" onClick={() => handleAction(LeaveAction.Reject)}>
+            Reject
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleAction(LeaveAction.Approve)}
+          >
+            Approve
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

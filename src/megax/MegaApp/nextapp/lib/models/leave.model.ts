@@ -7,7 +7,7 @@ export interface Leave {
   type: LeaveType;
   note: string;
   status: LeaveStatus;
-  feedback: string;
+  comment: string | undefined;
   approvedBy?: string;
   isCreator: boolean;
   createdAt: Date;
@@ -41,6 +41,17 @@ export type LeaveDate = {
   date: Date;
   time: LeaveTime;
 };
+
+export enum LeaveAction {
+  Approve = 0,
+  Reject = 1,
+  Cancel = 2,
+}
+
+export type LeaveActionRequest = {
+  action: LeaveAction;
+  comment: string | undefined;
+}
 
 export const LeaveTypeDescriptionMapping = {
   [LeaveType.Annual]: 'Annual leave',

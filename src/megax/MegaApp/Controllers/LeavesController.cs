@@ -60,12 +60,25 @@ public class LeavesController : ApplicationControllerBase
     /// Approve a leave
     /// </summary>
     /// <returns></returns>
+    [HttpPost("{id}/action")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> HandleAction(int id, LeaveActionRequest request)
+    {
+        var result = await leaveService.HandleLeaveActionAsync(id, request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Approve a leave
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("{id}/approve")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ApproveLeave(int id)
     {
-        var result = await leaveService.ApproveLeaveAsync(id);
+        var result = await leaveService.ApproveLeaveAsync(id, null);
         return Ok(result);
     }
 
@@ -84,7 +97,6 @@ public class LeavesController : ApplicationControllerBase
             return BadRequest(ModelState);
         }
 
-        request.UserId = GetCurrentUserId(); // enhance when do allow teammate to request
         var result = await leaveService.RequestLeaveAsync(request);
         return Ok(result);
     }

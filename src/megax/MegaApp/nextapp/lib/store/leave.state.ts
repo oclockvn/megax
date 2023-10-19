@@ -2,6 +2,8 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Filter } from "../models/common.model";
 import {
   Leave,
+  LeaveAction,
+  LeaveActionRequest,
   LeaveDate,
   LeaveRequest,
   LeaveStatus,
@@ -12,6 +14,7 @@ import {
   fetchLeaveSummary,
   fetchLeaves,
   fetchRequestingLeaves,
+  handleAction,
   submitLeave,
 } from "../apis/leave.api";
 // import { fetchTodo } from "../apis/s.api";
@@ -78,6 +81,16 @@ export const approveLeaveThunk = createAsyncThunk(
   }
 );
 
+export const handleLeaveActionThunk = createAsyncThunk(
+  "leaves/handle-action",
+  async (
+    { id, request }: { id: number; request: LeaveActionRequest },
+    _thunkApi
+  ) => {
+    return await handleAction(id, request);
+  }
+);
+
 export const leaveSlice = createSlice({
   name: "leaves",
   initialState,
@@ -118,11 +131,40 @@ export const leaveSlice = createSlice({
           // state.error = `Request failed. Error code: ${code}`;
         }
       })
+      .addCase(handleLeaveActionThunk.fulfilled, (state, action) => {
+        if (!action.payload.success) {
+          return;
+        }
+
+        const {
+          request: { action: actionType, comment },
+          id,
+        } = action.meta.arg;
+        const result = action.payload.data;
+        const leave = state.items.find(x => x.id === id);
+        leave!.status = result;
+        leave!.comment = comment;
+
+        switch (actionType) {
+          case LeaveAction.Approve:
+          case LeaveAction.Reject:
+            state.requesting = state.requesting.filter(x => x.id !== id);
+            break;
+          case LeaveAction.Cancel:
+            if (result !== LeaveStatus.Cancelled) {
+              state.items = state.items.filter(x => x.id !== id);
+            }
+            break;
+        }
+      })
       .addCase(approveLeaveThunk.fulfilled, (state, action) => {
         if (action.payload.success) {
-          state.requesting = state.requesting.filter(
-            x => x.id !== action.meta.arg
-          );
+          const id = action.meta.arg;
+          const leave = state.items.find(x => x.id === id);
+
+          leave!.status = LeaveStatus.Approved;
+
+          state.requesting = state.requesting.filter(x => x.id !== id);
         }
       })
       .addCase(cancelLeaveThunk.fulfilled, (state, action) => {

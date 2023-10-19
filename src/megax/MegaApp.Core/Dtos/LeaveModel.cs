@@ -28,7 +28,7 @@ public record LeaveModel : Creator
     public LeaveStatus Status { get; set; }
 
     [MaxLength(255)]
-    public string Feedback { get; set; }
+    public string Comment { get; set; }
     public int ApprovedBy { get; set; }
     public DateTimeOffset? ApprovedAt { get; set; }
 
@@ -79,7 +79,7 @@ public record LeaveModel : Creator
         Note = leave.Note;
         Status = leave.Status;
         UserId = leave.UserId;
-        Feedback = leave.Feedback;
+        Comment = leave.Comment;
         ApprovedAt = leave.ApprovedAt;
         ApprovedBy = leave.ApprovedBy;
         CreatedAt = leave.CreatedAt;
@@ -123,3 +123,5 @@ public record LeaveDateModel
         LeaveId = d.LeaveId;
     }
 }
+
+public record LeaveActionRequest(LeaveAction Action, [MaxLength(255)] string Comment);

@@ -19,7 +19,7 @@ public class Leave : ICreator, IUpdatedByEntity
     public LeaveStatus Status { get; set; }
 
     [MaxLength(255)]
-    public string Feedback { get; set; }
+    public string Comment { get; set; }
     public int ApprovedBy { get; set; }
     public DateTimeOffset? ApprovedAt { get; set; }
 
