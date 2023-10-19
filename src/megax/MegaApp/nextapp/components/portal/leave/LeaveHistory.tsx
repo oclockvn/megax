@@ -1,6 +1,6 @@
 "use client";
 
-import Timeline, { timelineClasses } from "@mui/lab/Timeline";
+import Timeline  from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineOppositeContent, {
   timelineOppositeContentClasses,
@@ -16,14 +16,14 @@ import {
   LeaveStatusMapping,
 } from "@/lib/models/leave.model";
 import Chip from "@mui/material/Chip";
+import LeaveCardLoading from "@/components/common/skeletons/LeaveCardLoading";
 
 export type LeaveHistoryProps = {
   items: Leave[];
   loading?: boolean;
-  loadingElement?: React.ReactNode;
 };
 
-export default function LeaveHistory({ items, loading, loadingElement }: LeaveHistoryProps) {
+export default function LeaveHistory({ items, loading }: LeaveHistoryProps) {
   return (
     <>
       <Timeline
@@ -48,7 +48,9 @@ export default function LeaveHistory({ items, loading, loadingElement }: LeaveHi
             <TimelineSeparator>
               <TimelineDot
                 className={
-                  [LeaveStatus.Cancelled, LeaveStatus.Rejected].includes(leave.status)
+                  [LeaveStatus.Cancelled, LeaveStatus.Rejected].includes(
+                    leave.status
+                  )
                     ? `bg-orange-500`
                     : "bg-green-500"
                 }
@@ -56,7 +58,7 @@ export default function LeaveHistory({ items, loading, loadingElement }: LeaveHi
               <TimelineConnector />
             </TimelineSeparator>
             <TimelineContent>
-              {loading ? loadingElement : <LeaveCard leave={leave} />}
+              {loading ? <LeaveCardLoading /> : <LeaveCard leave={leave} />}
             </TimelineContent>
           </TimelineItem>
         ))}

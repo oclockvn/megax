@@ -17,9 +17,9 @@ import {
   LeaveType,
 } from "@/lib/models/leave.model";
 import LeaveForm from "@/components/portal/leave/LeaveForm";
-import Skeleton from "@mui/material/Skeleton";
-import { makeArr, makeArrOf } from "@/lib/helpers/array";
+import { makeArrOf } from "@/lib/helpers/array";
 import dt from "@/lib/datetime";
+import LeaveCardLoading from "@/components/common/skeletons/LeaveCardLoading";
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
@@ -47,32 +47,19 @@ export default function LeavePage() {
     ? makeArrOf(5, i => ({ id: i, status: LeaveStatus.New } as Leave))
     : items.filter(x => x.status !== LeaveStatus.New);
 
-  const taken = items
-    .reduce((prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates], [])
-    .filter(d => dt.isPast(d.date))
-    .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) / 2;
+  const taken =
+    items
+      .reduce(
+        (prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates],
+        []
+      )
+      .filter(d => dt.isPast(d.date))
+      .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) /
+    2;
 
   const requestedDates = items.reduce(
     (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
     []
-  );
-
-  const LoadingCard = ({ count = 1 }: { count?: number }) => (
-    <>
-      {makeArr(count).map(i => (
-        <div key={i} className="mt-4">
-          <div className="flex gap-4 items-center mb-2">
-            <Skeleton variant="circular" width={50} height={50} />
-            <div>
-              <Skeleton variant="text" width={200} />
-              <Skeleton variant="text" width={300} />
-            </div>
-          </div>
-
-          <Skeleton variant="rounded" height={200} />
-        </div>
-      ))}
-    </>
   );
 
   return (
@@ -107,7 +94,7 @@ export default function LeavePage() {
           </div>
           {loading ? (
             <>
-              <LoadingCard count={2} />
+              <LeaveCardLoading count={2} />
             </>
           ) : (
             queueItems.map((i, index) => (
@@ -120,11 +107,7 @@ export default function LeavePage() {
 
         <Grid item xs={12} sm={8}>
           <h3 className="mt-4 text-lg font-bold ps-[160px]">Leave History</h3>
-          <LeaveHistory
-            items={pastItems}
-            loading={loading}
-            loadingElement={<LoadingCard />}
-          />
+          <LeaveHistory items={pastItems} loading={loading} />
         </Grid>
       </Grid>
 

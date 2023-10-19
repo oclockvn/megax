@@ -94,7 +94,7 @@ internal class LeaveService : ILeaveService
             .Select(x => new LeaveModel(x, x.LeaveDates))
             .ToListAsync();
 
-        return leaves;
+        return leaves.WithCreator(userResolver.Resolve());
     }
 
     public async Task<LeaveSummary> GetLeaveSummaryAsync(int userId)
@@ -104,14 +104,13 @@ internal class LeaveService : ILeaveService
 
         return new LeaveSummary
         {
-            Leaves = leaves,
+            Leaves = leaves.WithCreator(userResolver.Resolve()),
             Capacity = leaveCapacity,
         };
     }
 
     public async Task<List<LeaveModel>> GetRequestingLeavesAsync()
     {
-        var currentUser = userResolver.Resolve();
         using var db = UseDb();
         var leaves = await db.Leaves.Where(x => x.Status == LeaveStatus.New)
             .OrderByDescending(x => x.Id)
@@ -121,7 +120,7 @@ internal class LeaveService : ILeaveService
             })
             .ToListAsync();
 
-        return leaves;
+        return leaves.WithCreator(userResolver.Resolve());
     }
 
     public async Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request)
@@ -185,7 +184,7 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
-        var model = new LeaveModel(leave, leave.LeaveDates);
+        var model = new LeaveModel(leave, leave.LeaveDates).WithCreator(userResolver.Resolve());
         return new Result<LeaveModel>(model);
     }
 

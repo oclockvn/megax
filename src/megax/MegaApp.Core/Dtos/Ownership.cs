@@ -16,4 +16,10 @@ public static class CreatorExtension
         self.CurrentUser = user.Id;
         return self;
     }
+
+    public static List<T> WithCreator<T>(this List<T> list, CurrentUser user) where T : Creator
+    {
+        list.ForEach(x => x.WithCreator(user));
+        return list;
+    }
 }
