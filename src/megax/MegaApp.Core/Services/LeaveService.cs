@@ -39,7 +39,7 @@ internal class LeaveService : ILeaveService
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync() ?? throw new EntityNotFoundException($"Leave id {id} could not be found");
 
-        if (leave.UserId == currentUser.Id)
+        if (leave.IsCreator(currentUser))
         {
             return Result<LeaveStatus>.Fail(ResultCode.SELF_APPROVAL_IS_NOT_ALLOWED);
         }

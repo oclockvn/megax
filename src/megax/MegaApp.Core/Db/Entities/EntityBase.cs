@@ -1,4 +1,6 @@
-﻿namespace MegaApp.Core.Db.Entities
+﻿using MegaApp.Core.Services;
+
+namespace MegaApp.Core.Db.Entities
 {
     public interface ICreatedByEntity
     {
@@ -10,5 +12,10 @@
     {
         DateTimeOffset UpdatedAt { get; set; }
         int? UpdatedBy { get; set; }
+    }
+
+    public interface ICreator : ICreatedByEntity
+    {
+        bool IsCreator(CurrentUser currentUser);
     }
 }

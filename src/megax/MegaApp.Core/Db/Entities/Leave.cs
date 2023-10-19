@@ -1,11 +1,12 @@
 ﻿using MegaApp.Core.Enums;
+using MegaApp.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Db.Entities;
 
-public class Leave : ICreatedByEntity, IUpdatedByEntity
+public class Leave : ICreator, IUpdatedByEntity
 {
     public int Id { get; set; }
 
@@ -31,6 +32,11 @@ public class Leave : ICreatedByEntity, IUpdatedByEntity
     public int? UpdatedBy { get; set; }
 
     public List<LeaveDate> LeaveDates { get; set; } = new();
+
+    public bool IsCreator(CurrentUser currentUser)
+    {
+        return currentUser?.Id == CreatedBy;
+    }
 }
 
 public class LeaveDate
@@ -52,8 +58,8 @@ public class LeaveConfiguration : IEntityTypeConfiguration<Leave>
         builder.HasMany(x => x.LeaveDates)
             .WithOne(x => x.Leave)
             .HasForeignKey(x => x.LeaveId);
-        builder.HasOne(x=>x.User)
-            .WithMany(x=>x.Leaves)
-            .HasForeignKey(x=>x.UserId);
+        builder.HasOne(x => x.User)
+            .WithMany(x => x.Leaves)
+            .HasForeignKey(x => x.UserId);
     }
 }

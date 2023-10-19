@@ -9,7 +9,7 @@ export interface Leave {
   status: LeaveStatus;
   feedback: string;
   approvedBy?: string;
-  isOwner: boolean;
+  isCreator: boolean;
   createdAt: Date;
   userId: number;
   userName: string;

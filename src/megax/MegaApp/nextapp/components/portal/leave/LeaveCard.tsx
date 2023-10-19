@@ -161,7 +161,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           avatar={
             <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
           }
-          action={(showAction || canCancel) && leave.isOwner && <CardAction />}
+          action={(showAction || canCancel) && leave.isCreator && <CardAction />}
           title={leave.userName}
           subheader={<TimeAgo date={leave.createdAt} />}
         />
@@ -201,7 +201,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
             icon={<FormatQuoteIcon />}
           />
         </CardContent>
-        {showAction && !leave.isOwner && (
+        {showAction && !leave.isCreator && (
           <CardActions className="grid grid-cols-2">
             <Button variant="text" color="warning">
               Reject

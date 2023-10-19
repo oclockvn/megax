@@ -1,7 +1,6 @@
 ﻿using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Enums;
 using MegaApp.Core.Validators;
-using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
@@ -38,6 +37,11 @@ public record LeaveModel : Creator
     public string UserName { get; set; }
 
     public List<LeaveDateModel> LeaveDates { get; set; } = new();
+
+    // public void Deconstruct(out bool isOwner, CurrentUser user)
+    // {
+    //     return curr.Id == CreatedBy;
+    // }
 
     public record Add : IValidatableObject
     {
