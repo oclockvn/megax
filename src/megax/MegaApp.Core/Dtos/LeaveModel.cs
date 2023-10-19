@@ -90,6 +90,11 @@ public record LeaveModel : Creator
     {
         LeaveDates.AddRange(dates.Select(d => new LeaveDateModel(d)));
     }
+
+    public LeaveModel(Db.Entities.Leave leave, List<LeaveDate> dates, User user) : this(leave, dates)
+    {
+        UserName = user.FullName;
+    }
 }
 
 public record LeaveDateModel

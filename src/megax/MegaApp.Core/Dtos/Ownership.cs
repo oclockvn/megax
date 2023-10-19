@@ -11,15 +11,18 @@ public record Creator
 
 public static class CreatorExtension
 {
-    public static T WithCreator<T>(this T self, CurrentUser user) where T : Creator
+    public static T WithCreator<T>(this T self, int currentUserId) where T : Creator
     {
-        self.CurrentUser = user.Id;
+        self.CurrentUser = currentUserId;
         return self;
     }
 
-    public static List<T> WithCreator<T>(this List<T> list, CurrentUser user) where T : Creator
+    public static List<T> WithCreator<T>(this List<T> list, int currentUserId) where T : Creator
     {
-        list.ForEach(x => x.WithCreator(user));
+        list.ForEach(x => x.WithCreator(currentUserId));
         return list;
     }
+
+    public static T WithCreator<T>(this T self, CurrentUser user) where T : Creator => WithCreator(self, user.Id);
+    public static List<T> WithCreator<T>(this List<T> list, CurrentUser user) where T : Creator => WithCreator(list, user.Id);
 }

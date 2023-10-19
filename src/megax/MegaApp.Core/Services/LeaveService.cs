@@ -91,7 +91,10 @@ internal class LeaveService : ILeaveService
         using var db = UseDb();
         var leaves = await db.Leaves.Where(x => x.UserId == userId)
             .OrderByDescending(x => x.Id)
-            .Select(x => new LeaveModel(x, x.LeaveDates))
+            .Select(x => new LeaveModel(x, x.LeaveDates)
+            {
+                UserName = x.User.FullName
+            })
             .ToListAsync();
 
         return leaves.WithCreator(userResolver.Resolve());
@@ -184,7 +187,12 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
-        var model = new LeaveModel(leave, leave.LeaveDates).WithCreator(userResolver.Resolve());
+        var (userId, userName) = userResolver.Resolve();
+        var model = new LeaveModel(leave, leave.LeaveDates)
+        {
+            UserName = userName,
+        }.WithCreator(userId);
+
         return new Result<LeaveModel>(model);
     }
 
