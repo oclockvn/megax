@@ -16,7 +16,7 @@ public record LeaveSummary
     public int Capacity { get; set; }
 }
 
-public record LeaveModel : Creator, IOwner
+public record LeaveModel : Creator
 {
     public int Id { get; set; }
 
@@ -38,8 +38,6 @@ public record LeaveModel : Creator, IOwner
     public string UserName { get; set; }
 
     public List<LeaveDateModel> LeaveDates { get; set; } = new();
-
-    public bool IsOwner => CreatedBy == UserId;
 
     public record Add : IValidatableObject
     {
