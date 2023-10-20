@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
 
-public class UserModel
+public record UserModel
 {
     public int Id { get; set; }
     public int AccountId { get; set; }
@@ -148,3 +148,14 @@ public class UserModel
 }
 
 public record UserDeviceRecord(int Id, string Name, string SerialNumber, string DeviceType, DateTimeOffset TakenAt, DateTimeOffset? ReturnedAt);
+
+public record UserCard
+{
+    public int Id { get; set; }
+    public string FullName { get; set; }
+    public string Email { get; set; }
+    public string Phone { get; set; }
+    public int TotalAnnual { get; set; }
+    public int TakenAnnual { get; set; }
+    public int TakenPaidLeave { get; set; }
+}

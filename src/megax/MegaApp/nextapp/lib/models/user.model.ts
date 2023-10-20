@@ -11,12 +11,22 @@ export interface UserDeviceRecord {
   returnedAt?: Date;
 }
 
+export type UserCard = {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  totalAnnual: number;
+  takenAnnual: number;
+  takenPaidLeave: number;
+};
+
 export const userSchema = yup.object({
   id: yup.number().nullable().default(null),
   accountId: yup.number().nullable().default(null),
-  code: yup.string().label('Employee ID').required().default(null),
+  code: yup.string().label("Employee ID").required().default(null),
   email: yup.string().required(),
-  fullName: yup.string().label('Full name').required(),
+  fullName: yup.string().label("Full name").required(),
   nickname: yup.string().nullable().default(null),
   phone: yup.string().nullable().default(null),
   address: yup.string().nullable().default(null),
@@ -65,7 +75,7 @@ export const userSchema = yup.object({
     ),
   contractType: yup
     .string()
-    .label('Contract type')
+    .label("Contract type")
     .oneOf(["official", "contractor", "fresher"])
     .required()
     .default("official"),

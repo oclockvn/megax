@@ -206,4 +206,18 @@ public class UsersController : ApplicationControllerBase
         var result = await userService.DeleteDocumentAsync(docid);
         return Ok(result);
     }
+
+    /// <summary>
+    /// Get user card info
+    /// </summary>
+    /// <param name="id">The user id</param>
+    /// <returns></returns>
+    [HttpGet("{id}/card")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(UserCard), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UserCard(int id)
+    {
+        var result = await userService.GetUserCardAsync(id);
+        return Ok(result);
+    }
 }
