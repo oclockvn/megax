@@ -96,11 +96,7 @@ function UserDeviceAdd({
         >
           Cancel
         </Button>
-        <Button
-          className="bg-blue-400 hover:!bg-blue-500 text-white flex-1"
-          type="button"
-          onClick={handleAssignDevice}
-        >
+        <Button type="button" variant="contained" onClick={handleAssignDevice}>
           Add
         </Button>
       </div>
@@ -209,7 +205,6 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
               type="button"
               variant="contained"
               size="small"
-              className="bg-blue-500 text-white hover:!bg-blue-600"
               onClick={toggleAddDeviceVisibility}
               disabled={isAddVisible}
             >

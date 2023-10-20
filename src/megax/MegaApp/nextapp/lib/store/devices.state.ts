@@ -113,6 +113,7 @@ export const devicesSlice = createSlice({
       .addCase(fetchDevicesThunk.fulfilled, (state, action) => {
         state.pagedDevices = action.payload;
         state.loading = false;
+        state.error = undefined;
       })
       .addCase(fetchDevicesThunk.pending, (state, action) => {
         state.loading = true;
@@ -120,6 +121,7 @@ export const devicesSlice = createSlice({
       .addCase(fetchDeviceDetailThunk.fulfilled, (state, action) => {
         state.currentDevice = action.payload;
         state.loading = false;
+        state.error = undefined;
       })
       .addCase(fetchDeviceDetailThunk.pending, (state, action) => {
         state.loading = true;
@@ -145,6 +147,7 @@ export const devicesSlice = createSlice({
         state.loadingState = undefined;
         if (action.payload.success) {
           state.currentDevice = action.payload.data;
+          state.error = undefined;
         } else {
           state.error = `Couldn't add device. Error code: ${action.payload.code}`;
         }
