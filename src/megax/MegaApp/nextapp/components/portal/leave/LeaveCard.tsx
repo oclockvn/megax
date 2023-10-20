@@ -128,7 +128,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     contentRight?: React.ReactNode | undefined;
     overrideCls?: string;
   }) => (
-    <div className={`flex gap-4 mt-4 ${overrideCls || ''} ${!!contentRight ? 'hover:bg-slate-100 rounded hover:shadow-[0_0_0_100vmax] hover:shadow-slate-100 [clip-path:inset(0_-100vmax)]' : ''}`}>
+    <div className={`flex gap-4 mt-4 ${overrideCls || ""}`}>
       <div className={pastLeave ? "text-gray-700" : "text-lime-600"}>
         {icon}
       </div>
@@ -204,14 +204,15 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
               category={`Leave Date`}
               content={
                 <>
-                  {leave.leaveDates?.map(d => (
+                  {leave.leaveDates?.map((d, idx) => (
                     <div
                       key={d.id}
-                      className="flex items-center gap-1 mt-1"
+                      className={`flex items-center gap-1 mt-1`}
                       title={dt.formatDate(d.date, "dd/MM/yyyy")}
                     >
                       {displayTime(d.time)}
                       {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
+                      → <TimeAgo date={d.date} />
                     </div>
                   ))}
                 </>
@@ -222,7 +223,9 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
               category="Leave Type"
               content={LeaveTypeDescriptionMapping[leave.type]}
               contentRight={
-                leave.type === LeaveType.Paid ? <PaidIcon color="error" /> : undefined
+                leave.type === LeaveType.Paid ? (
+                  <PaidIcon color="error" />
+                ) : undefined
               }
               icon={<CategoryIcon />}
             />
@@ -263,7 +266,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         </Card>
 
         {!showAction && (
-          <div className="absolute z-10 top-[50%] right-10 flex justify-end text-center">
+          <div className="absolute z-10 top-[50%] right-[40%] flex justify-end text-center">
             <div
               className={`border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}`}
             >
