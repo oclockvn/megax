@@ -80,8 +80,8 @@ public record LeaveModel : Creator
         Status = leave.Status;
         UserId = leave.UserId;
         Comment = leave.Comment;
-        ApprovedAt = leave.ApprovedAt;
-        ApprovedBy = leave.ApprovedBy;
+        ApprovedAt = leave.ResponseAt;
+        ApprovedBy = leave.ResponseBy;
         CreatedAt = leave.CreatedAt;
         CreatedBy = leave.CreatedBy.GetValueOrDefault();
     }

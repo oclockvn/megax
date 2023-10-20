@@ -115,6 +115,8 @@ public class User : ICreatedByEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+    [MaxLength(255)]
+    public string CreatedName { get; set; }
 }
 
 public static class UserQueryExtension

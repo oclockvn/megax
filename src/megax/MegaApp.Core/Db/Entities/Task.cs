@@ -24,8 +24,12 @@ public class TodoTask : ICreatedByEntity, IUpdatedByEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+    [MaxLength(255)]
+    public string CreatedName { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public int? UpdatedBy { get; set; }
+    [MaxLength(255)]
+    public string UpdatedName { get; set; }
 }
 
 public class SubTask : ICreatedByEntity, IUpdatedByEntity
@@ -40,8 +44,12 @@ public class SubTask : ICreatedByEntity, IUpdatedByEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+    [MaxLength(255)]
+    public string CreatedName { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public int? UpdatedBy { get; set; }
+    [MaxLength(255)]
+    public string UpdatedName { get; set; }
 }
 
 public class TaskConfiguration : IEntityTypeConfiguration<TodoTask>

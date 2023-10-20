@@ -20,16 +20,22 @@ public class Leave : ICreator, IUpdatedByEntity
 
     [MaxLength(255)]
     public string Comment { get; set; }
-    public int ApprovedBy { get; set; }
-    public DateTimeOffset? ApprovedAt { get; set; }
+    public int ResponseBy { get; set; }
+    [MaxLength(255)]
+    public string ResponseName { get; set; }
+    public DateTimeOffset? ResponseAt { get; set; }
 
     public int UserId { get; set; }
     public User User { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+    [MaxLength(255)]
+    public string CreatedName { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public int? UpdatedBy { get; set; }
+    [MaxLength(255)]
+    public string UpdatedName { get; set; }
 
     public List<LeaveDate> LeaveDates { get; set; } = new();
 
