@@ -9,6 +9,7 @@ import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import CheckIcon from "@mui/icons-material/Check";
 import CategoryIcon from "@mui/icons-material/Category";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import PaidIcon from "@mui/icons-material/Paid";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
@@ -17,6 +18,7 @@ import {
   LeaveAction,
   LeaveStatus,
   LeaveTime,
+  LeaveType,
   LeaveTypeDescriptionMapping,
 } from "@/lib/models/leave.model";
 import dt from "@/lib/datetime";
@@ -42,6 +44,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import { useRef } from "react";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -116,23 +119,26 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     icon,
     category,
     content,
+    contentRight,
     overrideCls,
   }: {
     icon: React.ReactNode;
     category: string;
     content: string | React.ReactNode;
+    contentRight?: React.ReactNode | undefined;
     overrideCls?: string;
   }) => (
-    <div className={`flex gap-4 mt-4 ${overrideCls}`}>
+    <div className={`flex gap-4 mt-4 ${overrideCls || ''} ${!!contentRight ? 'hover:bg-slate-100 rounded hover:shadow-[0_0_0_100vmax] hover:shadow-slate-100 [clip-path:inset(0_-100vmax)]' : ''}`}>
       <div className={pastLeave ? "text-gray-700" : "text-lime-600"}>
         {icon}
       </div>
-      <div>
+      <div className="flex-1">
         <strong className={pastLeave ? "text-gray-700" : "text-lime-600"}>
           {category}
         </strong>
         <div>{content}</div>
       </div>
+      {!!contentRight && <div className="self-center">{contentRight}</div>}
     </div>
   );
 
@@ -215,6 +221,9 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
             <LeaveItem
               category="Leave Type"
               content={LeaveTypeDescriptionMapping[leave.type]}
+              contentRight={
+                leave.type === LeaveType.Paid ? <PaidIcon color="error" /> : undefined
+              }
               icon={<CategoryIcon />}
             />
             <LeaveItem
@@ -222,14 +231,22 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
               content={leave.note || "(blank)"}
               icon={<FormatQuoteIcon />}
             />
-            {Number(leave.comment?.length) > 0 &&
-
-            <LeaveItem
-              category="Comment"
-              content={<>{leave.comment} {!!leave.responseName && <i className="text-gray-400 text-sm">by {leave.responseName}</i>}</>}
-              icon={<CommentIcon />}
-            />
-            }
+            {Number(leave.comment?.length) > 0 && (
+              <LeaveItem
+                category="Comment"
+                content={
+                  <>
+                    {leave.comment}{" "}
+                    {!!leave.responseName && (
+                      <i className="text-gray-400 text-sm">
+                        by {leave.responseName}
+                      </i>
+                    )}
+                  </>
+                }
+                icon={<CommentIcon />}
+              />
+            )}
           </CardContent>
           {showAction && !leave.isCreator && (
             <CardActions>
@@ -246,7 +263,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         </Card>
 
         {!showAction && (
-          <div className="absolute z-10 top-[50%] left-0 right-10 flex justify-end text-center">
+          <div className="absolute z-10 top-[50%] right-10 flex justify-end text-center">
             <div
               className={`border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}`}
             >
@@ -278,7 +295,10 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         <DialogActions>
           <Button onClick={popupState.close}>Close</Button>
           <div className="flex-[1]"></div>
-          <Button color="warning" onClick={() => handleAction(LeaveAction.Reject)}>
+          <Button
+            color="warning"
+            onClick={() => handleAction(LeaveAction.Reject)}
+          >
             Reject
           </Button>
           <Button
