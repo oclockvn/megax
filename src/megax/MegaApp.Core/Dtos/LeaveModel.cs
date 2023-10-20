@@ -1,7 +1,6 @@
 ﻿using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Enums;
 using MegaApp.Core.Validators;
-using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Dtos;
@@ -16,27 +15,19 @@ public record LeaveSummary
     public int Capacity { get; set; }
 }
 
-public record LeaveModel
+public record LeaveModel : Creator
 {
     public int Id { get; set; }
-
-    [MaxLength(255)]
     public string Reason { get; set; }
     public LeaveType Type { get; set; }
-
-    [MaxLength(255)]
     public string Note { get; set; }
     public LeaveStatus Status { get; set; }
-
-    [MaxLength(255)]
-    public string Feedback { get; set; }
-    public int ApprovedBy { get; set; }
-    public DateTimeOffset? ApprovedAt { get; set; }
+    public string Comment { get; set; }
+    public int ResponseBy { get; set; }
+    public string ResponseName { get; set; }
+    public DateTimeOffset? ResponseAt { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
-    public int? CreatedBy { get; set; }
-    public bool IsOwner { get; set; }
-
     public int UserId { get; set; }
     public string UserName { get; set; }
 
@@ -77,15 +68,23 @@ public record LeaveModel
         Reason = leave.Reason;
         Note = leave.Note;
         Status = leave.Status;
-        Feedback = leave.Feedback;
-        ApprovedAt = leave.ApprovedAt;
-        ApprovedBy = leave.ApprovedBy;
+        UserId = leave.UserId;
+        Comment = leave.Comment;
+        ResponseAt = leave.ResponseAt;
+        ResponseBy = leave.ResponseBy;
+        ResponseName = leave.ResponseName;
         CreatedAt = leave.CreatedAt;
+        CreatedBy = leave.CreatedBy.GetValueOrDefault();
     }
 
     public LeaveModel(Db.Entities.Leave leave, List<LeaveDate> dates) : this(leave)
     {
         LeaveDates.AddRange(dates.Select(d => new LeaveDateModel(d)));
+    }
+
+    public LeaveModel(Db.Entities.Leave leave, List<LeaveDate> dates, User user) : this(leave, dates)
+    {
+        UserName = user.FullName;
     }
 }
 
@@ -115,3 +114,5 @@ public record LeaveDateModel
         LeaveId = d.LeaveId;
     }
 }
+
+public record LeaveActionRequest(LeaveAction Action, [MaxLength(255)] string Comment);

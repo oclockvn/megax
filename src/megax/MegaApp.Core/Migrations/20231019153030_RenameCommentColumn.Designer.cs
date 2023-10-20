@@ -4,6 +4,7 @@ using MegaApp.Core.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MegaApp.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231019153030_RenameCommentColumn")]
+    partial class RenameCommentColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,10 +105,6 @@ namespace MegaApp.Core.Migrations
 
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
-
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -233,10 +232,6 @@ namespace MegaApp.Core.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<int>("DeviceId")
                         .HasColumnType("int");
 
@@ -351,10 +346,6 @@ namespace MegaApp.Core.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("FileName")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -392,10 +383,6 @@ namespace MegaApp.Core.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("FileType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -416,6 +403,12 @@ namespace MegaApp.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("ApprovedBy")
+                        .HasColumnType("int");
+
                     b.Property<string>("Comment")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -428,25 +421,11 @@ namespace MegaApp.Core.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("Note")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Reason")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTimeOffset?>("ResponseAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("ResponseBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ResponseName")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -461,10 +440,6 @@ namespace MegaApp.Core.Migrations
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
-
-                    b.Property<string>("UpdatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -524,10 +499,6 @@ namespace MegaApp.Core.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -584,10 +555,6 @@ namespace MegaApp.Core.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -604,10 +571,6 @@ namespace MegaApp.Core.Migrations
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
-
-                    b.Property<string>("UpdatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -695,10 +658,6 @@ namespace MegaApp.Core.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
 
@@ -719,10 +678,6 @@ namespace MegaApp.Core.Migrations
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
-
-                    b.Property<string>("UpdatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -788,10 +743,6 @@ namespace MegaApp.Core.Migrations
 
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
-
-                    b.Property<string>("CreatedName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTimeOffset?>("Dob")
                         .HasColumnType("datetimeoffset");

@@ -12,9 +12,9 @@ public interface IBankService
 
 internal class BankService : IBankService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public BankService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public BankService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

@@ -7,9 +7,9 @@ export interface Leave {
   type: LeaveType;
   note: string;
   status: LeaveStatus;
-  feedback: string;
-  approvedBy?: string;
-  isOwner: boolean;
+  comment: string | undefined;
+  responseName?: string;
+  isCreator: boolean;
   createdAt: Date;
   userId: number;
   userName: string;
@@ -42,9 +42,27 @@ export type LeaveDate = {
   time: LeaveTime;
 };
 
+export enum LeaveAction {
+  Approve = 0,
+  Reject = 1,
+  Cancel = 2,
+}
+
+export type LeaveActionRequest = {
+  action: LeaveAction;
+  comment: string | undefined;
+}
+
 export const LeaveTypeDescriptionMapping = {
   [LeaveType.Annual]: 'Annual leave',
   [LeaveType.Paid]: 'Paid leave',
   [LeaveType.TimeInLieu]: 'Time off in lieu',
   // [LeaveType.Other]: 'Other'
+}
+
+export const LeaveStatusMapping = {
+  [LeaveStatus.New]: 'Requested',
+  [LeaveStatus.Approved]: 'Approved',
+  [LeaveStatus.Cancelled]: 'Cancelled',
+  [LeaveStatus.Rejected]: 'Rejected',
 }

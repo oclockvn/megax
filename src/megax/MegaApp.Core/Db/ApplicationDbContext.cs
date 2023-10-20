@@ -5,6 +5,9 @@ namespace MegaApp.Core.Db
 {
     public class ApplicationDbContext : DbContext
     {
+        public int CurrentUserId { get; private set; }
+        public string CurrentUserName { get; private set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> contextOptions) : base(contextOptions)
         {
         }
@@ -24,7 +27,7 @@ namespace MegaApp.Core.Db
         public DbSet<Entities.File> Files { get; set; }
         public DbSet<FileReference> FileReferences { get; set; }
 
-        public DbSet<TodoTask> Tasks {get;set;}
+        public DbSet<TodoTask> Tasks { get; set; }
         public DbSet<SubTask> SubTasks { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Client> Clients { get; set; }
@@ -50,7 +53,37 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new ClientConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new LeaveConfiguration());
+        }
 
+        public void SetCurrentUser(int userId, string userName)
+        {
+            CurrentUserId = userId;
+            CurrentUserName = userName;
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var (userId, userName) = (CurrentUserId, CurrentUserName);
+            if (userId > 0)
+            {
+                foreach (var entry in ChangeTracker.Entries())
+                {
+                    if (entry.State == EntityState.Added && entry.Entity is ICreatedByEntity createEntity)
+                    {
+                        createEntity.CreatedAt = DateTimeOffset.Now;
+                        createEntity.CreatedBy = userId;
+                        createEntity.CreatedName = userName;
+                    }
+                    else if (entry.State == EntityState.Modified && entry.Entity is IUpdatedByEntity updateEntity)
+                    {
+                        updateEntity.UpdatedAt = DateTimeOffset.Now;
+                        updateEntity.UpdatedBy = userId;
+                        updateEntity.UpdatedName = userName;
+                    }
+                }
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }

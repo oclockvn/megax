@@ -43,9 +43,9 @@ public interface IFileService
 
 internal class FileService : IFileService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public FileService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public FileService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

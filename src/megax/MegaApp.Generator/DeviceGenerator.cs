@@ -12,9 +12,9 @@ public interface IDeviceGenerator
 
 public class DeviceGenerator : IDeviceGenerator
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
 
-    public DeviceGenerator(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public DeviceGenerator(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

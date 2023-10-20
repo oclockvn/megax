@@ -11,7 +11,7 @@ export default function Home() {
   const appDispatch= useAppDispatch()
 
   useEffect(() => {
-    appDispatch(fetchTaskListThunk())
+    // appDispatch(fetchTaskListThunk())
   }, [appDispatch])
 
   return (

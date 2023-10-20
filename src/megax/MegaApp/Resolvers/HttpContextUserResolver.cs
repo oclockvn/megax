@@ -17,7 +17,7 @@ internal class HttpContextUserResolver : IUserResolver
         var user = httpContextAccessor.HttpContext?.User;
         if (user == null)
         {
-            return null;
+            return new(0, null);
         }
 
         _ = int.TryParse(user.FindFirstValue(ClaimTypes.NameIdentifier), out var id);

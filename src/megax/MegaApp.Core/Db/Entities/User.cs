@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 
 namespace MegaApp.Core.Db.Entities;
@@ -116,6 +115,8 @@ public class User : ICreatedByEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+    [MaxLength(255)]
+    public string CreatedName { get; set; }
 }
 
 public static class UserQueryExtension

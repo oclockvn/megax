@@ -27,6 +27,16 @@ public class LeaveRequestValidator : BusinessValidator<LeaveModel.Add>
             {
                 error = "Duplicated leave date found";
             }
+            else // cross leave (past and future together)
+            {
+                var hasPast = input.LeaveDates.Any(d => d.Date < DateTimeOffset.Now);
+                var hasFuture = input.LeaveDates.Any(d => d.Date >= DateTimeOffset.Now);
+                if (hasPast && hasFuture)
+                {
+                    error = "Leave request with dates in past and future is not allowed";
+                }
+
+            }
         }
 
         return string.IsNullOrWhiteSpace(error);

@@ -17,7 +17,9 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddCoreServices(this IServiceCollection services, Action<DbContextOptionsBuilder> contextOptionBuilder, IConfiguration configuration)
     {
         return services
-            .AddDbContextFactory<ApplicationDbContext>(contextOptionBuilder)
+            .AddPooledDbContextFactory<ApplicationDbContext>(contextOptionBuilder)
+            // Register an additional context factory as a Scoped service, which gets a pooled context from the Singleton factory we registered above
+            .AddScoped<ApplicationDbContextFactory>()
             .AddScoped<IUserService, UserService>()
             .AddScoped<IAuthService, AuthService>()
             .AddScoped<IDeviceService, DeviceService>()

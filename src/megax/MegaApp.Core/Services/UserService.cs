@@ -30,10 +30,10 @@ public interface IUserService
 
 internal class UserService : IUserService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
     private readonly IFileService fileService;
 
-    public UserService(IDbContextFactory<ApplicationDbContext> dbContextFactory, IFileService fileService)
+    public UserService(ApplicationDbContextFactory dbContextFactory, IFileService fileService)
     {
         this.dbContextFactory = dbContextFactory;
         this.fileService = fileService;

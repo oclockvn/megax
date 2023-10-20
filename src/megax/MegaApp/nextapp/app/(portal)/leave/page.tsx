@@ -9,8 +9,17 @@ import LeaveHistory from "@/components/portal/leave/LeaveHistory";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { useEffect, useState } from "react";
 import { fetchLeaveSummaryThunk } from "@/lib/store/leave.state";
-import { Leave, LeaveStatus, LeaveType } from "@/lib/models/leave.model";
+import {
+  Leave,
+  LeaveDate,
+  LeaveStatus,
+  LeaveTime,
+  LeaveType,
+} from "@/lib/models/leave.model";
 import LeaveForm from "@/components/portal/leave/LeaveForm";
+import { makeArrOf } from "@/lib/helpers/array";
+import dt from "@/lib/datetime";
+import LeaveCardLoading from "@/components/common/skeletons/LeaveCardLoading";
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
@@ -34,16 +43,19 @@ export default function LeavePage() {
   };
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
-  const pastItems = items.filter(x => x.status !== LeaveStatus.New);
-  const taken = items
-    .filter(x => x.status === LeaveStatus.Approved)
-    .reduce(
-      (prev: Date[], { leaveDates }) => [
-        ...prev,
-        ...leaveDates.map(d => d.date),
-      ],
-      []
-    ).length;
+  const pastItems = loading
+    ? makeArrOf(5, i => ({ id: i, status: LeaveStatus.New } as Leave))
+    : items.filter(x => x.status !== LeaveStatus.New);
+
+  const taken =
+    items
+      .reduce(
+        (prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates],
+        []
+      )
+      .filter(d => dt.isPast(d.date))
+      .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) /
+    2;
 
   const requestedDates = items.reduce(
     (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
@@ -76,20 +88,31 @@ export default function LeavePage() {
         <Grid item xs={12} sm={4}>
           <div className="flex items-center justify-between mt-4 mb-2 font-bold">
             <h3 className="text-lg">Your Requests</h3>
-            <div>
-              (Taken {taken} / {capacity} total)
-            </div>
+            {/* <div>
+              (Taken {taken}/{capacity} total days)
+            </div> */}
           </div>
-          {queueItems.map((i, index) => (
-            <div key={i.id} className={index === 0 ? "" : "mt-4"}>
-              <LeaveCard leave={i} />
-            </div>
-          ))}
+          {loading ? (
+            <>
+              <LeaveCardLoading count={2} />
+            </>
+          ) : (
+            queueItems.map((i, index) => (
+              <div key={i.id} className={index === 0 ? "" : "mt-4"}>
+                <LeaveCard leave={i} />
+              </div>
+            ))
+          )}
         </Grid>
 
         <Grid item xs={12} sm={8}>
-          <h3 className="mt-4 text-lg font-bold ps-[160px]">Leave History</h3>
-          <LeaveHistory items={pastItems} />
+          <div className="flex justify-between items-center text-lg font-bold mt-4">
+            <h3 className="ps-[160px]">Leave History</h3>
+            <div className="me-8">
+              (Taken {taken}/{capacity} total days annual)
+            </div>
+          </div>
+          <LeaveHistory items={pastItems} loading={loading} />
         </Grid>
       </Grid>
 

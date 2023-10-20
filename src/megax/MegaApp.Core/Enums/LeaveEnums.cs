@@ -21,3 +21,10 @@ public enum LeaveTime
     AM = 1,
     PM = 2,
 }
+
+public enum LeaveAction
+{
+    Approve,
+    Reject,
+    Cancel,
+}

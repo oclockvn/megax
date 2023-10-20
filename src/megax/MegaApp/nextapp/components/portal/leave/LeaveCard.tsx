@@ -6,27 +6,45 @@ import CardContent from "@mui/material/CardContent";
 import CommentIcon from "@mui/icons-material/Comment";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
+import CheckIcon from "@mui/icons-material/Check";
 import CategoryIcon from "@mui/icons-material/Category";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import PaidIcon from "@mui/icons-material/Paid";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Avatar from "@mui/material/Avatar";
-// import IconButton from "@mui/material/IconButton";
 import {
   Leave,
+  LeaveAction,
   LeaveStatus,
   LeaveTime,
+  LeaveType,
   LeaveTypeDescriptionMapping,
 } from "@/lib/models/leave.model";
 import dt from "@/lib/datetime";
 import CloseIcon from "@mui/icons-material/Close";
-// import EditIcon from "@mui/icons-material/Edit";
 import Chip from "@mui/material/Chip";
 import TimeAgo from "react-timeago";
 import { getInitial } from "@/lib/string.helper";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { useConfirm } from "material-ui-confirm";
-import { cancelLeaveThunk } from "@/lib/store/leave.state";
+import {
+  cancelLeaveThunk,
+  handleLeaveActionThunk,
+} from "@/lib/store/leave.state";
 import toast from "react-hot-toast";
+import {
+  usePopupState,
+  bindTrigger,
+  bindDialog,
+} from "material-ui-popup-state/hooks";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import { useRef } from "react";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -41,6 +59,11 @@ const timeDic = {
 export default function LeaveCard({ leave }: LeaveCardProps) {
   const appDispatch = useAppDispatch();
   const confirmation = useConfirm();
+  const commentRef = useRef<HTMLInputElement>(null);
+
+  const popupState = usePopupState({
+    variant: "dialog",
+  });
 
   const handleCancel = () => {
     confirmation({
@@ -69,23 +92,53 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
       });
   };
 
+  const handleAction = (actionType: LeaveAction) => {
+    appDispatch(
+      handleLeaveActionThunk({
+        id: leave.id,
+        request: { action: actionType, comment: commentRef?.current?.value },
+      })
+    )
+      .unwrap()
+      .then(res => {
+        if (res.success) {
+          toast.success(
+            `Leave is ${
+              actionType == LeaveAction.Approve ? "approved" : "rejected"
+            } successfully`
+          );
+
+          popupState.close();
+        } else {
+          toast.error(`Could not handle leave action. Error code: ${res.code}`);
+        }
+      });
+  };
+
   const LeaveItem = ({
     icon,
     category,
     content,
+    contentRight,
     overrideCls,
   }: {
     icon: React.ReactNode;
     category: string;
     content: string | React.ReactNode;
+    contentRight?: React.ReactNode | undefined;
     overrideCls?: string;
   }) => (
-    <div className={`flex gap-4 mt-4 ${overrideCls}`}>
-      <div className="text-lime-600">{icon}</div>
-      <div>
-        <strong className="text-lime-600">{category}</strong>
+    <div className={`flex gap-4 mt-4 ${overrideCls || ""}`}>
+      <div className={pastLeave ? "text-gray-700" : "text-lime-600"}>
+        {icon}
+      </div>
+      <div className="flex-1">
+        <strong className={pastLeave ? "text-gray-700" : "text-lime-600"}>
+          {category}
+        </strong>
         <div>{content}</div>
       </div>
+      {!!contentRight && <div className="self-center">{contentRight}</div>}
     </div>
   );
 
@@ -98,13 +151,6 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
   const CardAction = () => {
     return (
       <div className="flex items-center gap-2">
-        {/* <Button
-          size="small"
-          startIcon={<EditIcon fontSize="small" />}
-          onClick={() => onEdit(leave)}
-        >
-          Edit
-        </Button> */}
         <Button
           color="warning"
           size="small"
@@ -131,74 +177,142 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
   const labelCls =
     leave.status === LeaveStatus.Approved
       ? "border-green-500 text-green-500"
-      : "border-fuchsia-500 text-fuchsia-500";
+      : "border-orange-500 text-orange-500";
 
   return (
-    <div className="relative">
-      <Card className={pastLeave ? "bg-gray-200" : ""}>
-        <CardHeader
-          avatar={
-            <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
-          }
-          action={(showAction || canCancel) && <CardAction />}
-          title={leave.userName}
-          subheader={<TimeAgo date={leave.createdAt} />}
-        />
-        <CardContent>
-          <LeaveItem
-            category="Leave Reason"
-            content={leave.reason}
-            overrideCls="!mt-0"
-            icon={<CommentIcon />}
-          />
-          <LeaveItem
-            category="Leave Date"
-            content={
-              <>
-                {leave.leaveDates?.map((d, index) => (
-                  <div
-                    key={d.id}
-                    className="flex items-center gap-1 mt-1"
-                    title={dt.formatDate(d.date, "dd/MM/yyyy")}
-                  >
-                    {displayTime(d.time)}
-                    {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
-                  </div>
-                ))}
-              </>
+    <>
+      <div className="relative" data-id={leave.id}>
+        <Card className={pastLeave ? "bg-gray-200" : ""}>
+          <CardHeader
+            avatar={
+              <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
             }
-            icon={<DateRangeIcon />}
+            action={
+              (showAction || canCancel) && leave.isCreator && <CardAction />
+            }
+            title={leave.userName}
+            subheader={<TimeAgo date={leave.createdAt} />}
           />
-          <LeaveItem
-            category="Leave Type"
-            content={LeaveTypeDescriptionMapping[leave.type]}
-            icon={<CategoryIcon />}
-          />
-          <LeaveItem
-            category="Leave Note"
-            content={leave.note || "(blank)"}
-            icon={<FormatQuoteIcon />}
-          />
-        </CardContent>
-        {showAction && !leave.isOwner && (
-          <CardActions>
-            <Button variant="contained" color="primary">
-              Approve
-            </Button>
-            <Button color="warning">Reject</Button>
-          </CardActions>
-        )}
-      </Card>
+          <CardContent>
+            <LeaveItem
+              category="Leave Reason"
+              content={leave.reason}
+              overrideCls="!mt-0"
+              icon={<EditNoteIcon />}
+            />
+            <LeaveItem
+              category={`Leave Date`}
+              content={
+                <>
+                  {leave.leaveDates?.map((d, idx) => (
+                    <div
+                      key={d.id}
+                      className={`flex items-center gap-1 mt-1`}
+                      title={dt.formatDate(d.date, "dd/MM/yyyy")}
+                    >
+                      {displayTime(d.time)}
+                      {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
+                      → <TimeAgo date={d.date} />
+                    </div>
+                  ))}
+                </>
+              }
+              icon={pastLeave ? <CheckIcon /> : <DateRangeIcon />}
+            />
+            <LeaveItem
+              category="Leave Type"
+              content={LeaveTypeDescriptionMapping[leave.type]}
+              contentRight={
+                leave.type === LeaveType.Paid ? (
+                  <PaidIcon color="error" />
+                ) : undefined
+              }
+              icon={<CategoryIcon />}
+            />
+            <LeaveItem
+              category="Leave Note"
+              content={leave.note || "(blank)"}
+              icon={<FormatQuoteIcon />}
+            />
+            {Number(leave.comment?.length) > 0 && (
+              <LeaveItem
+                category="Comment"
+                content={
+                  <>
+                    {leave.comment}{" "}
+                    {!!leave.responseName && (
+                      <i className="text-gray-400 text-sm">
+                        by {leave.responseName}
+                      </i>
+                    )}
+                  </>
+                }
+                icon={<CommentIcon />}
+              />
+            )}
+          </CardContent>
+          {showAction && !leave.isCreator && (
+            <CardActions>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                {...bindTrigger(popupState)}
+              >
+                Response
+              </Button>
+            </CardActions>
+          )}
+        </Card>
 
-      {!showAction && (
-        <div className="absolute z-10 top-[50%] left-0 right-10 flex justify-end text-center">
-          <div
-            className={`border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}`}
-          >
-            {LeaveStatus[leave.status]}
+        {!showAction && (
+          <div className="absolute z-10 top-[50%] right-[40%] flex justify-end text-center">
+            <div
+              className={`border-[4px] border-solid font-bold px-2 uppercase rotate-[-45deg] ${labelCls}`}
+            >
+              {LeaveStatus[leave.status]}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      <Dialog
+        {...bindDialog(popupState)}
+        aria-labelledby="approval-popup"
+        aria-describedby="approval-popup"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="approval-popup">{"Are you sure?"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            fullWidth
+            variant="standard"
+            placeholder="What's your comment?"
+            // ref={commentRef}
+            inputRef={commentRef}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={popupState.close}>Close</Button>
+          <div className="flex-[1]"></div>
+          <Button
+            color="warning"
+            onClick={() => handleAction(LeaveAction.Reject)}
+          >
+            Reject
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleAction(LeaveAction.Approve)}
+          >
+            Approve
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

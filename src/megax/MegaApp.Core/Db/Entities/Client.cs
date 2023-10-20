@@ -1,4 +1,3 @@
-using MegaApp.Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
@@ -16,6 +15,8 @@ public class Client : ICreatedByEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
+    [MaxLength(255)]
+    public string CreatedName { get; set; }
 }
 
 public class ClientConfiguration : IEntityTypeConfiguration<Client>

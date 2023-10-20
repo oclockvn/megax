@@ -5,7 +5,6 @@ using MegaApp.Core.Enums;
 using MegaApp.Core.Exceptions;
 using MegaApp.Core.Validators;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace MegaApp.Core.Services;
 
@@ -13,26 +12,69 @@ public interface ILeaveService
 {
     Task<LeaveSummary> GetLeaveSummaryAsync(int userId);
     Task<List<LeaveModel>> GetLeavesAsync(int userId);
+    Task<List<LeaveModel>> GetRequestingLeavesAsync();
     Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request);
-    Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId);
+    Task<Result<LeaveStatus>> HandleLeaveActionAsync(int id, LeaveActionRequest request);
+    Task<Result<LeaveStatus>> ApproveLeaveAsync(int id, string comment);
+    Task<Result<LeaveStatus>> RejectLeaveAsync(int id, string comment);
     Task<Result<LeaveStatus>> CancelLeaveAsync(int id);
 }
 
 internal class LeaveService : ILeaveService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+    private readonly ApplicationDbContextFactory dbContextFactory;
     private readonly IUserResolver userResolver;
 
-    public LeaveService(IDbContextFactory<ApplicationDbContext> dbContextFactory, IUserResolver userResolver)
+    public LeaveService(ApplicationDbContextFactory dbContextFactory, IUserResolver userResolver)
     {
         this.dbContextFactory = dbContextFactory;
         this.userResolver = userResolver;
     }
 
-    public Task<Result<LeaveModel>> ApproveLeaveAsync(int id, int approveUserId)
+    public async Task<Result<LeaveStatus>> HandleLeaveActionAsync(int id, LeaveActionRequest request)
     {
-        throw new NotImplementedException();
+        return request.Action switch
+        {
+            LeaveAction.Approve => await ApproveLeaveAsync(id, request.Comment),
+            LeaveAction.Reject => await RejectLeaveAsync(id, request.Comment),
+            LeaveAction.Cancel => await CancelLeaveAsync(id),
+            _ => throw new NotSupportedException("this action is not supported yet"),
+        };
     }
+
+    private async Task<Result<LeaveStatus>> HandleActionInternalAsync(int id, string comment, LeaveStatus status)
+    {
+        var currentUser = userResolver.Resolve();
+
+        using var db = UseDb();
+        var leave = await db.Leaves
+            // .Include(x => x.LeaveDates)
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync() ?? throw new EntityNotFoundException($"Leave id {id} could not be found");
+
+        if (leave.IsCreator(currentUser))
+        {
+            return Result<LeaveStatus>.Fail(status == LeaveStatus.Approved ? ResultCode.SELF_APPROVAL_IS_NOT_ALLOWED : ResultCode.SELF_REJECTION_IS_NOT_ALLOWED);
+        }
+
+        if (leave.Status != LeaveStatus.New)
+        {
+            return Result<LeaveStatus>.Fail($"Leave was updated to {leave.Status}");
+        }
+
+        leave.Status = LeaveStatus.Approved;
+        leave.Comment = comment;
+        leave.ResponseAt = DateTimeOffset.Now;
+        leave.ResponseBy = currentUser.Id;
+        leave.ResponseName = currentUser.Name;
+
+        await db.SaveChangesAsync();
+
+        return new Result<LeaveStatus>(leave.Status);
+    }
+
+    public Task<Result<LeaveStatus>> ApproveLeaveAsync(int id, string comment) => HandleActionInternalAsync(id, comment, LeaveStatus.Approved);
+    public Task<Result<LeaveStatus>> RejectLeaveAsync(int id, string comment) => HandleActionInternalAsync(id, comment, LeaveStatus.Rejected);
 
     public async Task<Result<LeaveStatus>> CancelLeaveAsync(int id)
     {
@@ -50,10 +92,10 @@ internal class LeaveService : ILeaveService
             return Result<LeaveStatus>.Fail(Result.LEAVE_WAS_PASSED);
         }
 
-        if (leave.Status == Enums.LeaveStatus.Approved)
+        if (leave.Status == LeaveStatus.Approved)
         {
             // return Result<int>.Fail(Result.LEAVE_WAS_APPROVED);
-            leave.Status = Enums.LeaveStatus.Cancelled;
+            leave.Status = LeaveStatus.Cancelled;
         }
         else // no need to keep it if it's not approved yet
         {
@@ -70,16 +112,13 @@ internal class LeaveService : ILeaveService
         using var db = UseDb();
         var leaves = await db.Leaves.Where(x => x.UserId == userId)
             .OrderByDescending(x => x.Id)
-            .Select(x => new LeaveModel(x)
+            .Select(x => new LeaveModel(x, x.LeaveDates)
             {
-                LeaveDates = x.LeaveDates.Select(d => new LeaveDateModel(d)).ToList(),
-                UserId = x.UserId,
-                UserName = x.User.FullName,
-                IsOwner = x.UserId == userId
+                UserName = x.User.FullName
             })
             .ToListAsync();
 
-        return leaves;
+        return leaves.WithCreator(userResolver.Resolve());
     }
 
     public async Task<LeaveSummary> GetLeaveSummaryAsync(int userId)
@@ -89,9 +128,23 @@ internal class LeaveService : ILeaveService
 
         return new LeaveSummary
         {
-            Leaves = leaves,
+            Leaves = leaves.WithCreator(userResolver.Resolve()),
             Capacity = leaveCapacity,
         };
+    }
+
+    public async Task<List<LeaveModel>> GetRequestingLeavesAsync()
+    {
+        using var db = UseDb();
+        var leaves = await db.Leaves.Where(x => x.Status == LeaveStatus.New)
+            .OrderByDescending(x => x.Id)
+            .Select(x => new LeaveModel(x, x.LeaveDates)
+            {
+                UserName = x.User.FullName,
+            })
+            .ToListAsync();
+
+        return leaves.WithCreator(userResolver.Resolve());
     }
 
     public async Task<Result<LeaveModel>> RequestLeaveAsync(LeaveModel.Add request)
@@ -101,6 +154,9 @@ internal class LeaveService : ILeaveService
         {
             throw new BusinessRuleViolationException(error);
         }
+
+        var endDate = request.LeaveDates.OrderByDescending(x => x.Date).First();
+        var isPastLeave = endDate.Date < DateTimeOffset.Now;
 
         using var db = UseDb();
 
@@ -117,24 +173,22 @@ internal class LeaveService : ILeaveService
             return Result<LeaveModel>.Fail(Result.OVERLAP_LEAVE_REQUEST);
         }
 
+        var (userId, userName) = userResolver.Resolve();
         var leave = new Leave
         {
             Type = request.Type,
             Reason = request.Reason,
             Note = request.Note,
-            Status = Enums.LeaveStatus.New,
-            UserId = request.UserId,
+            Status = isPastLeave ? LeaveStatus.Approved : LeaveStatus.New, // past leave auto set as Approved
+            UserId = userId,
         };
 
-        if (leave.Type == Enums.LeaveType.Annual)
+        if (!isPastLeave && leave.Type == LeaveType.Annual)
         {
             // check for available leave remain
-            var takenDates = await db.LeaveDates
-                .Where(x => x.Leave.Status == Enums.LeaveStatus.Approved && x.Leave.UserId == request.UserId)
-                .Select(x => new { x.Date, x.Time })
-                .ToListAsync();
-
-            var takenDays = takenDates.Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1); // half date = 1 point
+            var takenDays = await db.LeaveDates
+                .Where(x => new[] { LeaveStatus.Approved, LeaveStatus.New }.Contains(x.Leave.Status) && x.Leave.UserId == request.UserId)
+                .SumAsync(l => l.Time == LeaveTime.All ? 2 : 1); // half date = 1 point
 
             // todo: store available leave in user
             var totalAvailable = 30; // half date = 1 point => 15 days
@@ -155,14 +209,11 @@ internal class LeaveService : ILeaveService
         db.Leaves.Add(leave);
         await db.SaveChangesAsync();
 
-        var currentUser = userResolver.Resolve();
-
         var model = new LeaveModel(leave, leave.LeaveDates)
         {
-            IsOwner = request.UserId == leave.UserId,
-            UserId = currentUser.Id,
-            UserName = currentUser.Name,
-        };
+            UserName = userName,
+        }.WithCreator(userId);
+
         return new Result<LeaveModel>(model);
     }
 
