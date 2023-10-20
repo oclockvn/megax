@@ -142,8 +142,10 @@ export const leaveSlice = createSlice({
         } = action.meta.arg;
         const result = action.payload.data;
         const leave = state.items.find(x => x.id === id);
-        leave!.status = result;
-        leave!.comment = comment;
+        if (leave) {
+          leave.status = result;
+          leave.comment = comment;
+        }
 
         switch (actionType) {
           case LeaveAction.Approve:

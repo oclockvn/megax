@@ -42,7 +42,7 @@ internal class LeaveService : ILeaveService
         };
     }
 
-    public async Task<Result<LeaveStatus>> ApproveLeaveAsync(int id, string comment)
+    private async Task<Result<LeaveStatus>> HandleActionInternalAsync(int id, string comment, LeaveStatus status)
     {
         var currentUser = userResolver.Resolve();
 
@@ -54,7 +54,7 @@ internal class LeaveService : ILeaveService
 
         if (leave.IsCreator(currentUser))
         {
-            return Result<LeaveStatus>.Fail(ResultCode.SELF_APPROVAL_IS_NOT_ALLOWED);
+            return Result<LeaveStatus>.Fail(status == LeaveStatus.Approved ? ResultCode.SELF_APPROVAL_IS_NOT_ALLOWED : ResultCode.SELF_REJECTION_IS_NOT_ALLOWED);
         }
 
         if (leave.Status != LeaveStatus.New)
@@ -64,37 +64,17 @@ internal class LeaveService : ILeaveService
 
         leave.Status = LeaveStatus.Approved;
         leave.Comment = comment;
+        leave.ResponseAt = DateTimeOffset.Now;
+        leave.ResponseBy = currentUser.Id;
+        leave.ResponseName = currentUser.Name;
+
         await db.SaveChangesAsync();
 
         return new Result<LeaveStatus>(leave.Status);
     }
 
-    public async Task<Result<LeaveStatus>> RejectLeaveAsync(int id, string comment)
-    {
-        var currentUser = userResolver.Resolve();
-
-        using var db = UseDb();
-        var leave = await db.Leaves
-            // .Include(x => x.LeaveDates)
-            .Where(x => x.Id == id)
-            .FirstOrDefaultAsync() ?? throw new EntityNotFoundException($"Leave id {id} could not be found");
-
-        if (leave.IsCreator(currentUser))
-        {
-            return Result<LeaveStatus>.Fail(ResultCode.SELF_REJECTION_IS_NOT_ALLOWED);
-        }
-
-        if (leave.Status != LeaveStatus.New)
-        {
-            return Result<LeaveStatus>.Fail($"Leave was updated to {leave.Status}");
-        }
-
-        leave.Status = LeaveStatus.Rejected;
-        leave.Comment = comment;
-        await db.SaveChangesAsync();
-
-        return new Result<LeaveStatus>(leave.Status);
-    }
+    public Task<Result<LeaveStatus>> ApproveLeaveAsync(int id, string comment) => HandleActionInternalAsync(id, comment, LeaveStatus.Approved);
+    public Task<Result<LeaveStatus>> RejectLeaveAsync(int id, string comment) => HandleActionInternalAsync(id, comment, LeaveStatus.Rejected);
 
     public async Task<Result<LeaveStatus>> CancelLeaveAsync(int id)
     {

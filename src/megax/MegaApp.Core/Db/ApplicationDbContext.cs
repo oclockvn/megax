@@ -63,7 +63,7 @@ namespace MegaApp.Core.Db
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var (userId, _) = (CurrentUserId, CurrentUserName);
+            var (userId, userName) = (CurrentUserId, CurrentUserName);
             if (userId > 0)
             {
                 foreach (var entry in ChangeTracker.Entries())
@@ -72,16 +72,13 @@ namespace MegaApp.Core.Db
                     {
                         createEntity.CreatedAt = DateTimeOffset.Now;
                         createEntity.CreatedBy = userId;
-                    }
-                    else if (entry.State == EntityState.Added && entry.Entity is ICreator creator)
-                    {
-                        creator.CreatedAt = DateTimeOffset.Now;
-                        creator.CreatedBy = userId;
+                        createEntity.CreatedName = userName;
                     }
                     else if (entry.State == EntityState.Modified && entry.Entity is IUpdatedByEntity updateEntity)
                     {
                         updateEntity.UpdatedAt = DateTimeOffset.Now;
                         updateEntity.UpdatedBy = userId;
+                        updateEntity.UpdatedName = userName;
                     }
                 }
             }

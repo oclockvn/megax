@@ -226,7 +226,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
 
             <LeaveItem
               category="Comment"
-              content={leave.comment}
+              content={<>{leave.comment} {!!leave.responseName && <i className="text-gray-400 text-sm">by {leave.responseName}</i>}</>}
               icon={<CommentIcon />}
             />
             }
@@ -241,13 +241,6 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
               >
                 Response
               </Button>
-              {/* <Button
-                variant="contained"
-                color="primary"
-                onClick={handleApprove}
-              >
-                Approve
-              </Button> */}
             </CardActions>
           )}
         </Card>

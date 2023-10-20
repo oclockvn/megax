@@ -8,7 +8,7 @@ export interface Leave {
   note: string;
   status: LeaveStatus;
   comment: string | undefined;
-  approvedBy?: string;
+  responseName?: string;
   isCreator: boolean;
   createdAt: Date;
   userId: number;

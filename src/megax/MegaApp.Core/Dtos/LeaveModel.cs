@@ -18,30 +18,20 @@ public record LeaveSummary
 public record LeaveModel : Creator
 {
     public int Id { get; set; }
-
-    [MaxLength(255)]
     public string Reason { get; set; }
     public LeaveType Type { get; set; }
-
-    [MaxLength(255)]
     public string Note { get; set; }
     public LeaveStatus Status { get; set; }
-
-    [MaxLength(255)]
     public string Comment { get; set; }
-    public int ApprovedBy { get; set; }
-    public DateTimeOffset? ApprovedAt { get; set; }
+    public int ResponseBy { get; set; }
+    public string ResponseName { get; set; }
+    public DateTimeOffset? ResponseAt { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
     public int UserId { get; set; }
     public string UserName { get; set; }
 
     public List<LeaveDateModel> LeaveDates { get; set; } = new();
-
-    // public void Deconstruct(out bool isOwner, CurrentUser user)
-    // {
-    //     return curr.Id == CreatedBy;
-    // }
 
     public record Add : IValidatableObject
     {
@@ -80,8 +70,9 @@ public record LeaveModel : Creator
         Status = leave.Status;
         UserId = leave.UserId;
         Comment = leave.Comment;
-        ApprovedAt = leave.ResponseAt;
-        ApprovedBy = leave.ResponseBy;
+        ResponseAt = leave.ResponseAt;
+        ResponseBy = leave.ResponseBy;
+        ResponseName = leave.ResponseName;
         CreatedAt = leave.CreatedAt;
         CreatedBy = leave.CreatedBy.GetValueOrDefault();
     }

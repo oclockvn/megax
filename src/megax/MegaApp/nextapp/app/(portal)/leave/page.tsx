@@ -88,9 +88,9 @@ export default function LeavePage() {
         <Grid item xs={12} sm={4}>
           <div className="flex items-center justify-between mt-4 mb-2 font-bold">
             <h3 className="text-lg">Your Requests</h3>
-            <div>
+            {/* <div>
               (Taken {taken}/{capacity} total days)
-            </div>
+            </div> */}
           </div>
           {loading ? (
             <>
@@ -106,7 +106,12 @@ export default function LeavePage() {
         </Grid>
 
         <Grid item xs={12} sm={8}>
-          <h3 className="mt-4 text-lg font-bold ps-[160px]">Leave History</h3>
+          <div className="flex justify-between items-center text-lg font-bold mt-4">
+            <h3 className="ps-[160px]">Leave History</h3>
+            <div className="me-8">
+              (Taken {taken}/{capacity} total days annual)
+            </div>
+          </div>
           <LeaveHistory items={pastItems} loading={loading} />
         </Grid>
       </Grid>
