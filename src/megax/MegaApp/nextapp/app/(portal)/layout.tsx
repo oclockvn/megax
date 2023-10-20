@@ -6,6 +6,7 @@ import MuiThemeProvider from "@/components/providers/MuiThemeProvider";
 import { quicksand } from "@/styles/fonts";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import DatePickerLocalizationProvider from "@/components/providers/DatePickerLocalizationProvider";
+import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
 
 export const metadata = {
   title: "MegaApp",
@@ -22,14 +23,16 @@ export default async function PortalLayout({
       <body className={quicksand.variable}>
         <MuiThemeProvider>
           <LayoutWrapper>
-            <StateProvider>
-              <DatePickerLocalizationProvider>
-                <AuthProvider useGuard>
-                  <Nav />
-                  {children}
-                </AuthProvider>
-              </DatePickerLocalizationProvider>
-            </StateProvider>
+            <ReactQueryProvider>
+              <StateProvider>
+                <DatePickerLocalizationProvider>
+                  <AuthProvider useGuard>
+                    <Nav />
+                    {children}
+                  </AuthProvider>
+                </DatePickerLocalizationProvider>
+              </StateProvider>
+            </ReactQueryProvider>
           </LayoutWrapper>
         </MuiThemeProvider>
       </body>

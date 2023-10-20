@@ -11,13 +11,12 @@ import {
   bindHover,
   bindPopover,
 } from "material-ui-popup-state/hooks";
-import { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CircularProgress from "@mui/material/CircularProgress";
 import { getUserCard } from "@/lib/apis/user.api";
-import { UserCard } from "@/lib/models/user.model";
+import { useQuery } from "@tanstack/react-query";
 
 type UserAvatarProps = {
   // key: number | string;
@@ -26,39 +25,23 @@ type UserAvatarProps = {
   disableHover?: boolean;
 };
 
-export default function UserAvatar({ id, content, disableHover }: UserAvatarProps) {
-  const [loading, setLoading] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserCard | undefined>(undefined);
+export default function UserAvatar({
+  id,
+  content,
+  disableHover,
+}: UserAvatarProps) {
 
   const popupState = usePopupState({
     variant: "popover",
     popupId: "avatar-",
   });
 
-  useEffect(() => {
-    if (popupState.isOpen) {
-      setLoading(true);
-    }
-  }, [popupState.isOpen]);
-
-  useEffect(() => {
-    if (loading) {
-      // const t = setTimeout(() => {
-      //   setLoading(false);
-      // }, 1500);
-
-      // return () => {
-      //   clearTimeout(t);
-      // };
-      getUserCard(id)
-        .then(res => {
-          setUserInfo(res);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [loading, userInfo]);
+  const { isLoading, data: userInfo } = useQuery({
+    queryKey: ["user_card", id],
+    queryFn: async () => await getUserCard(id),
+    staleTime: 60 * 5 * 1000,
+    enabled: popupState.isOpen,
+  });
 
   const LineItem = ({
     left,
@@ -102,22 +85,22 @@ export default function UserAvatar({ id, content, disableHover }: UserAvatarProp
               avatar={<Avatar>{content}</Avatar>}
             />
             <CardContent>
-              {loading ? (
+              {isLoading ? (
                 <div className="flex items-center mb-4">
                   <CircularProgress className="mx-auto" size={32} />
                 </div>
               ) : (
                 <>
-                  <LineItem
-                    left={<EmailIcon />}
-                    right={userInfo?.email}
-                  />
-                  <LineItem left={<PhoneIcon />} right={userInfo?.phone} />
+                  <LineItem left={<EmailIcon />} right={userInfo?.email} />
+                  {!!userInfo?.phone && <LineItem left={<PhoneIcon />} right={userInfo?.phone} />}
                   <LineItem
                     left={<CalendarMonthIcon />}
                     right={
                       <>
-                        <div>Annual leave: {userInfo?.takenAnnual} taken / {userInfo?.totalAnnual} total</div>
+                        <div>
+                          Annual leave: {userInfo?.takenAnnual} taken /{" "}
+                          {userInfo?.totalAnnual} total
+                        </div>
                         <div>Paid leave: {userInfo?.takenPaidLeave} taken</div>
                       </>
                     }
