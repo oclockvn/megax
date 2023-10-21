@@ -1,7 +1,7 @@
 import api, { upload } from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
-import { User, UserDeviceRecord } from "@/lib/models/user.model";
-import { normalizeDateTimePayload, qs, toFormData } from "../util";
+import { User, UserCard, UserDeviceRecord } from "@/lib/models/user.model";
+import { delay, normalizeDateTimePayload, qs, toFormData } from "../util";
 import { AxiosError,  } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
@@ -85,5 +85,10 @@ export async function creteUpdateDocument(id: number, req: Partial<UserDocument 
 
 export async function deleteDocument(id: number, documentId: number) {
   const res = await api.delete<Result<boolean>>(`api/users/${id}/document/${documentId}`);
+  return res.data;
+}
+
+export async function getUserCard(id: number) {
+  const res = await api.get<UserCard>(`api/users/${id}/card`);
   return res.data;
 }

@@ -100,9 +100,8 @@ export default function UserContactList() {
               <TableCell>Relationship</TableCell>
               <TableCell align="right" width={100}>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
-                  className="bg-blue-500 text-white hover:!bg-blue-600"
                   onClick={() => handleOpenContact({})}
                 >
                   <AddIcon fontSize="inherit" className="me-2" />

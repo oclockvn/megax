@@ -1,15 +1,17 @@
 ﻿using MegaApp.Core.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace MegaApp.Core.Dtos;
 
-public class UserModel
+public record UserModel
 {
     public int Id { get; set; }
     public int AccountId { get; set; }
     public string Code { get; set; }
     public string Email { get; set; }
     public string FullName { get; set; }
+    public string Title { get; set; }
     public string Nickname { get; set; }
     public string Phone { get; set; }
     public string Address { get; set; }
@@ -68,6 +70,7 @@ public class UserModel
         Code = user.Code;
         Email = user.Email;
         FullName = user.FullName;
+        Title = user.Title;
         Nickname = user.Nickname;
         Phone = user.Phone;
         Address = user.Address;
@@ -113,6 +116,9 @@ public class UserModel
         [MaxLength(100)]
         public string Email { get; set; } = null!;
 
+        [MaxLength(100)]
+        public string Title { get; set; } = null!;
+
         [Required]
         public string FullName { get; set; } = null!;
 
@@ -148,3 +154,15 @@ public class UserModel
 }
 
 public record UserDeviceRecord(int Id, string Name, string SerialNumber, string DeviceType, DateTimeOffset TakenAt, DateTimeOffset? ReturnedAt);
+
+public record UserCard
+{
+    public int Id { get; set; }
+    public string FullName { get; set; }
+    public string Title { get; set; }
+    public string Email { get; set; }
+    public string Phone { get; set; }
+    public int TotalAnnual { get; set; }
+    public int TakenAnnual { get; set; }
+    public int TakenPaidLeave { get; set; }
+}

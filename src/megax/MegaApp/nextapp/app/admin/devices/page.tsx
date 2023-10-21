@@ -141,7 +141,6 @@ export default function DeviceListPage() {
           <Button
             variant="contained"
             color="primary"
-            className="bg-blue-500"
             startIcon={<AddIcon />}
             href={`${pathname}/new`}
           >

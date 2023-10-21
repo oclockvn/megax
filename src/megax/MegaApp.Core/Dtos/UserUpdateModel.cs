@@ -19,6 +19,9 @@ public class UserUpdateModel : IValidatableObject
     [Required]
     public string FullName { get; set; }
 
+    [MaxLength(100)]
+    public string Title { get; set; }
+
     [MaxLength(255)]
     public string Nickname { get; set; }
 

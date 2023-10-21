@@ -110,6 +110,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 fullWidth
                 required
                 label="Employee ID"
+                placeholder="Leave empty to generate unique value"
                 name="code"
                 variant="outlined"
               />
@@ -117,7 +118,15 @@ export default function UserInfo({ user }: { user: User | undefined }) {
 
             <div className="mb-4">
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={9}>
+                <Grid item xs={12} sm={3}>
+                  <TextFieldElement
+                    fullWidth
+                    label="Title"
+                    name="title"
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
                   <TextFieldElement
                     fullWidth
                     required
@@ -431,18 +440,22 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Alert>
             )}
           </CardContent>
+        </Card>
 
-          <CardActions className="bg-slate-100">
-            <Button
-              color="primary"
-              variant="outlined"
-              type="submit"
-              disabled={loading}
-            >
-              Save Changes
-            </Button>
+        <Card className="mt-2 sticky bottom-0">
+          <CardActions>
+            <div className="flex items-center gap-2">
+              <Button
+                color="primary"
+                variant="contained"
+                type="submit"
+                disabled={loading}
+              >
+                Save Changes
+              </Button>
 
-            {loading && <div>{loadingState}</div>}
+              {loading && <div>{loadingState}</div>}
+            </div>
           </CardActions>
         </Card>
       </FormContainer>

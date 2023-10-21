@@ -45,6 +45,7 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import { useRef } from "react";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
+import UserAvatar from "@/components/common/UserAvatar";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -185,7 +186,8 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
         <Card className={pastLeave ? "bg-gray-200" : ""}>
           <CardHeader
             avatar={
-              <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
+              // <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
+              <UserAvatar id={leave.userId} content={getInitial(leave.userName)} />
             }
             action={
               (showAction || canCancel) && leave.isCreator && <CardAction />

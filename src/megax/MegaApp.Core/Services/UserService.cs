@@ -13,6 +13,7 @@ public interface IUserService
     Task<UserModel> GetUserAsync(int id);
     Task<UserModel> GetUserAsync(string username);
     Task<PagedResult<UserModel>> GetUsersAsync(Filter filter);
+    Task<UserCard> GetUserCardAsync(int id);
 
     Task<Result<int>> CreateUserAsync(UserModel.NewUser user);
     Task<Result<int>> UpdateUserDetailAsync(int id, UserUpdateModel req);
@@ -111,6 +112,7 @@ internal class UserService : IUserService
         {
             FullName = user.FullName,
             Email = user.Email,
+            Title = user.Title,
             CreatedAt = DateTimeOffset.Now,
             Dob = user.Dob,
             Phone = user.Phone,
@@ -157,6 +159,7 @@ internal class UserService : IUserService
         user.Code = req.Code;
         // user.Email = req.Email;
         user.FullName = req.FullName;
+        user.Title = req.Title;
         user.Nickname = req.Nickname;
         user.Phone = req.Phone;
         user.Address = req.Address;
@@ -421,5 +424,42 @@ internal class UserService : IUserService
         // todo: remove file
 
         return new Result<bool>(true);
+    }
+
+    public async Task<UserCard> GetUserCardAsync(int id)
+    {
+        using var db = UseDb();
+        var user = await db.Users.Where(x => x.Id == id)
+        .Select(x => new UserCard
+        {
+            Id = id,
+            FullName = x.FullName,
+            Title = x.Title,
+            Phone = x.Phone,
+            Email = x.Email,
+        })
+        .FirstOrDefaultAsync() ?? throw new EntityNotFoundException($"User id {id} could not be found");
+
+        var leaves = await db.LeaveDates.Where(l => l.Leave.UserId == id)
+        .Select(x => new
+        {
+            x.Date,
+            x.Time,
+            x.Leave.Status,
+            x.Leave.Type,
+        })
+        .ToListAsync();
+
+        user.TotalAnnual = 15; // todo: get annual from db
+        // note: any past leaves are taken
+        user.TakenAnnual = leaves
+            .Where(x => x.Date.Date <= DateTimeOffset.Now.Date && x.Type == Enums.LeaveType.Annual)
+            .Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1) / 2;
+
+        user.TakenPaidLeave = leaves
+            .Where(x => x.Date.Date <= DateTimeOffset.Now.Date && x.Type == Enums.LeaveType.Paid)
+            .Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1) / 2;
+
+        return user;
     }
 }

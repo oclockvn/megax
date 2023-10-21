@@ -257,9 +257,8 @@ export default function DeviceInfo({
                   {disabled ? (
                     <Button
                       color="success"
-                      variant="outlined"
+                      variant="contained"
                       type="button"
-                      className="bg-green-500 text-white hover:!bg-green-600"
                       onClick={confirmDelete}
                       disabled={loading}
                     >
@@ -268,9 +267,8 @@ export default function DeviceInfo({
                   ) : (
                     <Button
                       color="error"
-                      variant="outlined"
+                      variant="contained"
                       type="button"
-                      className="bg-red-500 text-white hover:!bg-red-600"
                       startIcon={<ClearIcon />}
                       onClick={confirmDelete}
                       disabled={loading}
@@ -293,9 +291,8 @@ export default function DeviceInfo({
                   Save
                 </Button>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   type="button"
-                  className="bg-blue-500 text-white hover:!bg-blue-600"
                   onClick={handleSubmit(e => onButtonSubmit(e, true))}
                   disabled={loading}
                 >

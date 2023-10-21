@@ -37,6 +37,7 @@ export default function UserListPage() {
         </Link>
       ),
     },
+    { field: "title", headerName: "Title", width: 200 },
     { field: "email", headerName: "Email", width: 300 },
     {
       field: "dob",

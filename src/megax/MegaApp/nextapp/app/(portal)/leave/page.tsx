@@ -47,8 +47,9 @@ export default function LeavePage() {
     ? makeArrOf(5, i => ({ id: i, status: LeaveStatus.New } as Leave))
     : items.filter(x => x.status !== LeaveStatus.New);
 
-  const taken =
+  const takenAnnual =
     items
+      .filter(l => l.type === LeaveType.Annual)
       .reduce(
         (prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates],
         []
@@ -57,6 +58,16 @@ export default function LeavePage() {
       .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) /
     2;
 
+  const takenPaid =
+    items
+      .filter(l => l.type === LeaveType.Paid)
+      .reduce(
+        (prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates],
+        []
+      )
+      .filter(d => dt.isPast(d.date))
+      .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) /
+    2;
   const requestedDates = items.reduce(
     (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
     []
@@ -109,7 +120,7 @@ export default function LeavePage() {
           <div className="flex justify-between items-center text-lg font-bold mt-4">
             <h3 className="ps-[160px]">Leave History</h3>
             <div className="me-8">
-              (Taken {taken}/{capacity} total days annual)
+              (Annual: Taken {takenAnnual}/{capacity} total - Paid: {takenPaid} taken)
             </div>
           </div>
           <LeaveHistory items={pastItems} loading={loading} />
