@@ -26,10 +26,12 @@ import { toast } from "react-hot-toast";
 import { UserDeviceRecord } from "@/lib/models/user.model";
 import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
+import UndoIcon from '@mui/icons-material/Undo';
 import { useConfirm } from "material-ui-confirm";
 import Link from "next/link";
 import DeviceIconSelector from "@/components/admin/devices/DeviceIconSelector";
 import Chip from "@mui/material/Chip";
+import UserDeviceLoading from "@/components/common/skeletons/UserDeviceLoading";
 
 function UserDeviceAdd({
   userId,
@@ -161,6 +163,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
             type="button"
             variant="text"
             size="small"
+            endIcon={<UndoIcon />}
             onClick={() => confirmReturn(d.id)}
           >
             Return
@@ -195,6 +198,27 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     </div>
   );
 
+  const Body = () => {
+    if (loading) {
+      return <UserDeviceLoading count={3} />;
+    }
+
+    return devices?.length ? (
+      <List>
+        {devices.map(i => (
+          <React.Fragment key={i.id}>
+            <DeviceItem {...i} />
+            <Divider />
+          </React.Fragment>
+        ))}
+      </List>
+    ) : (
+      <div className="px-4 pt-4">
+        <Alert severity="info">No devices yet!</Alert>
+      </div>
+    );
+  };
+
   return (
     <>
       <Card>
@@ -221,20 +245,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
             />
           )}
 
-          {devices?.length ? (
-            <List>
-              {devices.map(i => (
-                <React.Fragment key={i.id}>
-                  <DeviceItem {...i} />
-                  <Divider />
-                </React.Fragment>
-              ))}
-            </List>
-          ) : (
-            <div className="px-4 pt-4">
-              <Alert severity="info">No devices yet!</Alert>
-            </div>
-          )}
+          <Body />
         </CardContent>
         <CardActions></CardActions>
       </Card>

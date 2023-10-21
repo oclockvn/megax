@@ -1,7 +1,7 @@
 import api, { upload } from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
 import { User, UserCard, UserDeviceRecord } from "@/lib/models/user.model";
-import { normalizeDateTimePayload, qs, toFormData } from "../util";
+import { delay, normalizeDateTimePayload, qs, toFormData } from "../util";
 import { AxiosError,  } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
@@ -42,6 +42,7 @@ export async function assignDevice(id: number, deviceId: number) {
 }
 
 export async function getDevices(id: number) {
+  await delay(2000)
   const res = await api.get<UserDeviceRecord[]>(`api/users/${id}/devices`);
   return res.data;
 }
