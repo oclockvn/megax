@@ -12,6 +12,9 @@ public class User : ICreatedByEntity
     public string Code { get; set; } = null!;
 
     [MaxLength(100)]
+    public string Title { get; set; } = null!;
+
+    [MaxLength(100)]
     [Required]
     public string Email { get; set; } = null!;
 

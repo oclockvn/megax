@@ -112,6 +112,7 @@ internal class UserService : IUserService
         {
             FullName = user.FullName,
             Email = user.Email,
+            Title = user.Title,
             CreatedAt = DateTimeOffset.Now,
             Dob = user.Dob,
             Phone = user.Phone,
@@ -158,6 +159,7 @@ internal class UserService : IUserService
         user.Code = req.Code;
         // user.Email = req.Email;
         user.FullName = req.FullName;
+        user.Title = req.Title;
         user.Nickname = req.Nickname;
         user.Phone = req.Phone;
         user.Address = req.Address;
