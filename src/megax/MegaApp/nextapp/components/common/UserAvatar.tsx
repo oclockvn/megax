@@ -98,8 +98,7 @@ export default function UserAvatar({
                     right={
                       <>
                         <div>
-                          Annual leave: {userInfo?.takenAnnual} taken /{" "}
-                          {userInfo?.totalAnnual} total
+                          Annual leave: {userInfo?.takenAnnual} taken/{userInfo?.totalAnnual} total
                         </div>
                         <div>Paid leave: {userInfo?.takenPaidLeave} taken</div>
                       </>

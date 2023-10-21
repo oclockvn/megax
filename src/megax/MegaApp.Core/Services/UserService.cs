@@ -451,12 +451,13 @@ internal class UserService : IUserService
         .ToListAsync();
 
         user.TotalAnnual = 15; // todo: get annual from db
+        // note: any past leaves are taken
         user.TakenAnnual = leaves
-            .Where(x => x.Date.Date <= DateTimeOffset.Now.Date && x.Status == Enums.LeaveStatus.Approved && x.Type == Enums.LeaveType.Annual)
+            .Where(x => x.Date.Date <= DateTimeOffset.Now.Date && x.Type == Enums.LeaveType.Annual)
             .Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1) / 2;
 
         user.TakenPaidLeave = leaves
-            .Where(x => x.Date.Date <= DateTimeOffset.Now.Date && x.Status == Enums.LeaveStatus.Approved && x.Type == Enums.LeaveType.Paid)
+            .Where(x => x.Date.Date <= DateTimeOffset.Now.Date && x.Type == Enums.LeaveType.Paid)
             .Sum(x => x.Time == Enums.LeaveTime.All ? 2 : 1) / 2;
 
         return user;

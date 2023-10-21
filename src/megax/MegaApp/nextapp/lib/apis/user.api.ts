@@ -42,7 +42,6 @@ export async function assignDevice(id: number, deviceId: number) {
 }
 
 export async function getDevices(id: number) {
-  await delay(2000)
   const res = await api.get<UserDeviceRecord[]>(`api/users/${id}/devices`);
   return res.data;
 }
