@@ -24,8 +24,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import datetime from "@/lib/datetime";
 import nationalities from "@/lib/constants/nationalities";
-// import { useContext } from "react";
-// import { ScrollContext } from "@/components/providers/ScrollDirectionProvider";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
@@ -86,9 +84,6 @@ export default function UserInfo({ user }: { user: User | undefined }) {
     resolver: yupResolver(userSchema),
     values: user,
   });
-
-// const scrollDir = useContext(ScrollContext)
-// console.log(scrollDir);
 
   return (
     <>
@@ -445,18 +440,22 @@ export default function UserInfo({ user }: { user: User | undefined }) {
               </Alert>
             )}
           </CardContent>
+        </Card>
 
-          <CardActions className="bg-slate-100">
-            <Button
-              color="primary"
-              variant="contained"
-              type="submit"
-              disabled={loading}
-            >
-              Save Changes
-            </Button>
+        <Card className="mt-2 sticky bottom-0">
+          <CardActions>
+            <div className="flex items-center gap-2">
+              <Button
+                color="primary"
+                variant="contained"
+                type="submit"
+                disabled={loading}
+              >
+                Save Changes
+              </Button>
 
-            {loading && <div>{loadingState}</div>}
+              {loading && <div>{loadingState}</div>}
+            </div>
           </CardActions>
         </Card>
       </FormContainer>
