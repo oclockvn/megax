@@ -110,6 +110,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 fullWidth
                 required
                 label="Employee ID"
+                placeholder="Leave empty to generate unique value"
                 name="code"
                 variant="outlined"
               />
@@ -117,7 +118,15 @@ export default function UserInfo({ user }: { user: User | undefined }) {
 
             <div className="mb-4">
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={9}>
+                <Grid item xs={12} sm={3}>
+                  <TextFieldElement
+                    fullWidth
+                    label="Title"
+                    name="title"
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
                   <TextFieldElement
                     fullWidth
                     required
@@ -435,7 +444,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
           <CardActions className="bg-slate-100">
             <Button
               color="primary"
-              variant="outlined"
+              variant="contained"
               type="submit"
               disabled={loading}
             >
