@@ -7,6 +7,7 @@ import LayoutWrapper from "@/components/LayoutWrapper";
 import { quicksand } from "@/styles/fonts";
 import MuiThemeProvider from "@/components/providers/MuiThemeProvider";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
+import ScrollDirectionProvider from "@/components/providers/ScrollDirectionProvider";
 
 export const metadata = {
   title: "MegaApp - Admin",
@@ -21,20 +22,22 @@ export default async function PortalLayout({
   return (
     <html lang="en">
       <body className={quicksand.variable}>
-        <MuiThemeProvider>
-          <LayoutWrapper>
-            <ReactQueryProvider>
-              <StateProvider>
-                <DatePickerLocalizationProvider>
-                  <AuthProvider useGuard>
-                    <Nav />
-                    {children}
-                  </AuthProvider>
-                </DatePickerLocalizationProvider>
-              </StateProvider>
-            </ReactQueryProvider>
-          </LayoutWrapper>
-        </MuiThemeProvider>
+        <ScrollDirectionProvider>
+          <MuiThemeProvider>
+            <LayoutWrapper>
+              <ReactQueryProvider>
+                <StateProvider>
+                  <DatePickerLocalizationProvider>
+                    <AuthProvider useGuard>
+                      <Nav />
+                      {children}
+                    </AuthProvider>
+                  </DatePickerLocalizationProvider>
+                </StateProvider>
+              </ReactQueryProvider>
+            </LayoutWrapper>
+          </MuiThemeProvider>
+        </ScrollDirectionProvider>
       </body>
     </html>
   );

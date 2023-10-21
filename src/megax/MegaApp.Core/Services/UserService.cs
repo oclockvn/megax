@@ -434,6 +434,7 @@ internal class UserService : IUserService
         {
             Id = id,
             FullName = x.FullName,
+            Title = x.Title,
             Phone = x.Phone,
             Email = x.Email,
         })

@@ -81,7 +81,7 @@ export default function UserAvatar({
           <Card className="min-w-[400px]">
             <CardHeader
               title={userInfo?.fullName}
-              subheader={`Tech Lead`}
+              subheader={userInfo?.title}
               avatar={<Avatar>{content}</Avatar>}
             />
             <CardContent>

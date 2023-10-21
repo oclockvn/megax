@@ -14,6 +14,7 @@ export interface UserDeviceRecord {
 export type UserCard = {
   id: number;
   fullName: string;
+  title: string;
   email: string;
   phone: string;
   totalAnnual: number;
