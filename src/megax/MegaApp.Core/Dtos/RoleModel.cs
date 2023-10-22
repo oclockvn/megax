@@ -9,6 +9,6 @@ public record RoleModel
 
 public record UserRoleModel
 {
-    public int UserId { get; set; }
     public int RoleId { get; set; }
+    public string Role { get; set; }
 }

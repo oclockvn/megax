@@ -30,7 +30,7 @@ internal class UserRoleService : IUserRoleService
         .Select(x => new UserRoleModel
         {
             RoleId = x.RoleId,
-            UserId = userId,
+            Role = x.Role.Name,
         })
         .ToArrayAsync();
     }
