@@ -29,6 +29,8 @@ public static class ServiceCollectionExtension
             .AddScoped<ITaskService, TaskService>()
             .AddScoped<IProjectService, ProjectService>()
             .AddScoped<ILeaveService, LeaveService>()
+            .AddScoped<IRoleService, RoleService>()
+            .AddScoped<IUserRoleService, UserRoleService>()
             .AddSettings(configuration)
             ;
     }
