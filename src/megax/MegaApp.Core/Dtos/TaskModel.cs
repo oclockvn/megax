@@ -19,7 +19,7 @@ public record TodoTaskModel
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
     public int? UpdatedBy { get; set; }
 
     public TodoTaskModel()
@@ -72,7 +72,7 @@ public record SubTaskModel
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
     public int? UpdatedBy { get; set; }
 
     public SubTaskModel()
