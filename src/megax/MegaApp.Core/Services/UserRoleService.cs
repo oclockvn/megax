@@ -1,14 +1,14 @@
 ﻿using MegaApp.Core.Db;
 using MegaApp.Core.Dtos;
-using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
-using MegaApp.Core.Exceptions;
 
 namespace MegaApp.Core.Services;
 
 public interface IUserRoleService
 {
+    Task<UserRoleModel[]> GetUserRolesAsync(int userId);
+    Task<Result<int[]>> UpdateUserRolesAsync(int userId, int[] selectedRoles);
 }
 
 internal class UserRoleService : IUserRoleService
@@ -22,6 +22,44 @@ internal class UserRoleService : IUserRoleService
         this.fileService = fileService;
     }
 
-    private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
+    public async Task<UserRoleModel[]> GetUserRolesAsync(int userId)
+    {
+        using var db = UseDb();
+        return await db.UserRoles
+        .Where(x => x.UserId == userId && x.Role.Active)
+        .Select(x => new UserRoleModel
+        {
+            RoleId = x.RoleId,
+            UserId = userId,
+        })
+        .ToArrayAsync();
+    }
 
+    public async Task<Result<int[]>> UpdateUserRolesAsync(int userId, int[] selectedRoles)
+    {
+        using var db = UseDb();
+        Task<int[]> GetRolesAsync() => db.UserRoles.Where(x => x.UserId == userId).Select(x => x.RoleId).ToArrayAsync();
+        var userRoles = await GetRolesAsync();
+
+        // var existingRoles = userRoles.Select(x => x.RoleId).ToArray();
+        var newRoles = selectedRoles.Except(userRoles).ToArray();
+        var deletedRoles = userRoles.Except(selectedRoles).ToArray();
+
+        if (newRoles.Length > 0)
+        {
+            db.UserRoles.AddRange(newRoles.Select(r => new UserRole { UserId = userId, RoleId = r }));
+        }
+
+        if (deletedRoles.Length > 0)
+        {
+            await db.UserRoles.Where(x => x.UserId == userId && deletedRoles.Contains(x.RoleId)).ExecuteDeleteAsync();
+        }
+
+        await db.SaveChangesAsync();
+        var currentRoles = await GetRolesAsync();
+
+        return new Result<int[]>(currentRoles);
+    }
+
+    private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
 }
