@@ -110,16 +110,17 @@ public class User : ICreatedByEntity
     public int? TeamId { get; set; } = null!;
     public Team Team { get; set; } = null!;
 
+    public DateTimeOffset CreatedAt { get; set; }
+    public int? CreatedBy { get; set; }
+    [MaxLength(255)]
+    public string CreatedName { get; set; }
+
     public List<Account> Accounts { get; set; } = new();
     public List<UserDocument> Documents { get; set; } = new();
     public List<Contact> Contacts { get; set; } = new();
     public List<TodoTask> Tasks { get; set; } = new();
     public List<Leave> Leaves { get; set; } = new();
-
-    public DateTimeOffset CreatedAt { get; set; }
-    public int? CreatedBy { get; set; }
-    [MaxLength(255)]
-    public string CreatedName { get; set; }
+    public List<UserRole> Roles { get; set; } = new();
 }
 
 public static class UserQueryExtension
