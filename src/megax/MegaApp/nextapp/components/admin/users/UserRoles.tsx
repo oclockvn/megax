@@ -50,14 +50,7 @@ export default function UserRoles() {
       <div>
         <FormContainer formContext={formContext} onSuccess={handleSave}>
           <Card>
-            <CardHeader
-              title="Roles"
-              action={
-                <Button size="small" startIcon={<EditIcon />}>
-                  Edit
-                </Button>
-              }
-            />
+            <CardHeader title="Roles" />
             <CardContent className="pt-0">
               <CheckboxButtonGroup
                 name="userRoles"
