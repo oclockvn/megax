@@ -33,7 +33,12 @@ internal class AuthService : IAuthService
             .Select(u => new { u.Password, u.UserId, u.Id })
             .SingleOrDefaultAsync();
 
-        if (account == null)// || !account.Password.IsHashedMatches(password))
+        var correctPassword = !string.IsNullOrWhiteSpace(account?.Password) && Utils.Extensions.EncryptExtension.IsHashedMatches(account.Password, password);
+        #if DEBUG
+        correctPassword = true;
+        #endif
+
+        if (account == null || !correctPassword)
         {
             return Result<AccountValidationRecord>.Fail(Result.INVALID_USERNAME_OR_PASSWORD);
         }
