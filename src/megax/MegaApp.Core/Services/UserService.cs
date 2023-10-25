@@ -68,7 +68,8 @@ internal class UserService : IUserService
                     IssueBy = d.IssueBy,
                     IssueDate = d.IssueDate,
                     IssuePlace = d.IssuePlace,
-                }).ToList()
+                }).ToList(),
+                Roles = u.Roles.Select(r => new UserRoleModel(r.RoleId, "")).ToArray()
             })
             .FirstOrDefaultAsync();
 

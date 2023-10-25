@@ -27,11 +27,7 @@ internal class UserRoleService : IUserRoleService
         using var db = UseDb();
         return await db.UserRoles
         .Where(x => x.UserId == userId && x.Role.Active)
-        .Select(x => new UserRoleModel
-        {
-            RoleId = x.RoleId,
-            Role = x.Role.Name,
-        })
+        .Select(x => new UserRoleModel(x.RoleId, x.Role.Name))
         .ToArrayAsync();
     }
 

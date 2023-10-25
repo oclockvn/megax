@@ -7,8 +7,4 @@ public record RoleModel
     public bool Active { get; set; }
 }
 
-public record UserRoleModel
-{
-    public int RoleId { get; set; }
-    public string Role { get; set; }
-}
+public record UserRoleModel(int RoleId, string Role);
