@@ -1,9 +1,15 @@
 import api from "@/lib/api";
 import { Role } from "../models/role.model";
 import { Result } from "../models/common.model";
+import { UserRole } from "../models/user.model";
 
 export async function getUserRoles(id: number) {
   const res = await api.get<Role[]>(`api/userroles/${id}/roles`);
+  return res.data;
+}
+
+export async function getCurrentUserRolesAndPermissions() {
+  const res = await api.get<UserRole[]>(`api/userroles/roles-and-permissions`);
   return res.data;
 }
 

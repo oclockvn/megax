@@ -17,6 +17,19 @@ public class UserRolesController : ApplicationControllerBase
     }
 
     /// <summary>
+    /// Get current user's roles and permissions
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("roles-and-permissions")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(UserRoleModel[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrentUserRolesAndPermissions()
+    {
+        var roles = await userRoleService.GetUserRolesAsync(GetCurrentUserId());
+        return Ok(roles);
+    }
+
+    /// <summary>
     /// Get all active user's roles
     /// </summary>
     /// <returns></returns>

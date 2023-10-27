@@ -29,7 +29,7 @@ export type UserCard = {
 
 export const userRoleSchema = yup.object({
   roleId: yup.number().required(),
-  role: yup.string().label("Role").nullable().default(null),
+  role: yup.string().label("Role"),
 });
 
 export const userSchema = yup.object({

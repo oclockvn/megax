@@ -4,6 +4,7 @@ import AuthProvider from "@/components/providers/AuthProvider";
 import "../globals.css";
 import MuiThemeProvider from "@/components/providers/MuiThemeProvider";
 import { quicksand } from "@/styles/fonts";
+import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
 
 export const metadata = {
   title: "MegaApp - Sign In",
@@ -19,10 +20,12 @@ export default function PortalLayout({
     <html lang="en">
       <body className={quicksand.variable}>
         <MuiThemeProvider>
-          <AuthProvider>
-            <Nav />
-            <div className="container mx-auto">{children}</div>
-          </AuthProvider>
+          <ReactQueryProvider>
+            <AuthProvider>
+              <Nav />
+              <div className="container mx-auto">{children}</div>
+            </AuthProvider>
+          </ReactQueryProvider>
         </MuiThemeProvider>
       </body>
     </html>

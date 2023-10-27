@@ -5,19 +5,29 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoute from "./ProtectedRoute";
 
 const googleAuthOption = {
-  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
-}
+  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+};
+
+type AuthProviderProps = {
+  children: React.ReactNode;
+  useGuard?: boolean;
+  requiredRoles?: string[];
+};
 
 export default function AuthProvider({
   children,
   useGuard = false,
-}: {
-  children: React.ReactNode;
-  useGuard?: boolean;
-}) {
+  requiredRoles,
+}: AuthProviderProps) {
   return (
     <GoogleOAuthProvider {...googleAuthOption}>
-      {useGuard ? <ProtectedRoute>{children}</ProtectedRoute> : children}
+      {useGuard ? (
+        <ProtectedRoute requiredRoles={requiredRoles}>
+          {children}
+        </ProtectedRoute>
+      ) : (
+        children
+      )}
     </GoogleOAuthProvider>
   );
 }
