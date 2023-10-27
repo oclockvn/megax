@@ -71,6 +71,7 @@ function Nav() {
       requiredRoles: ["admin", "hr", "leader"],
     },
   ].filter(link => hasAccess(link.requiredRoles, roles));
+  // console.log({ roles,routes });
 
   const toolbarBg = isAuthenticated ? "" : "bg-white";
   const logoColor = isAuthenticated ? "text-white" : "text-blue-500";

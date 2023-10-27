@@ -45,18 +45,20 @@ export const useAccess = (
   const { data: roles, status } = useQuery({
     queryKey: ["roles-and-permissions"],
     queryFn: () => getCurrentUserRolesAndPermissions(),
-    enabled: requireCheck,
+    // enabled: requireCheck,
     staleTime: Infinity,
   });
 
+  const userRoles = roles?.map(r => r.role?.toLowerCase() || "") || [];
+  console.log({ userRoles });
   if (!requireCheck) {
     return {
       status: "success",
       hasAccess: true,
+      roles: userRoles,
     };
   }
 
-  const userRoles = roles?.map(r => r.role?.toLowerCase() || "") || [];
   if (status !== "success") {
     return {
       status,
@@ -67,6 +69,7 @@ export const useAccess = (
 
   const required = requiredRoles?.map(r => r.toLowerCase()) || [];
   const canAccess = hasAccess(required, userRoles);
+  console.log({ canAccess, userRoles });
 
   return {
     status,
@@ -81,5 +84,9 @@ export const hasAccess = (requiredRoles?: string[], ownRoles?: string[]) => {
   }
 
   const roles = ownRoles?.map(r => r.toLowerCase()) || [];
-  return requiredRoles?.some(r => roles.includes(r.toLowerCase())) === true;
+  const has =
+    requiredRoles?.some(r => roles.includes(r.toLowerCase())) === true;
+  // console.log({roles,has, requiredRoles});
+
+  return has;
 };

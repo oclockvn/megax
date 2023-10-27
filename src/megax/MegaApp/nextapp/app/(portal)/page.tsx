@@ -8,17 +8,18 @@ import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Home() {
-  const appDispatch= useAppDispatch()
+  const appDispatch = useAppDispatch();
 
   useEffect(() => {
     // appDispatch(fetchTaskListThunk())
-  }, [appDispatch])
+  }, [appDispatch]);
 
   return (
     <Grid container spacing={2} className="p-2">
-      <Grid item xs={12} sm={8}>Dashboard</Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid item xs={12} sm={8}>
+        Dashboard
       </Grid>
+      <Grid item xs={12} sm={4}></Grid>
     </Grid>
-  )
+  );
 }
