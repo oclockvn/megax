@@ -1,4 +1,5 @@
 using MegaApp;
+using MegaApp.Authorization;
 using MegaApp.Core;
 using MegaApp.Generator;
 using MegaApp.Infrastructure;
@@ -51,6 +52,10 @@ builder.Services
     ;
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorization(option =>
+{
+    option.AddPolicy(HasAccessHandler.PolicyName, policy => policy.Requirements.Add(new HasAccessRequirement()));
+});
 
 var app = builder.Build();
 var isDevelopment = app.Environment.IsDevelopment();

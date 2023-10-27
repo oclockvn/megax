@@ -31,6 +31,7 @@ public static class ServiceCollectionExtension
             .AddScoped<ILeaveService, LeaveService>()
             .AddScoped<IRoleService, RoleService>()
             .AddScoped<IUserRoleService, UserRoleService>()
+            .AddScoped<IPermissionService, PermissionService>()
             .AddSettings(configuration)
             ;
     }
