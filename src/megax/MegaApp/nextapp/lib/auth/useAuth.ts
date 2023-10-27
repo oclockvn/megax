@@ -12,7 +12,6 @@ export default function useAuth(): AuthResult {
   const token = storage.get("token");
   if (token) {
     const jwt = jwt_decode<Record<string, any>>(token);
-    // console.log(jwt, { expired: expired(Number(jwt["exp"]))});
     if (jwt && typeof jwt === "object") {
       if (!expired(Number(jwt["exp"]))) {
         const name =
@@ -50,7 +49,6 @@ export const useAccess = (
   });
 
   const userRoles = roles?.map(r => r.role?.toLowerCase() || "") || [];
-  console.log({ userRoles });
   if (!requireCheck) {
     return {
       status: "success",
@@ -69,7 +67,6 @@ export const useAccess = (
 
   const required = requiredRoles?.map(r => r.toLowerCase()) || [];
   const canAccess = hasAccess(required, userRoles);
-  console.log({ canAccess, userRoles });
 
   return {
     status,
@@ -86,7 +83,6 @@ export const hasAccess = (requiredRoles?: string[], ownRoles?: string[]) => {
   const roles = ownRoles?.map(r => r.toLowerCase()) || [];
   const has =
     requiredRoles?.some(r => roles.includes(r.toLowerCase())) === true;
-  // console.log({roles,has, requiredRoles});
 
   return has;
 };
