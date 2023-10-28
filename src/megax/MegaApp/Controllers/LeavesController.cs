@@ -66,6 +66,8 @@ public class LeavesController : ApplicationControllerBase
     [HttpPost("{id}/action")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
+    [Authorize(Policy = HasAccessHandler.PolicyName)]
+    [HasAccess(roles: new[] { "sa", "admin", "leader" }, null)]
     public async Task<IActionResult> HandleAction(int id, LeaveActionRequest request)
     {
         var result = await leaveService.HandleLeaveActionAsync(id, request);
@@ -79,7 +81,8 @@ public class LeavesController : ApplicationControllerBase
     [HttpPost("{id}/approve")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
-    // [HasPermission(new[]{"admin", "leader"})]
+    [Authorize(Policy = "HasPermission")]
+    [HasAccess(roles: new[] { "sa", "admin", "leader" }, null)]
     public async Task<IActionResult> ApproveLeave(int id)
     {
         var result = await leaveService.ApproveLeaveAsync(id, null);
@@ -94,8 +97,6 @@ public class LeavesController : ApplicationControllerBase
     [HttpPost]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<LeaveModel>), StatusCodes.Status200OK)]
-    // [HasPermission(new[]{"test1","test2"})]
-    [Authorize(Policy = "HasPermission")]
     public async Task<IActionResult> RequestLeave(LeaveModel.Add request)
     {
         if (!ModelState.IsValid)

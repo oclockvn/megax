@@ -1,15 +1,12 @@
 ﻿using MegaApp.Core.Db;
-using MegaApp.Core.Exceptions;
-using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MegaApp.Core.Services;
 
-// public record AccountValidationRecord(int Id, int UserId);
-
 public interface IPermissionService
 {
-    Task<bool> HasPermissionAsync(string[] permissions);
+    Task<bool> HasPermissionAsync(int userId, string[] permissions);
+    Task<bool> HasRolesAsync(int userId, string[] roles);
 }
 
 internal class PermissionService : IPermissionService
@@ -21,9 +18,19 @@ internal class PermissionService : IPermissionService
         this.dbContextFactory = dbContextFactory;
     }
 
-    public Task<bool> HasPermissionAsync(string[] permissions)
+    public async Task<bool> HasPermissionAsync(int userId, string[] permissions)
     {
-        throw new NotImplementedException();
+        return await Task.FromResult(true);
+    }
+
+    public async Task<bool> HasRolesAsync(int userId, string[] roles)
+    {
+        using var db = UseDb();
+        var userRoles = await db.UserRoles.Where(u => u.UserId == userId && u.Role.Active)
+        .Select(x => x.Role.Name)
+        .ToListAsync();
+
+        return userRoles.Any(r => roles.Contains(r, StringComparer.OrdinalIgnoreCase));
     }
 
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();

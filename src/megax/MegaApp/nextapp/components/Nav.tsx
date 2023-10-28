@@ -93,14 +93,9 @@ function Nav() {
               <div className="flex-1 flex">
                 <div className="flex-1 flex items-center justify-center">
                   {routes.map((r, i) => (
-                    <Button
-                      key={i}
-                      variant="outlined"
-                      href={r.href}
-                      className="!text-white"
-                    >
+                    <Link key={i} href={r.href} className="!text-white p-3">
                       {r.label}
-                    </Button>
+                    </Link>
                   ))}
                 </div>
                 <div>

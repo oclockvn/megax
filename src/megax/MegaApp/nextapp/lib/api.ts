@@ -31,15 +31,17 @@ api.interceptors.response.use(
 
 function handleRefreshToken(err: any) {
   const originalConfig = err.config;
+  console.log({status: err.response.status,data: err.response.data});
 
-  // if not 401 unauthorized -> skip it
-  if (!err.response || err.response.status !== 401) {
-    return Promise.reject(err);
-  }
+  // // if not 401 unauthorized -> skip it
+  // if (!err.response || err.response.status !== 401) {
+  //   return Promise.reject(err);
+  // }
 
   // forbidden
-  if (err.response.status === 403 && err.response.data) {
-    return Promise.reject(err.response.data);
+  if (err.response.status === 403) {
+    // return Promise.reject('403');
+    window.location.href = '/forbidden';
   }
 
   // Access Token was expired
