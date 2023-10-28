@@ -7,7 +7,7 @@ namespace MegaApp.Core.Services;
 
 public interface IUserRoleService
 {
-    Task<UserRoleModel[]> GetUserRolesAsync(int userId);
+    Task<AccessControlModel> GetUserRolesAsync(int userId);
     Task<Result<int[]>> UpdateUserRolesAsync(int userId, int[] selectedRoles);
 }
 
@@ -22,13 +22,15 @@ internal class UserRoleService : IUserRoleService
         this.fileService = fileService;
     }
 
-    public async Task<UserRoleModel[]> GetUserRolesAsync(int userId)
+    public async Task<AccessControlModel> GetUserRolesAsync(int userId)
     {
         using var db = UseDb();
-        return await db.UserRoles
+        var userRoles = await db.UserRoles
         .Where(x => x.UserId == userId && x.Role.Active)
         .Select(x => new UserRoleModel(x.RoleId, x.Role.Name))
         .ToArrayAsync();
+
+        return new AccessControlModel(userRoles);
     }
 
     public async Task<Result<int[]>> UpdateUserRolesAsync(int userId, int[] selectedRoles)

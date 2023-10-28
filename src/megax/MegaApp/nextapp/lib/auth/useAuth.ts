@@ -1,7 +1,7 @@
 import jwt_decode from "jwt-decode";
 import storage from "../storage";
 import { useQuery } from "@tanstack/react-query";
-import { getCurrentUserRolesAndPermissions } from "../apis/userRole.api";
+import { getCurrentUserRolesAndPermissions } from "../apis/user.api";
 
 type AuthResult = {
   authenticated: boolean;
@@ -41,14 +41,14 @@ export const useAccess = (
   roles?: string[];
 } => {
   const requireCheck = Number(requiredRoles?.length) > 0;
-  const { data: roles, status } = useQuery({
+  const { data, status } = useQuery({
     queryKey: ["roles-and-permissions"],
     queryFn: () => getCurrentUserRolesAndPermissions(),
     // enabled: requireCheck,
     staleTime: Infinity,
   });
 
-  const userRoles = roles?.map(r => r.role?.toLowerCase() || "") || [];
+  const userRoles = data?.roles?.map(r => r.role?.toLowerCase() || "") || [];
   if (!requireCheck) {
     return {
       status: "success",

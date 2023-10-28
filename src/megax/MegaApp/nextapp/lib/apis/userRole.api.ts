@@ -8,11 +8,6 @@ export async function getUserRoles(id: number) {
   return res.data;
 }
 
-export async function getCurrentUserRolesAndPermissions() {
-  const res = await api.get<UserRole[]>(`api/userroles/roles-and-permissions`);
-  return res.data;
-}
-
 export async function updateUserRoles(id: number, roles: number[]) {
   const res = await api.post<Result<number[]>>(`api/userroles/${id}/roles`, roles);
   return res.data;

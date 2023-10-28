@@ -167,3 +167,5 @@ public record UserCard
     public int TakenAnnual { get; set; }
     public int TakenPaidLeave { get; set; }
 }
+
+public record AccessControlModel(UserRoleModel[] Roles);

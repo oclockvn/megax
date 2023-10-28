@@ -99,3 +99,7 @@ export const userSchema = yup.object({
 
 export type User = yup.InferType<typeof userSchema>;
 export type UserRole = yup.InferType<typeof userRoleSchema>;
+
+export type AccessControlModel = {
+  roles: UserRole[]
+}
