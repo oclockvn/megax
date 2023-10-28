@@ -12,7 +12,6 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import PaidIcon from "@mui/icons-material/Paid";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
-import Avatar from "@mui/material/Avatar";
 import {
   Leave,
   LeaveAction,
@@ -44,8 +43,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import { useRef } from "react";
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import UserAvatar from "@/components/common/UserAvatar";
+import hasAccess from "@/hooks/accessControl";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -61,6 +60,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
   const appDispatch = useAppDispatch();
   const confirmation = useConfirm();
   const commentRef = useRef<HTMLInputElement>(null);
+  const canApprove = hasAccess("leave.approve");
 
   const popupState = usePopupState({
     variant: "dialog",
@@ -187,7 +187,10 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           <CardHeader
             avatar={
               // <Avatar aria-label="recipe">{getInitial(leave.userName)}</Avatar>
-              <UserAvatar id={leave.userId} content={getInitial(leave.userName)} />
+              <UserAvatar
+                id={leave.userId}
+                content={getInitial(leave.userName)}
+              />
             }
             action={
               (showAction || canCancel) && leave.isCreator && <CardAction />
@@ -213,8 +216,8 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
                       title={dt.formatDate(d.date, "dd/MM/yyyy")}
                     >
                       {displayTime(d.time)}
-                      {dt.formatDate(d.date, "dd/MM/yyyy")}{" "}
-                      → <TimeAgo date={d.date} />
+                      {dt.formatDate(d.date, "dd/MM/yyyy")} →{" "}
+                      <TimeAgo date={d.date} />
                     </div>
                   ))}
                 </>
@@ -253,7 +256,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
               />
             )}
           </CardContent>
-          {showAction && !leave.isCreator && (
+          {showAction && !leave.isCreator && canApprove && (
             <CardActions>
               <Button
                 variant="contained"

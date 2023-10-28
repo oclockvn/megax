@@ -181,6 +181,7 @@ export const leaveSlice = createSlice({
           leave!.status = data;
         } else {
           state.items = state.items.filter(x => x.id !== id);
+          state.requesting = state.requesting.filter(x => x.id !== id);
         }
       });
   },

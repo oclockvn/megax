@@ -13,10 +13,10 @@ import Link from "next/link";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import { hasAccess } from "@/lib/auth/useAuth";
+import { hasRoles } from "@/lib/auth/useAuth";
 import dynamic from "next/dynamic";
 import storage from "@/lib/storage";
-import { AuthContext } from "./providers/ProtectedRoute";
+import { AuthContext } from "@/hooks/context";
 
 declare type NavLink = {
   label: string;
@@ -70,8 +70,7 @@ function Nav() {
       href: "/admin/devices",
       requiredRoles: ["admin", "hr", "leader"],
     },
-  ].filter(link => hasAccess(link.requiredRoles, roles));
-  // console.log({ roles,routes });
+  ].filter(link => hasRoles(link.requiredRoles, roles));
 
   const toolbarBg = isAuthenticated ? "" : "bg-white";
   const logoColor = isAuthenticated ? "text-white" : "text-blue-500";

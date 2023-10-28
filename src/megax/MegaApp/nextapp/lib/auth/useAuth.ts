@@ -66,7 +66,7 @@ export const useAccess = (
   }
 
   const required = requiredRoles?.map(r => r.toLowerCase()) || [];
-  const canAccess = hasAccess(required, userRoles);
+  const canAccess = hasRoles(required, userRoles);
 
   return {
     status,
@@ -75,7 +75,7 @@ export const useAccess = (
   };
 };
 
-export const hasAccess = (requiredRoles?: string[], ownRoles?: string[]) => {
+export const hasRoles = (requiredRoles?: string[], ownRoles?: string[]) => {
   if (!requiredRoles || requiredRoles.length === 0) {
     return true;
   }
