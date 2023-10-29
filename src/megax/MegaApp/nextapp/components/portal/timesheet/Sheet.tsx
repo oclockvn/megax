@@ -6,60 +6,46 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import HomeIcon from "@mui/icons-material/Home";
 import ApartmentIcon from "@mui/icons-material/Apartment";
-import React, { useReducer } from "react";
+import React, {  } from "react";
 import { WorkDay, WorkStatus } from "@/lib/models/timesheet.model";
 import dt from "@/lib/datetime";
-
-type _State = {
-  loading: boolean;
-  days: WorkDay[];
-};
-
-type _Action = {
-  type: "update-status";
-  payload: { date: Date; status: WorkStatus };
-};
-
-function reducer(state: _State, action: _Action) {
-  switch (action.type) {
-    case "update-status":
-      const { date, status } = action.payload;
-      state = {
-        ...state,
-        loading: false,
-        days: state.days.map(d => ({
-          ...d,
-          status: d.date.getTime() === date.getTime() ? status : d.status,
-        })),
-      };
-      break;
-  }
-
-  return state;
-}
+import { useAppDispatch } from "@/lib/store/state.hook";
+import { updateWeekStatus } from "@/lib/store/userTimesheet.state";
 
 type SheetProps = {
   days: WorkDay[];
 };
 
-export default function Sheet(props: SheetProps) {
-  const initState: _State = {
-    loading: false,
-    days: props.days,
+export default function Sheet({ days }: SheetProps) {
+  const appDispatch = useAppDispatch();
+
+  const handleRegister = () => {
+    console.log(days);
   };
 
-  const [state, dispatch] = useReducer(reducer, initState);
+  const handleUpdateStatus = (date: Date, status: WorkStatus) => {
+    appDispatch(
+      updateWeekStatus({
+        date,
+        status,
+      })
+    );
+  };
 
   return (
     <div className="grid grid-cols-8 mt-4">
       <div className="flex self-end justify-center">
         {/* <Avatar>QP</Avatar> */}
-        <Button variant="contained" className="mb-[5px]">
-          Register
+        <Button
+          variant="contained"
+          className="mb-[5px]"
+          onClick={() => handleRegister()}
+        >
+          Apply
         </Button>
       </div>
 
-      {state.days.map(d => (
+      {days.map(d => (
         <div
           key={d.date.getTime()}
           className="flex items-center justify-center"
@@ -69,12 +55,7 @@ export default function Sheet(props: SheetProps) {
               <ToggleButtonGroup
                 value={d.status}
                 exclusive
-                onChange={(_, s) =>
-                  dispatch({
-                    type: "update-status",
-                    payload: { date: d.date, status: s },
-                  })
-                }
+                onChange={(_, s) => handleUpdateStatus(d.date, s)}
                 aria-label="Work location"
                 color="primary"
               >
@@ -95,7 +76,9 @@ export default function Sheet(props: SheetProps) {
               </ToggleButtonGroup>
             </div>
           ) : (
-            <div><b>Weekend</b></div>
+            <div>
+              <b>Weekend</b>
+            </div>
           )}
         </div>
       ))}

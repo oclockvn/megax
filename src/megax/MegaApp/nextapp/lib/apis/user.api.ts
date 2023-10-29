@@ -1,10 +1,17 @@
 import api, { upload } from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
-import { AccessControlModel, User, UserCard, UserDeviceRecord } from "@/lib/models/user.model";
-import { delay, normalizeDateTimePayload, qs, toFormData } from "../util";
-import { AxiosError,  } from "axios";
+import {
+  AccessControlModel,
+  User,
+  UserCard,
+  UserDeviceRecord,
+} from "@/lib/models/user.model";
+import { normalizeDateTimePayload, qs, toFormData } from "../util";
+import { AxiosError } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
+import dt from "@/lib/datetime";
+import { WorkDay, WorkStatus } from "../models/timesheet.model";
 
 export async function fetchUserList(filter: Partial<Filter>) {
   const res = await api.get<PagedResult<User>>("api/users?" + qs(filter));
@@ -67,24 +74,38 @@ export async function returnDevice(id: number, deviceId: number) {
   }
 }
 
-export async function creteUpdateContact(id: number, req: Partial<Contact | null>) {
+export async function creteUpdateContact(
+  id: number,
+  req: Partial<Contact | null>
+) {
   const res = await api.post<Result<Contact>>(`api/users/${id}/contact`, req);
   return res.data;
 }
 
 export async function deleteContact(id: number, contactId: number) {
-  const res = await api.delete<Result<boolean>>(`api/users/${id}/contact/${contactId}`);
+  const res = await api.delete<Result<boolean>>(
+    `api/users/${id}/contact/${contactId}`
+  );
   return res.data;
 }
 
-export async function creteUpdateDocument(id: number, req: Partial<UserDocument | null>, files?: File[]) {
-  const payload = normalizeDateTimePayload(req!)
-  const res = await upload<Result<UserDocument>>(`api/users/${id}/document`, toFormData(payload!, files));
+export async function creteUpdateDocument(
+  id: number,
+  req: Partial<UserDocument | null>,
+  files?: File[]
+) {
+  const payload = normalizeDateTimePayload(req!);
+  const res = await upload<Result<UserDocument>>(
+    `api/users/${id}/document`,
+    toFormData(payload!, files)
+  );
   return res.data;
 }
 
 export async function deleteDocument(id: number, documentId: number) {
-  const res = await api.delete<Result<boolean>>(`api/users/${id}/document/${documentId}`);
+  const res = await api.delete<Result<boolean>>(
+    `api/users/${id}/document/${documentId}`
+  );
   return res.data;
 }
 
@@ -94,6 +115,21 @@ export async function getUserCard(id: number) {
 }
 
 export async function getCurrentUserRolesAndPermissions() {
-  const res = await api.get<AccessControlModel>(`api/users/roles-and-permissions`);
+  const res = await api.get<AccessControlModel>(
+    `api/users/roles-and-permissions`
+  );
   return res.data;
+}
+
+export async function getUserTimesheet(date: Date) {
+  const week = dt.getWeekDays(date);
+  const days = week.map(
+    d =>
+      ({
+        date: d,
+        status: WorkStatus.Office,
+      } as WorkDay)
+  );
+
+  return await Promise.resolve(days);
 }

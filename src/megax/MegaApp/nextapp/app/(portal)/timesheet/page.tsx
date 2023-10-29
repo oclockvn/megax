@@ -3,40 +3,33 @@
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import Sheet from "@/components/portal/timesheet/Sheet";
 import SheetNav from "@/components/portal/timesheet/SheetNav";
 import dt from "@/lib/datetime";
-import { WorkDay, WorkStatus } from "@/lib/models/timesheet.model";
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import {
+  fetchTimesheetThunk,
+  navWeek as moveWeek,
+} from "@/lib/store/userTimesheet.state";
 
 export default function Timesheet() {
-  const [current, setCurrent] = useState(new Date());
+  const { timesheet, current } = useAppSelector(s => s.userTimesheet);
+  const appDispatch = useAppDispatch();
+
   const week = dt.getWeekDays(current);
-  const days = week.map(
-    d =>
-      ({
-        date: d,
-        status: WorkStatus.Remote,
-      } as WorkDay)
-  );
 
   const navWeek = (dir: -1 | 0 | 1) => {
-    switch (dir) {
-      case 0:
-        setCurrent(new Date());
-        break;
-      case -1:
-        setCurrent(prev => dt.addDays(prev, -7));
-        break;
-      case 1:
-        setCurrent(prev => dt.addDays(prev, 7));
-        break;
-    }
+    appDispatch(moveWeek(dir));
   };
+
+  useEffect(() => {
+    appDispatch(fetchTimesheetThunk(current));
+  }, [appDispatch, current]);
 
   return (
     <div className="container mx-auto">
-      <SheetNav week={days.map(d => d.date)} nav={navWeek} />
+      <SheetNav week={week} nav={navWeek} />
 
       <Divider className="my-4" />
 
@@ -60,7 +53,7 @@ export default function Timesheet() {
         ))}
       </div>
 
-      <Sheet days={days} />
+      {timesheet.length > 0 && <Sheet days={timesheet} />}
     </div>
   );
 }
