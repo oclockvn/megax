@@ -32,6 +32,7 @@ public static class ServiceCollectionExtension
             .AddScoped<IRoleService, RoleService>()
             .AddScoped<IUserRoleService, UserRoleService>()
             .AddScoped<IPermissionService, PermissionService>()
+            .AddScoped<ITimesheetService, TimesheetService>()
             .AddSettings(configuration)
             ;
     }
