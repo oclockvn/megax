@@ -1,7 +1,9 @@
+using MegaApp.Authorization;
 using MegaApp.Core.Services;
 using MegaApp.Infrastructure.Http;
 using MegaApp.Resolvers;
 using MegaApp.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MegaApp
 {
@@ -20,6 +22,7 @@ namespace MegaApp
                 .AddScoped<ITokenService, TokenService>()
                 .AddScoped<IHttpOriginResolver, HttpOriginResolver>()
                 .AddScoped<IUserResolver, HttpContextUserResolver>()
+                .AddScoped<IAuthorizationHandler, HasAccessHandler>()
                 ;
         }
     }

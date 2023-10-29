@@ -17,6 +17,8 @@ import {
 } from "../models/common.model";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
+import { updateUserRoles } from "../apis/userRole.api";
+import StateProvider from "./state.provider";
 
 export interface UsersState {
   pagedUsers: PagedResult<User>;
@@ -117,7 +119,7 @@ export const deleteContactThunk = createAsyncThunk(
 export const createUpdateDocumentThunk = createAsyncThunk(
   "users/create-update-document",
   async (
-    req: { id: number; document: Partial<UserDocument | null>, files?: File[] },
+    req: { id: number; document: Partial<UserDocument | null>; files?: File[] },
     thunkApi
   ) => {
     thunkApi.dispatch(
@@ -161,6 +163,17 @@ export const deleteDocumentThunk = createAsyncThunk(
         success: false,
       });
     }
+  }
+);
+
+export const updateUserRolesThunk = createAsyncThunk(
+  "users/update-roles",
+  async (req: { id: number; roles: number[] }, thunkApi) => {
+    thunkApi.dispatch(
+      userSlice.actions.setLoading({ loading: true, msg: "Saving changes..." })
+    );
+
+    return await updateUserRoles(req.id, req.roles);
   }
 );
 
@@ -270,6 +283,15 @@ export const userSlice = createSlice({
       .addCase(updateUserDetailThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = "Something went wrong!";
+      })
+      .addCase(updateUserRolesThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload.success) {
+          state.user!.roles = action.payload.data.map(r => ({
+            roleId: r,
+            role: "",
+          }));
+        }
       });
   },
 });

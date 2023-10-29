@@ -28,7 +28,7 @@ export default async function PortalLayout({
               <ReactQueryProvider>
                 <StateProvider>
                   <DatePickerLocalizationProvider>
-                    <AuthProvider useGuard>
+                    <AuthProvider useGuard requiredRoles={['sa', 'admin', 'team lead']}>
                       <Nav />
                       {children}
                     </AuthProvider>

@@ -32,7 +32,7 @@ public class Leave : ICreator, IUpdatedByEntity
     public int? CreatedBy { get; set; }
     [MaxLength(255)]
     public string CreatedName { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
     public int? UpdatedBy { get; set; }
     [MaxLength(255)]
     public string UpdatedName { get; set; }

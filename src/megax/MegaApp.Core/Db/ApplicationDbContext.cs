@@ -15,6 +15,8 @@ namespace MegaApp.Core.Db
         public DbSet<User> Users { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
         public DbSet<DeviceType> DeviceTypes { get; set; }
         public DbSet<Device> Devices { get; set; }
@@ -53,6 +55,8 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new ClientConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new LeaveConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
         }
 
         public void SetCurrentUser(int userId, string userName)

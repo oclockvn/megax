@@ -11,7 +11,7 @@ namespace MegaApp.Core.Db.Entities
 
     public interface IUpdatedByEntity
     {
-        public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
         public string UpdatedName { get; set; }
     }

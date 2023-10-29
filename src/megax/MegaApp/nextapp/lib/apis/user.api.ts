@@ -1,6 +1,6 @@
 import api, { upload } from "@/lib/api";
 import { Filter, PagedResult, Result } from "@/lib/models/common.model";
-import { User, UserCard, UserDeviceRecord } from "@/lib/models/user.model";
+import { AccessControlModel, User, UserCard, UserDeviceRecord } from "@/lib/models/user.model";
 import { delay, normalizeDateTimePayload, qs, toFormData } from "../util";
 import { AxiosError,  } from "axios";
 import { Contact } from "../models/contact.model";
@@ -90,5 +90,10 @@ export async function deleteDocument(id: number, documentId: number) {
 
 export async function getUserCard(id: number) {
   const res = await api.get<UserCard>(`api/users/${id}/card`);
+  return res.data;
+}
+
+export async function getCurrentUserRolesAndPermissions() {
+  const res = await api.get<AccessControlModel>(`api/users/roles-and-permissions`);
   return res.data;
 }

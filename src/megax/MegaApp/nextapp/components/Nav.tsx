@@ -8,21 +8,24 @@ import {
   MenuItem,
   Menu,
   Button,
-  // Skeleton,
 } from "@mui/material";
-// import { signOut } from "next-auth/react";
 import Link from "next/link";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/lib/auth/useAuth";
+import { hasRoles } from "@/lib/auth/useAuth";
 import dynamic from "next/dynamic";
-// import { googleLogout } from "@react-oauth/google";
 import storage from "@/lib/storage";
+import { AuthContext } from "@/hooks/context";
+
+declare type NavLink = {
+  label: string;
+  href: string;
+  requiredRoles?: string[];
+};
 
 function Nav() {
-  const [isAuthenticated, username] = useAuth();
-
+  const { isAuthenticated, name: username, roles } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
 
@@ -44,6 +47,31 @@ function Nav() {
     router.push("/login");
   };
 
+  const routes: NavLink[] = [
+    {
+      label: "Requests",
+      href: "/requests",
+    },
+    {
+      label: "Tasks",
+      href: "/tasks",
+    },
+    {
+      label: "Report",
+      href: "/report",
+    },
+    {
+      label: "Users",
+      href: "/admin/users",
+      requiredRoles: ["admin", "hr", "leader"],
+    },
+    {
+      label: "Devices",
+      href: "/admin/devices",
+      requiredRoles: ["admin", "hr", "leader"],
+    },
+  ].filter(link => hasRoles(link.requiredRoles, roles));
+
   const toolbarBg = isAuthenticated ? "" : "bg-white";
   const logoColor = isAuthenticated ? "text-white" : "text-blue-500";
 
@@ -63,42 +91,11 @@ function Nav() {
             {isAuthenticated ? (
               <div className="flex-1 flex">
                 <div className="flex-1 flex items-center justify-center">
-                  <Button
-                    variant="outlined"
-                    href="/requests"
-                    className="!text-white"
-                  >
-                  Requests
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    href="/tasks"
-                    className="!text-white"
-                  >
-                    Tasks
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    href="/report"
-                    className="!text-white"
-                  >
-                    Report
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    href="/admin/users"
-                    className="!text-white"
-                  >
-                    Users
-                  </Button>
-
-                  <Button
-                    variant="outlined"
-                    href="/admin/devices"
-                    className="!text-white"
-                  >
-                    Devices
-                  </Button>
+                  {routes.map((r, i) => (
+                    <Link key={i} href={r.href} className="!text-white p-3">
+                      {r.label}
+                    </Link>
+                  ))}
                 </div>
                 <div>
                   <span className="mr-1">Hi {username}</span>

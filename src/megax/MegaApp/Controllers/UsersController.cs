@@ -13,14 +13,17 @@ public class UsersController : ApplicationControllerBase
 {
     private readonly IUserService userService;
     private readonly IStorageService storageService;
+    private readonly IUserRoleService userRoleService;
 
     public UsersController(
         IUserService userService,
-        IStorageService storageService
+        IStorageService storageService,
+        IUserRoleService userRoleService
         )
     {
         this.userService = userService;
         this.storageService = storageService;
+        this.userRoleService = userRoleService;
     }
 
     /// <summary>
@@ -219,5 +222,18 @@ public class UsersController : ApplicationControllerBase
     {
         var result = await userService.GetUserCardAsync(id);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Get current user's roles and permissions
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("roles-and-permissions")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(UserRoleModel[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrentUserRolesAndPermissions()
+    {
+        var roles = await userRoleService.GetUserRolesAsync(GetCurrentUserId());
+        return Ok(roles);
     }
 }

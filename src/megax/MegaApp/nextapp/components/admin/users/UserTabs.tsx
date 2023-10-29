@@ -12,6 +12,7 @@ import UserContactList from "./UserContactList";
 import UserDocumentList from "./UserDocumentList";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import CustomTabPanel from "@/components/common/CustomTabPanel";
+import UserRoles from "./UserRoles";
 
 declare type UserTabsProps = {
   user: User | undefined;
@@ -61,6 +62,10 @@ export default function UserTabs({ user }: UserTabsProps) {
       value: "documents",
       label: "Documents",
     },
+    {
+      value: 'user-roles',
+      label: 'User roles',
+    },
   ];
 
   return (
@@ -90,6 +95,9 @@ export default function UserTabs({ user }: UserTabsProps) {
       </CustomTabPanel>
       <CustomTabPanel value={"documents"} curr={value}>
         <UserDocumentList />
+      </CustomTabPanel>
+      <CustomTabPanel value={"user-roles"} curr={value}>
+        <UserRoles />
       </CustomTabPanel>
     </Box>
   );

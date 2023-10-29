@@ -22,6 +22,16 @@ export type UserCard = {
   takenPaidLeave: number;
 };
 
+// export type UserRole = {
+//   roleId: number;
+//   role: string;
+// }
+
+export const userRoleSchema = yup.object({
+  roleId: yup.number().required(),
+  role: yup.string().label("Role"),
+});
+
 export const userSchema = yup.object({
   id: yup.number().nullable().default(null),
   accountId: yup.number().nullable().default(null),
@@ -84,6 +94,12 @@ export const userSchema = yup.object({
   teamId: yup.number().nullable().default(null),
   contacts: yup.array().of(contactSchema).nullable().default([]),
   documents: yup.array().of(documentSchema).nullable().default([]),
+  roles: yup.array().of(userRoleSchema).nullable().default([]),
 });
 
 export type User = yup.InferType<typeof userSchema>;
+export type UserRole = yup.InferType<typeof userRoleSchema>;
+
+export type AccessControlModel = {
+  roles: UserRole[]
+}

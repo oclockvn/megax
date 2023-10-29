@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.5",
-    "@types/react-timeago": "^4.1.4"
+    "@types/react-timeago": "^4.1.4",
+    "eslint": "8.52.0"
   }
 }

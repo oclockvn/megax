@@ -50,6 +50,7 @@ public record UserModel
     // public List<Account> Accounts { get; set; } = new();
     public List<DocumentModel> Documents { get; set; } = new();
     public List<ContactModel> Contacts { get; set; } = new();
+    public UserRoleModel[] Roles { get; set; }
 
     // public DateTimeOffset CreatedAt { get; set; }
     // public int? CreatedBy { get; set; }
@@ -166,3 +167,5 @@ public record UserCard
     public int TakenAnnual { get; set; }
     public int TakenPaidLeave { get; set; }
 }
+
+public record AccessControlModel(UserRoleModel[] Roles);

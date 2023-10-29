@@ -1,7 +1,10 @@
-﻿using MegaApp.Core;
+﻿using MegaApp.Authorization;
+using MegaApp.Core;
 using MegaApp.Core.Dtos;
 using MegaApp.Core.Enums;
 using MegaApp.Core.Services;
+// using MegaApp.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MegaApp.Controllers;
@@ -63,6 +66,8 @@ public class LeavesController : ApplicationControllerBase
     [HttpPost("{id}/action")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
+    [Authorize(Policy = HasAccessHandler.PolicyName)]
+    [HasAccess(roles: new[] { "sa", "admin", "leader" }, null)]
     public async Task<IActionResult> HandleAction(int id, LeaveActionRequest request)
     {
         var result = await leaveService.HandleLeaveActionAsync(id, request);
@@ -76,6 +81,8 @@ public class LeavesController : ApplicationControllerBase
     [HttpPost("{id}/approve")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<LeaveStatus>), StatusCodes.Status200OK)]
+    [Authorize(Policy = "HasPermission")]
+    [HasAccess(roles: new[] { "sa", "admin", "leader" }, null)]
     public async Task<IActionResult> ApproveLeave(int id)
     {
         var result = await leaveService.ApproveLeaveAsync(id, null);

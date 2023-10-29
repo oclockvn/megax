@@ -43,11 +43,10 @@ namespace MegaApp.Services
                 new Claim(ClaimTypes.Email, claim.Email),
             };
 
-
 #if !DEBUG
-            if (expiryMinites == 0)
+            if (expiryMinutes == 0)
             {
-                expiryMinites = Math.Max(jwtOption.ExpireMinutes, 60);
+                expiryMinutes = Math.Max(jwtOption.ExpireMinutes, 60);
             }
 #endif
 
