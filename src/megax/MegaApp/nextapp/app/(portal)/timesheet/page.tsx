@@ -19,17 +19,13 @@ export default function Timesheet() {
 
   const week = dt.getWeekDays(current);
 
-  const navWeek = (dir: -1 | 0 | 1) => {
-    appDispatch(moveWeek(dir));
-  };
-
   useEffect(() => {
     appDispatch(fetchTimesheetThunk(current));
   }, [appDispatch, current]);
 
   return (
     <div className="container mx-auto">
-      <SheetNav week={week} nav={navWeek} />
+      <SheetNav current={current} week={week} />
 
       <Divider className="my-4" />
 
