@@ -76,6 +76,21 @@ function Nav() {
     },
   ].filter(link => hasRoles(link.requiredRoles, roles));
 
+  const userMenus: NavLink[] = [
+    {
+      label: "Profile",
+      href: "/profile",
+    },
+    {
+      label: "Leave Request",
+      href: "/leave",
+    },
+    {
+      label: "Timesheet",
+      href: "/timesheet",
+    },
+  ];
+
   const toolbarBg = isAuthenticated ? "" : "bg-white";
   const logoColor = isAuthenticated ? "text-white" : "text-blue-500";
 
@@ -128,12 +143,11 @@ function Nav() {
                     open={Boolean(anchorEl)}
                     onClose={() => handleClose()}
                   >
-                    <MenuItem onClick={() => handleClose("/profile")}>
-                      Profile
-                    </MenuItem>
-                    <MenuItem onClick={() => handleClose("/leave")}>
-                      Leave Request
-                    </MenuItem>
+                    {userMenus.map((menu, i) => (
+                      <MenuItem key={i} onClick={() => handleClose(menu.href)}>
+                        {menu.label}
+                      </MenuItem>
+                    ))}
                     <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
                   </Menu>
                 </div>
