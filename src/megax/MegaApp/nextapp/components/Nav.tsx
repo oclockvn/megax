@@ -49,6 +49,10 @@ function Nav() {
 
   const routes: NavLink[] = [
     {
+      label: "Timesheet",
+      href: "/timesheet",
+    },
+    {
       label: "Requests",
       href: "/requests",
     },
