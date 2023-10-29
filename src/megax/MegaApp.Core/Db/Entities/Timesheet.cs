@@ -35,5 +35,9 @@ public class TimesheetConfiguration : IEntityTypeConfiguration<Timesheet>
 
         builder.HasIndex(x => x.Date)
             .IsUnique();
+
+        builder.HasOne(x => x.User)
+            .WithMany(u => u.Timesheets)
+            .HasForeignKey(x => x.UserId);
     }
 }

@@ -121,6 +121,7 @@ public class User : ICreatedByEntity
     public List<TodoTask> Tasks { get; set; } = new();
     public List<Leave> Leaves { get; set; } = new();
     public List<UserRole> Roles { get; set; } = new();
+    public List<Timesheet> Timesheets { get; set; } = new();
 }
 
 public static class UserQueryExtension
