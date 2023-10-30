@@ -12,6 +12,7 @@ import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
 import dt from "@/lib/datetime";
 import { WorkDay, WorkStatus } from "../models/timesheet.model";
+import { extractErrors } from "../helpers/response";
 
 export async function fetchUserList(filter: Partial<Filter>) {
   const res = await api.get<PagedResult<User>>("api/users?" + qs(filter));
@@ -132,4 +133,22 @@ export async function getUserTimesheet(date: Date) {
   );
 
   return await Promise.resolve(days);
+}
+
+export async function applyTimesheet(days: WorkDay[]) {
+  return api
+    .post<Result<boolean>>(`api/users/timesheet`, {
+      timesheets: days,
+    })
+    .then(res => res.data)
+    .catch((error: AxiosError) => {
+      let err = error?.response?.data
+        ? extractErrors(error.response.data)
+        : "Something went wrong";
+
+      return {
+        success: false,
+        code: err,
+      } as Result<boolean>;
+    });
 }

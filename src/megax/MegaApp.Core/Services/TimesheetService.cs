@@ -10,6 +10,7 @@ namespace MegaApp.Core.Services;
 public interface ITimesheetService
 {
     Task<Result<bool>> ApplyTimesheetAsync(int userId, TimesheetModel[] request);
+    Task<> ApplyTimesheetAsync(int userId, TimesheetModel[] request);
 }
 
 internal class TimesheetService : ITimesheetService
