@@ -75,6 +75,9 @@ export const userTimesheetSlice = createSlice({
         state.loading = false;
         state.timesheet = action.payload;
       })
+      .addCase(applyTimesheetThunk.fulfilled, (state, _) => {
+        state.loading = false;
+      })
       .addCase(applyTimesheetThunk.rejected, (state, _) => {
         state.loading = false;
       });
