@@ -4,7 +4,6 @@ using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Exceptions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace MegaApp.Core.Services;
 
@@ -17,21 +16,19 @@ public interface ITimesheetService
 internal class TimesheetService : ITimesheetService
 {
     private readonly ApplicationDbContextFactory dbContextFactory;
-    private readonly IFileService fileService;
 
-    public TimesheetService(ApplicationDbContextFactory dbContextFactory, IFileService fileService)
+    public TimesheetService(ApplicationDbContextFactory dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
-        this.fileService = fileService;
     }
 
     public async Task<Result<bool>> ApplyTimesheetAsync(int userId, TimesheetModel[] request)
     {
         // assume we don't work in the weekend (5 days per week)
         // and only weekday
-        if (request == null || request.Length != 5)
+        if (request == null || request.Length > 5)
         {
-            throw new BusinessRuleViolationException("Timesheet must have exact 5 days");
+            throw new BusinessRuleViolationException("Timesheet must have max 5 days");
         }
 
         var invalidRequest = request.Any(r => r.Id > 0) && request.Any(r => r.Id == 0);
@@ -46,11 +43,6 @@ internal class TimesheetService : ITimesheetService
             throw new BusinessRuleViolationException("Timesheet does not support weekend");
         }
 
-        if (request.Select(x => x.Date).ToArray().IsConsecutive() == false)
-        {
-            throw new BusinessRuleViolationException("Timesheet is not consecutive");
-        }
-
         using var db = UseDb();
         // only allow update or insert at once
         // it means, if any object is updating, the rest are updating
@@ -62,6 +54,18 @@ internal class TimesheetService : ITimesheetService
         }
         else
         {
+            if (request.Select(x => x.Date).ToArray().IsConsecutive() == false)
+            {
+                throw new BusinessRuleViolationException("Timesheet is not consecutive");
+            }
+
+            // do not register in the past
+            var beginning = request.OrderBy(x => x.Date).First();
+            if (beginning.Date < DateTime.Today)
+            {
+                throw new BusinessRuleViolationException("Do not support register timesheet in the past");
+            }
+
             InsertTimesheetInternal(request, db, userId);
         }
 
@@ -72,12 +76,12 @@ internal class TimesheetService : ITimesheetService
 
     private async Task UpdateTimesheetInternalAsync(TimesheetModel[] request, ApplicationDbContext db)
     {
-        var ids = request.Select(x => x.Id).ToArray();
+        var ids = request.Where(x => x.Date >= DateTime.Today).Select(x => x.Id).ToArray();
         var timesheets = await db.Timesheets.Where(t => ids.Contains(t.Id)).ToListAsync();
-        if (timesheets.Count != 5)
-        {
-            throw new BusinessRuleViolationException($"Timesheet starts from {request[0].Date} does not have enough days");
-        }
+        // if (timesheets.Count != 5)
+        // {
+        //     throw new BusinessRuleViolationException($"Timesheet starts from {request[0].Date} does not have enough days");
+        // }
 
         foreach (var t in timesheets)
         {

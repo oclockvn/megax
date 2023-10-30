@@ -6,6 +6,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import HomeIcon from "@mui/icons-material/Home";
 import ApartmentIcon from "@mui/icons-material/Apartment";
+import WeekendIcon from '@mui/icons-material/Weekend';
 import React from "react";
 import dt from "@/lib/datetime";
 import { Timesheet, WorkType } from "@/lib/models/timesheet.model";
@@ -65,6 +66,8 @@ export default function Sheet({ timesheet, loading }: SheetProps) {
     );
   };
 
+  const canApply = timesheet.some(d => dt.isFuture(d.date));
+
   return (
     <div className="grid grid-cols-8 mt-4">
       <div className="flex self-end justify-center">
@@ -73,7 +76,7 @@ export default function Sheet({ timesheet, loading }: SheetProps) {
           variant="contained"
           className="mb-[5px]"
           onClick={() => handleRegister()}
-          disabled={loading}
+          disabled={loading || !canApply}
         >
           APPLY
         </Button>
@@ -95,32 +98,45 @@ export default function Sheet({ timesheet, loading }: SheetProps) {
               >
                 {d.workType === WorkType.Office ? "Office" : "Remote"}
               </div>
-              <ToggleButtonGroup
-                value={d.workType}
-                exclusive
-                onChange={(_, s) => handleUpdateStatus(d.date, s)}
-                aria-label="Work location"
-                color="primary"
-              >
-                <ToggleButton
-                  value={WorkType.Office}
-                  aria-label="left aligned"
-                  title="Office"
+              {dt.isFuture(d.date) ? (
+                <ToggleButtonGroup
+                  value={d.workType}
+                  exclusive
+                  onChange={(_, s) => handleUpdateStatus(d.date, s)}
+                  aria-label="Work location"
+                  color="primary"
                 >
-                  <ApartmentIcon />
-                </ToggleButton>
-                <ToggleButton
-                  value={WorkType.Remote}
-                  aria-label="centered"
-                  title="Working remotely"
-                >
-                  <HomeIcon />
-                </ToggleButton>
-              </ToggleButtonGroup>
+                  <ToggleButton
+                    value={WorkType.Office}
+                    aria-label="left aligned"
+                    title="Office"
+                  >
+                    <ApartmentIcon />
+                  </ToggleButton>
+                  <ToggleButton
+                    value={WorkType.Remote}
+                    aria-label="centered"
+                    title="Working remotely"
+                  >
+                    <HomeIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              ) : (
+                <div className="flex items-center justify-center h-[48px] text-blue-500">
+                  {d.workType === WorkType.Office ? (
+                    <ApartmentIcon />
+                  ) : (
+                    <HomeIcon />
+                  )}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="pt-[1rem]">
+            <div className="text-center">
               <b>Weekend</b>
+              <div>
+                <WeekendIcon />
+              </div>
             </div>
           )}
         </div>

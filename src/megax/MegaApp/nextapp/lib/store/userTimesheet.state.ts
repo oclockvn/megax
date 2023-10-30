@@ -43,7 +43,7 @@ export const userTimesheetSlice = createSlice({
       const { loading, msg } = action.payload;
       state.loading = loading;
     },
-    reset: state => initialState,
+    reset: _ => initialState,
     navWeek: (state, action: PayloadAction<-1 | 0 | 1>) => {
       switch (action.payload) {
         case 0:
@@ -70,10 +70,14 @@ export const userTimesheetSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(fetchTimesheetThunk.fulfilled, (state, action) => {
-      state.loading = false;
-      state.timesheet = action.payload;
-    });
+    builder
+      .addCase(fetchTimesheetThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.timesheet = action.payload;
+      })
+      .addCase(applyTimesheetThunk.rejected, (state, _) => {
+        state.loading = false;
+      });
   },
 });
 
