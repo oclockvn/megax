@@ -13,12 +13,12 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
-import UserTabs from "@/components/admin/users/UserTabs";
 import { fetchBanksThunk } from "@/lib/store/banks.state";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { delay } from "@/lib/util";
 
+const UserTabs = dynamic(() => import("@/components/admin/users/UserTabs"));
 const UserDeviceList = dynamic(
   () => import("@/components/admin/users/UserDeviceList")
 );
