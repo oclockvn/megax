@@ -8,22 +8,55 @@ import HomeIcon from "@mui/icons-material/Home";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import React from "react";
 import dt from "@/lib/datetime";
-import { WorkDay, WorkStatus } from "@/lib/models/timesheet.model";
+import { Timesheet, WorkType } from "@/lib/models/timesheet.model";
 import { useAppDispatch } from "@/lib/store/state.hook";
-import { updateWeekStatus } from "@/lib/store/userTimesheet.state";
+import {
+  applyTimesheetThunk,
+  updateWeekStatus,
+} from "@/lib/store/userTimesheet.state";
+import { useConfirm } from "material-ui-confirm";
+import toast from "react-hot-toast";
 
 type SheetProps = {
-  days: WorkDay[];
+  timesheet: Timesheet[];
+  loading?: boolean;
 };
 
-export default function Sheet({ days }: SheetProps) {
+export default function Sheet({ timesheet, loading }: SheetProps) {
   const appDispatch = useAppDispatch();
+  const confirmation = useConfirm();
 
   const handleRegister = () => {
-    console.log(days);
+    confirmation({
+      title: "Register your timesheet",
+      description:
+        "You're able to update timesheet as long as it's in the future",
+      dialogProps: {
+        maxWidth: "xs",
+      },
+    })
+      .then(() => {
+        appDispatch(
+          applyTimesheetThunk({
+            timesheet: timesheet,
+          })
+        )
+          .unwrap()
+          .then(res => {
+            if (res.success) {
+              toast.success(`Timesheet applied successfully`);
+              return;
+            }
+
+            toast.error(`Could not apply timesheet. Error code: ${res.code}`);
+          });
+      })
+      .catch(() => {
+        /*ignore*/
+      });
   };
 
-  const handleUpdateStatus = (date: Date, status: WorkStatus) => {
+  const handleUpdateStatus = (date: Date, status: WorkType) => {
     appDispatch(
       updateWeekStatus({
         date,
@@ -40,34 +73,44 @@ export default function Sheet({ days }: SheetProps) {
           variant="contained"
           className="mb-[5px]"
           onClick={() => handleRegister()}
+          disabled={loading}
         >
-          Apply
+          APPLY
         </Button>
       </div>
 
-      {days.map(d => (
+      {timesheet.map(d => (
         <div
           key={d.date.getTime()}
           className="flex items-center justify-center"
         >
           {!dt.isWeekend(d.date) ? (
             <div>
+              <div
+                className={`text-center font-bold ${
+                  d.workType === WorkType.Office
+                    ? " text-blue-500"
+                    : "text-fuchsia-500"
+                }`}
+              >
+                {d.workType === WorkType.Office ? "Office" : "Remote"}
+              </div>
               <ToggleButtonGroup
-                value={d.status}
+                value={d.workType}
                 exclusive
                 onChange={(_, s) => handleUpdateStatus(d.date, s)}
                 aria-label="Work location"
                 color="primary"
               >
                 <ToggleButton
-                  value={WorkStatus.Office}
+                  value={WorkType.Office}
                   aria-label="left aligned"
                   title="Office"
                 >
                   <ApartmentIcon />
                 </ToggleButton>
                 <ToggleButton
-                  value={WorkStatus.Remote}
+                  value={WorkType.Remote}
                   aria-label="centered"
                   title="Working remotely"
                 >
@@ -76,7 +119,7 @@ export default function Sheet({ days }: SheetProps) {
               </ToggleButtonGroup>
             </div>
           ) : (
-            <div>
+            <div className="pt-[1rem]">
               <b>Weekend</b>
             </div>
           )}

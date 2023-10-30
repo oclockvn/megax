@@ -1,12 +1,12 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { WorkDay, WorkStatus } from "../models/timesheet.model";
-import { getUserTimesheet } from "../apis/user.api";
+import { Timesheet, WorkType } from "../models/timesheet.model";
+import { applyTimesheet, getTimesheet } from "../apis/user.api";
 import dt from "@/lib/datetime";
 
 export interface UserTimesheetState {
   loading: boolean;
   current: Date;
-  timesheet: WorkDay[];
+  timesheet: Timesheet[];
 }
 
 const initialState: UserTimesheetState = {
@@ -18,12 +18,20 @@ const initialState: UserTimesheetState = {
 export const fetchTimesheetThunk = createAsyncThunk(
   "user-timesheet/fetch",
   async (date: Date, thunkApi) => {
-    console.log("fetching timesheet");
     thunkApi.dispatch(setLoading({ loading: true }));
-    return await getUserTimesheet(date);
+    return await getTimesheet(date);
   }
 );
 
+export const applyTimesheetThunk = createAsyncThunk(
+  "user-timesheet/apply",
+  async (req: { timesheet: Timesheet[] }, thunkApi) => {
+    thunkApi.dispatch(setLoading({ loading: true }));
+    return await applyTimesheet(
+      req.timesheet?.filter(t => !dt.isWeekend(t.date))
+    );
+  }
+);
 export const userTimesheetSlice = createSlice({
   name: "userTimesheet",
   initialState,
@@ -51,13 +59,13 @@ export const userTimesheetSlice = createSlice({
     },
     updateWeekStatus: (
       state,
-      action: PayloadAction<{ date: Date; status: WorkStatus }>
+      action: PayloadAction<{ date: Date; status: WorkType }>
     ) => {
       state.loading = false;
       const { date, status } = action.payload;
-      const found = state.timesheet.find(t => dt.isSameDay(t.date, date))
+      const found = state.timesheet.find(t => dt.isSameDay(t.date, date));
       if (found) {
-        found.status = status;
+        found.workType = status;
       }
     },
   },

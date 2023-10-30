@@ -4,13 +4,14 @@ using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Exceptions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace MegaApp.Core.Services;
 
 public interface ITimesheetService
 {
     Task<Result<bool>> ApplyTimesheetAsync(int userId, TimesheetModel[] request);
-    Task<> ApplyTimesheetAsync(int userId, TimesheetModel[] request);
+    Task<TimesheetModel[]> GetTimesheetAsync(int userId, DateTime current);
 }
 
 internal class TimesheetService : ITimesheetService
@@ -97,4 +98,38 @@ internal class TimesheetService : ITimesheetService
     }
 
     private ApplicationDbContext UseDb() => dbContextFactory.CreateDbContext();
+
+    public async Task<TimesheetModel[]> GetTimesheetAsync(int userId, DateTime current)
+    {
+        var startOfWeek = current.StartOfWeek();
+        var endOfWeek = current.EndOfWeek();
+
+        using var db = UseDb();
+        var timesheets = await db.Timesheets
+            .Where(x => x.UserId == userId && startOfWeek.Date <= x.Date && x.Date <= endOfWeek.Date)
+            .Select(x => new TimesheetModel
+            {
+                Id = x.Id,
+                Date = x.Date,
+                WorkType = x.WorkType,
+            })
+            .ToArrayAsync();
+
+        List<TimesheetModel> result = new();
+        while (startOfWeek <= endOfWeek)
+        {
+            var match = timesheets.SingleOrDefault(t => t.Date.IsSameDay(startOfWeek))
+            ?? new TimesheetModel
+            {
+                Id = 0,
+                Date = startOfWeek,
+                WorkType = Enums.WorkType.Office
+            };
+
+            result.Add(match);
+            startOfWeek = startOfWeek.AddDays(1);
+        }
+
+        return result.ToArray();
+    }
 }

@@ -1,9 +1,10 @@
-export enum WorkStatus {
+export enum WorkType {
   Office = 1,
   Remote = 2,
 }
 
-export type WorkDay = {
+export type Timesheet = {
+  id?: number;
   date: Date;
-  status: WorkStatus;
+  workType: WorkType;
 };

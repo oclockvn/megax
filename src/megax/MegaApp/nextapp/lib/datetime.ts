@@ -47,8 +47,8 @@ const formatDate = (date: Date, formatter: string): string => {
   return format(date, formatter);
 };
 
-const formatToServer = (date: Date): string => {
-  return formatISO(date);
+const formatToServer = (date: Date, noOffset: boolean = false): string => {
+  return noOffset ? `${format(date, 'yyyy-MM-dd')}T${format(date, 'hh:mm:ss')}` : formatISO(date);
 };
 
 const parseFromServer = (isoDate: string): Date => {

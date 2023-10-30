@@ -8,13 +8,10 @@ import Sheet from "@/components/portal/timesheet/Sheet";
 import SheetNav from "@/components/portal/timesheet/SheetNav";
 import dt from "@/lib/datetime";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import {
-  fetchTimesheetThunk,
-  navWeek as moveWeek,
-} from "@/lib/store/userTimesheet.state";
+import { fetchTimesheetThunk } from "@/lib/store/userTimesheet.state";
 
 export default function Timesheet() {
-  const { timesheet, current } = useAppSelector(s => s.userTimesheet);
+  const { timesheet, current, loading } = useAppSelector(s => s.userTimesheet);
   const appDispatch = useAppDispatch();
 
   const week = dt.getWeekDays(current);
@@ -49,7 +46,7 @@ export default function Timesheet() {
         ))}
       </div>
 
-      {timesheet.length > 0 && <Sheet days={timesheet} />}
+      {timesheet.length > 0 && <Sheet timesheet={timesheet} loading={loading} />}
     </div>
   );
 }

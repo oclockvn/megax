@@ -36,4 +36,16 @@ public static class DateTimeExtension
 
         return true;
     }
+
+    public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek = DayOfWeek.Monday)
+    {
+        int diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
+        return dt.AddDays(-1 * diff).Date;
+    }
+
+    public static DateTime EndOfWeek(this DateTime dt, DayOfWeek startOfWeek = DayOfWeek.Monday)
+    {
+        var start = dt.StartOfWeek(startOfWeek);
+        return start.AddDays(6);
+    }
 }

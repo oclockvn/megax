@@ -9,4 +9,4 @@ public record TimesheetModel
     public WorkType WorkType { get; set; }
 }
 
-public record TimesheetRequest(TimesheetModel[] Timesheets);
+public record TimesheetRequest(TimesheetModel[] Timesheet);

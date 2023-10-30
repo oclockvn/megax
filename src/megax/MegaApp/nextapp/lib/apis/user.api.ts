@@ -11,7 +11,7 @@ import { AxiosError } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
 import dt from "@/lib/datetime";
-import { WorkDay, WorkStatus } from "../models/timesheet.model";
+import { Timesheet, WorkType } from "../models/timesheet.model";
 import { extractErrors } from "../helpers/response";
 
 export async function fetchUserList(filter: Partial<Filter>) {
@@ -122,23 +122,13 @@ export async function getCurrentUserRolesAndPermissions() {
   return res.data;
 }
 
-export async function getUserTimesheet(date: Date) {
-  const week = dt.getWeekDays(date);
-  const days = week.map(
-    d =>
-      ({
-        date: d,
-        status: WorkStatus.Office,
-      } as WorkDay)
-  );
-
-  return await Promise.resolve(days);
-}
-
-export async function applyTimesheet(days: WorkDay[]) {
+export async function applyTimesheet(timesheet: Timesheet[]) {
   return api
     .post<Result<boolean>>(`api/users/timesheet`, {
-      timesheets: days,
+      timesheet: timesheet.map(t => ({
+        ...t,
+        date: dt.formatToServer(t.date, true)
+      })),
     })
     .then(res => res.data)
     .catch((error: AxiosError) => {
@@ -151,4 +141,11 @@ export async function applyTimesheet(days: WorkDay[]) {
         code: err,
       } as Result<boolean>;
     });
+}
+
+export async function getTimesheet(current: Date) {
+  const res = await api.get<Timesheet[]>(
+    `api/users/timesheet?current=${dt.formatToServer(current, true)}`
+  );
+  return res.data;
 }

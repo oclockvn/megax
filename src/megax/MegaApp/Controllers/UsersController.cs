@@ -250,7 +250,21 @@ public class UsersController : ApplicationControllerBase
     [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ApplyTimesheet(TimesheetRequest request)
     {
-        var result = await timesheetService.ApplyTimesheetAsync(GetCurrentUserId(), request.Timesheets);
+        var result = await timesheetService.ApplyTimesheetAsync(GetCurrentUserId(), request.Timesheet);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// get timesheet of current user
+    /// </summary>
+    /// <param name="current">The current date of week</param>
+    /// <returns></returns>
+    [HttpGet("timesheet")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(TimesheetModel[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTimesheet([FromQuery] DateTime current)
+    {
+        var timesheet = await timesheetService.GetTimesheetAsync(GetCurrentUserId(), current);
+        return Ok(timesheet);
     }
 }
