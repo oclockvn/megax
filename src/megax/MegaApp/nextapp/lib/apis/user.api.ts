@@ -11,7 +11,7 @@ import { AxiosError } from "axios";
 import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
 import dt from "@/lib/datetime";
-import { Timesheet, WorkType } from "../models/timesheet.model";
+import { Timesheet, TimesheetViewModel, WorkType } from "../models/timesheet.model";
 import { extractErrors } from "../helpers/response";
 
 export async function fetchUserList(filter: Partial<Filter>) {
@@ -144,7 +144,7 @@ export async function applyTimesheet(timesheet: Timesheet[]) {
 }
 
 export async function getTimesheet(current: Date) {
-  const res = await api.get<Timesheet[]>(
+  const res = await api.get<TimesheetViewModel>(
     `api/users/timesheet?current=${dt.formatToServer(current, true)}`
   );
   return res.data;

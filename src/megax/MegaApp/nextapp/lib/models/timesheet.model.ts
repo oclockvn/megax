@@ -8,3 +8,8 @@ export type Timesheet = {
   date: Date;
   workType: WorkType;
 };
+
+export type TimesheetViewModel = {
+  timesheets: Timesheet[];
+  estimated: boolean;
+}

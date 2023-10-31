@@ -21,7 +21,7 @@ const SheetWeek = dynamic(
 );
 
 export default function Timesheet() {
-  const { timesheet, current, loading } = useAppSelector(s => s.timesheet);
+  const { timesheet, current, loading, estimated } = useAppSelector(s => s.timesheet);
   const appDispatch = useAppDispatch();
 
   const week = dt.getWeekDays(current);
@@ -39,7 +39,7 @@ export default function Timesheet() {
       <SheetWeek week={week} />
 
       {timesheet.length > 0 && (
-        <Sheet timesheet={timesheet} loading={loading} />
+        <Sheet timesheet={timesheet} loading={loading} estimated={estimated} />
       )}
     </div>
   );

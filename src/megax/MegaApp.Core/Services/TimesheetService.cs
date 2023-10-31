@@ -50,6 +50,19 @@ internal class TimesheetService : ITimesheetService
             throw new BusinessRuleViolationException("Timesheet does not support weekend");
         }
 
+        var endDate = request.OrderByDescending(x => x.Date).First().Date;
+        if (endDate < DateTime.Today) // past register
+        {
+            throw new BusinessRuleViolationException("Do not support past timesheet");
+        }
+
+        // only allow timesheet in next week
+        var maxDate = DateTime.Now.EndOfWeek().AddDays(7);
+        if (endDate > maxDate)
+        {
+            throw new BusinessRuleViolationException("Do not support leave in 2 weeks");
+        }
+
         using var db = UseDb();
         // only allow update or insert at once
         // it means, if any object is updating, the rest are updating
@@ -84,14 +97,17 @@ internal class TimesheetService : ITimesheetService
     private void InsertTimesheetInternal(TimesheetModel[] request, ApplicationDbContext db, int userId)
     {
         // do not register in the past
-        var beginning = request.OrderBy(x => x.Date).First();
-        if (beginning.Date < DateTime.Today)
-        {
-            throw new BusinessRuleViolationException("Do not support register timesheet in the past");
-        }
-        var week = ISOWeek.GetWeekOfYear(beginning.Date);
+        // var beginning = request.OrderBy(x => x.Date).First();
+        // if (beginning.Date < DateTime.Today)
+        // {
+        //     throw new BusinessRuleViolationException("Do not support register timesheet in the past");
+        // }
 
-        var entities = request.Select(x => new Timesheet
+        // only apply from now on
+        var range = request.Where(x => x.Date >= DateTime.Today).ToArray();
+        var week = ISOWeek.GetWeekOfYear(range[0].Date);
+
+        var entities = range.Select(x => new Timesheet
         {
             UserId = userId,
             Date = x.Date.Date,

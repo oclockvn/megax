@@ -7,12 +7,14 @@ export interface TimesheetState {
   loading: boolean;
   current: Date;
   timesheet: Timesheet[];
+  estimated: boolean;
 }
 
 const initialState: TimesheetState = {
   loading: false,
   current: new Date(),
   timesheet: [],
+  estimated: false,
 };
 
 export const fetchTimesheetThunk = createAsyncThunk(
@@ -73,10 +75,13 @@ export const timesheetSlice = createSlice({
     builder
       .addCase(fetchTimesheetThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.timesheet = action.payload;
+        const { timesheets, estimated } = action.payload;
+        state.timesheet = timesheets;
+        state.estimated = estimated;
       })
       .addCase(applyTimesheetThunk.fulfilled, (state, _) => {
         state.loading = false;
+        state.estimated = false;
       })
       .addCase(applyTimesheetThunk.rejected, (state, _) => {
         state.loading = false;

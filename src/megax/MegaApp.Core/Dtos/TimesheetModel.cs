@@ -10,3 +10,5 @@ public record TimesheetModel
 }
 
 public record TimesheetRequest(TimesheetModel[] Timesheet);
+
+public record TimesheetViewModel(TimesheetModel[] Timesheets, bool Estimated);

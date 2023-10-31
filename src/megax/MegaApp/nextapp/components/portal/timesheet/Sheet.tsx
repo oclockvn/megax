@@ -7,6 +7,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import HomeIcon from "@mui/icons-material/Home";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import WeekendIcon from "@mui/icons-material/Weekend";
+import InfoIcon from "@mui/icons-material/Info";
 import React from "react";
 import dt from "@/lib/datetime";
 import { Timesheet, WorkType } from "@/lib/models/timesheet.model";
@@ -18,14 +19,21 @@ import {
 import { useConfirm } from "material-ui-confirm";
 import toast from "react-hot-toast";
 import Avatar from "@mui/material/Avatar";
+import Tooltip from "@mui/material/Tooltip";
 
 type SheetProps = {
   timesheet: Timesheet[];
   loading?: boolean;
   username?: string;
+  estimated?: boolean;
 };
 
-export default function Sheet({ timesheet, username, loading }: SheetProps) {
+export default function Sheet({
+  timesheet,
+  username,
+  loading,
+  estimated,
+}: SheetProps) {
   const appDispatch = useAppDispatch();
   const confirmation = useConfirm();
 
@@ -81,14 +89,23 @@ export default function Sheet({ timesheet, username, loading }: SheetProps) {
         {readonly ? (
           <Avatar>QP</Avatar>
         ) : (
-          <Button
-            variant="contained"
-            className="mb-[5px]"
-            onClick={() => handleRegister()}
-            disabled={loading || !canApply}
-          >
-            APPLY
-          </Button>
+          <div>
+            {!!estimated && (
+              <Tooltip title="Based on previous timesheet" placement="right">
+                <div className="flex items-center text-sm">
+                  Estimated <InfoIcon color="primary" fontSize="small" />
+                </div>
+              </Tooltip>
+            )}
+            <Button
+              variant="contained"
+              className="mb-[5px]"
+              onClick={() => handleRegister()}
+              disabled={loading || !canApply}
+            >
+              APPLY
+            </Button>
+          </div>
         )}
       </div>
 

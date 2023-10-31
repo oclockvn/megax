@@ -37,7 +37,7 @@ public class TimesheetConfiguration : IEntityTypeConfiguration<Timesheet>
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("sysdatetimeoffset()");
 
-        builder.HasIndex(x => x.Date)
+        builder.HasIndex(x => new { x.UserId, x.Date })
             .IsUnique();
 
         builder.HasOne(x => x.User)

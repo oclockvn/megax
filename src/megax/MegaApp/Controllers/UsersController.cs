@@ -266,8 +266,10 @@ public class UsersController : ApplicationControllerBase
     {
         var userId = GetCurrentUserId();
         var timesheet = await timesheetService.GetTimesheetAsync(userId, current);
+        var estimated = timesheet.All(d => d.Id == 0);
+
         // load preference future timesheet if viewing future timesheet
-        if (current >= DateTime.Today && timesheet.All(d => d.Id == 0))
+        if (estimated && current >= DateTime.Today)
         {
             var lastTimesheet = await timesheetService.GetLastTimesheetAsync(userId);
             if (lastTimesheet.Length > 0)
@@ -279,6 +281,6 @@ public class UsersController : ApplicationControllerBase
             }
         }
 
-        return Ok(timesheet);
+        return Ok(new TimesheetViewModel(timesheet, estimated));
     }
 }
