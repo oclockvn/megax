@@ -1,26 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import dynamic from "next/dynamic";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import dynamic from "next/dynamic";
+import Grid from "@mui/material/Grid";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
-import Grid from "@mui/material/Grid";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import { fetchBanksThunk } from "@/lib/store/banks.state";
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
 import { delay } from "@/lib/util";
 
-const UserTabs = dynamic(() => import("@/components/admin/users/UserTabs"));
+const UserTabs = dynamic(() => import("@/components/admin/users/UserTabs"), {
+  ssr: false,
+});
 const UserDeviceList = dynamic(
-  () => import("@/components/admin/users/UserDeviceList")
+  () => import("@/components/admin/users/UserDeviceList"),
+  { ssr: false }
 );
 
 export default function UserPage({ params }: { params: { id: number } }) {

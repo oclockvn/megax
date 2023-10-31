@@ -37,6 +37,11 @@ internal class TimesheetService : ITimesheetService
             throw new BusinessRuleViolationException("Do not support insert and update timesheet at the same time");
         }
 
+        if (request.Select(x => x.Date).ToArray().IsConsecutive() == false)
+        {
+            throw new BusinessRuleViolationException("Timesheet is not consecutive");
+        }
+
         var hasWeekend = request.Any(d => new[] { DayOfWeek.Saturday, DayOfWeek.Sunday }.Contains(d.Date.DayOfWeek));
         if (hasWeekend)
         {
@@ -54,18 +59,6 @@ internal class TimesheetService : ITimesheetService
         }
         else
         {
-            if (request.Select(x => x.Date).ToArray().IsConsecutive() == false)
-            {
-                throw new BusinessRuleViolationException("Timesheet is not consecutive");
-            }
-
-            // do not register in the past
-            var beginning = request.OrderBy(x => x.Date).First();
-            if (beginning.Date < DateTime.Today)
-            {
-                throw new BusinessRuleViolationException("Do not support register timesheet in the past");
-            }
-
             InsertTimesheetInternal(request, db, userId);
         }
 
@@ -76,12 +69,9 @@ internal class TimesheetService : ITimesheetService
 
     private async Task UpdateTimesheetInternalAsync(TimesheetModel[] request, ApplicationDbContext db)
     {
+        // only support future register
         var ids = request.Where(x => x.Date >= DateTime.Today).Select(x => x.Id).ToArray();
         var timesheets = await db.Timesheets.Where(t => ids.Contains(t.Id)).ToListAsync();
-        // if (timesheets.Count != 5)
-        // {
-        //     throw new BusinessRuleViolationException($"Timesheet starts from {request[0].Date} does not have enough days");
-        // }
 
         foreach (var t in timesheets)
         {
@@ -91,6 +81,13 @@ internal class TimesheetService : ITimesheetService
 
     private void InsertTimesheetInternal(TimesheetModel[] request, ApplicationDbContext db, int userId)
     {
+        // do not register in the past
+        var beginning = request.OrderBy(x => x.Date).First();
+        if (beginning.Date < DateTime.Today)
+        {
+            throw new BusinessRuleViolationException("Do not support register timesheet in the past");
+        }
+
         var entities = request.Select(x => new Timesheet
         {
             UserId = userId,

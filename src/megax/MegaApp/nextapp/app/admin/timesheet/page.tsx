@@ -1,12 +1,18 @@
 "use client";
 
-import Sheet from "@/components/portal/timesheet/Sheet";
-import SheetNav from "@/components/portal/timesheet/SheetNav";
-import SheetWeek from "@/components/portal/timesheet/SheetWeek";
 import datetime from "@/lib/datetime";
 import { Timesheet, WorkType } from "@/lib/models/timesheet.model";
 import { useAppSelector } from "@/lib/store/state.hook";
 import { Divider } from "@mui/material";
+import dynamic from "next/dynamic";
+
+const Sheet = dynamic(() => import("@/components/portal/timesheet/Sheet"));
+const SheetNav = dynamic(
+  () => import("@/components/portal/timesheet/SheetNav")
+);
+const SheetWeek = dynamic(
+  () => import("@/components/portal/timesheet/SheetWeek")
+);
 
 export default function TimesheetPage() {
   const { timesheet, current, loading } = useAppSelector(s => s.timesheet);

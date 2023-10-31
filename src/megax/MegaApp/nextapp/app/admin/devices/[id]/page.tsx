@@ -1,22 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { usePathname, useRouter } from "next/navigation";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import Grid from "@mui/material/Grid";
 import {
   fetchDeviceDetailThunk,
   fetchDeviceTypesThunk,
 } from "@/lib/store/devices.state";
-import DeviceInfo from "@/components/admin/devices/DeviceInfo";
-import DeviceOwnerList from "@/components/admin/devices/DeviceOwnerList";
 import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+
+const DeviceInfo = dynamic(
+  () => import("@/components/admin/devices/DeviceInfo"),
+  { ssr: false }
+);
+const DeviceOwnerList = dynamic(
+  () => import("@/components/admin/devices/DeviceOwnerList"),
+  { ssr: false }
+);
 
 export default function DevicePage({ params }: { params: { id: number } }) {
   const pathname = usePathname();

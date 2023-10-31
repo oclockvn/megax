@@ -1,23 +1,33 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { Filter, PageModel } from "@/lib/models/common.model";
-import AddIcon from "@mui/icons-material/Add";
-
-import CustomPagination from "@/components/grid/CustomPagination";
-import CommonSearch from "@/components/grid/CommonSearch";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { fetchDevicesThunk } from "@/lib/store/devices.state";
+
+import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
+import AddIcon from "@mui/icons-material/Add";
+
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckIcon from "@mui/icons-material/Check";
+
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import { Filter, PageModel } from "@/lib/models/common.model";
+import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import dateLib from "@/lib/datetime";
 import { formatMoney } from "@/lib/formatter";
+
+const CustomPagination = dynamic(
+  () => import("@/components/grid/CustomPagination"),
+  { ssr: false }
+);
+
+const CommonSearch = dynamic(() => import("@/components/grid/CommonSearch"), {
+  ssr: false,
+});
 
 export default function DeviceListPage() {
   const pathname = usePathname();

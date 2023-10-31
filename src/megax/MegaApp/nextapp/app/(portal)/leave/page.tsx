@@ -1,11 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
-import LeaveCard from "@/components/portal/leave/LeaveCard";
-import LeaveHistory from "@/components/portal/leave/LeaveHistory";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { useEffect, useState } from "react";
 import { fetchLeaveSummaryThunk } from "@/lib/store/leave.state";
@@ -16,10 +15,23 @@ import {
   LeaveTime,
   LeaveType,
 } from "@/lib/models/leave.model";
-import LeaveForm from "@/components/portal/leave/LeaveForm";
 import { makeArrOf } from "@/lib/helpers/array";
 import dt from "@/lib/datetime";
-import LeaveCardLoading from "@/components/common/skeletons/LeaveCardLoading";
+
+const LeaveCard = dynamic(() => import("@/components/portal/leave/LeaveCard"), {
+  ssr: false,
+});
+const LeaveHistory = dynamic(
+  () => import("@/components/portal/leave/LeaveHistory"),
+  { ssr: false }
+);
+const LeaveForm = dynamic(() => import("@/components/portal/leave/LeaveForm"), {
+  ssr: false,
+});
+const LeaveCardLoading = dynamic(
+  () => import("@/components/common/skeletons/LeaveCardLoading"),
+  { ssr: false }
+);
 
 export default function LeavePage() {
   const appDispatch = useAppDispatch();
@@ -120,7 +132,8 @@ export default function LeavePage() {
           <div className="flex justify-between items-center text-lg font-bold mt-4">
             <h3 className="ps-[160px]">Leave History</h3>
             <div className="me-8">
-              (Annual: Taken {takenAnnual}/{capacity} total - Paid: {takenPaid} taken)
+              (Annual: Taken {takenAnnual}/{capacity} total - Paid: {takenPaid}{" "}
+              taken)
             </div>
           </div>
           <LeaveHistory items={pastItems} loading={loading} />
