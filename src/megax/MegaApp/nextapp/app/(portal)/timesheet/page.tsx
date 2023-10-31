@@ -23,16 +23,12 @@ const SheetWeek = dynamic(
 export default function Timesheet() {
   const { timesheet, current, loading } = useAppSelector(s => s.timesheet);
   const appDispatch = useAppDispatch();
-  const loadRef = useRef(false);
 
   const week = dt.getWeekDays(current);
 
   useEffect(() => {
-    if (!loadRef.current) {
-      loadRef.current = true;
-      appDispatch(fetchTimesheetThunk(current));
-    }
-  }, [appDispatch, current, loadRef.current]);
+    appDispatch(fetchTimesheetThunk(current));
+  }, [appDispatch, current]);
 
   return (
     <div className="container mx-auto">
