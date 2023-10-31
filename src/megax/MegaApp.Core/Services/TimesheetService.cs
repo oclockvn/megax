@@ -4,6 +4,7 @@ using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MegaApp.Core.Db.Entities;
 using MegaApp.Core.Exceptions;
+using System.Globalization;
 
 namespace MegaApp.Core.Services;
 
@@ -87,12 +88,14 @@ internal class TimesheetService : ITimesheetService
         {
             throw new BusinessRuleViolationException("Do not support register timesheet in the past");
         }
+        var week = ISOWeek.GetWeekOfYear(beginning.Date);
 
         var entities = request.Select(x => new Timesheet
         {
             UserId = userId,
             Date = x.Date.Date,
             WorkType = x.WorkType,
+            Week = week,
         });
 
         db.Timesheets.AddRange(entities);

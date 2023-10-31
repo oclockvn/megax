@@ -11,6 +11,10 @@ public class Timesheet : ICreatedByEntity, IUpdatedByEntity
 
     public DateTime Date { get; set; }
     public WorkType WorkType { get; set; }
+    /// <summary>
+    /// Week of year
+    /// </summary>
+    public int Week { get; set; }
 
     public int UserId { get; set; }
     public User User { get; set; }

@@ -265,6 +265,8 @@ public class UsersController : ApplicationControllerBase
     public async Task<IActionResult> GetTimesheet([FromQuery] DateTime current)
     {
         var timesheet = await timesheetService.GetTimesheetAsync(GetCurrentUserId(), current);
+        // load preference future timesheet
+        // current.Wee
         return Ok(timesheet);
     }
 }
