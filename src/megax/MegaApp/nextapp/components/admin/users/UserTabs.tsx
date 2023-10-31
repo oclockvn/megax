@@ -9,8 +9,9 @@ import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Card from "@mui/material/Card";
+import CircularProgress from "@mui/material/CircularProgress";
 
-const UserInfo = dynamic(() => import("./UserInfo"), { ssr: false });
+const UserInfo = dynamic(() => import("./UserInfo"), { ssr: false, loading: () => <div><CircularProgress /></div> });
 const UserContactList = dynamic(() => import("./UserContactList"), {
   ssr: false,
 });

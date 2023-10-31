@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,6 +41,7 @@ export default function DeviceListPage() {
     page: filter.page || 0,
     pageSize: filter.pageSize || 100,
   };
+  const loadRef = useRef(false);
 
   const columns: GridColDef[] = [
     {
@@ -138,8 +139,11 @@ export default function DeviceListPage() {
 
   // for initial load
   useEffect(() => {
-    onPaging(new PageModel());
-  }, []);
+    if (!loadRef.current) {
+      loadRef.current = true;
+      onPaging(new PageModel());
+    }
+  }, [loadRef.current]);
 
   return (
     <div className="p-4">

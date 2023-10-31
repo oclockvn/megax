@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchUsersThunk } from "@/lib/store/users.state";
@@ -20,6 +20,7 @@ const CommonSearch = dynamic(() => import("@/components/grid/CommonSearch"));
 export default function UserListPage() {
   const pathname = usePathname();
   const appDispatch = useAppDispatch();
+  const loadRef = useRef(false);
   const { loading, pagedUsers } = useAppSelector(s => s.users);
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
@@ -93,11 +94,6 @@ export default function UserListPage() {
   useEffect(() => {
     appDispatch(fetchUsersThunk(filter));
   }, [filter]);
-
-  // for initial load
-  useEffect(() => {
-    onPaging(new PageModel());
-  }, []);
 
   return (
     <div className="p-4">

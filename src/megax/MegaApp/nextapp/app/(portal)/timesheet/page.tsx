@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Divider from "@mui/material/Divider";
 
 import dt from "@/lib/datetime";
@@ -23,12 +23,16 @@ const SheetWeek = dynamic(
 export default function Timesheet() {
   const { timesheet, current, loading } = useAppSelector(s => s.timesheet);
   const appDispatch = useAppDispatch();
+  const loadRef = useRef(false);
 
   const week = dt.getWeekDays(current);
 
   useEffect(() => {
-    appDispatch(fetchTimesheetThunk(current));
-  }, [appDispatch, current]);
+    if (!loadRef.current) {
+      loadRef.current = true;
+      appDispatch(fetchTimesheetThunk(current));
+    }
+  }, [appDispatch, current, loadRef.current]);
 
   return (
     <div className="container mx-auto">
