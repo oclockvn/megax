@@ -8,7 +8,7 @@ import bankStore from "./banks.state";
 import taskStore from "./tasks.state";
 import projectStore from "./projects.state";
 import leaveStore from "./leave.state";
-import userTimesheetState from "./userTimesheet.state";
+import timesheetState from "./timesheet.state";
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +21,7 @@ export const store = configureStore({
     tasks: taskStore,
     projects: projectStore,
     leaves: leaveStore,
-    userTimesheet: userTimesheetState
+    timesheet: timesheetState
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

@@ -6,7 +6,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import HomeIcon from "@mui/icons-material/Home";
 import ApartmentIcon from "@mui/icons-material/Apartment";
-import WeekendIcon from '@mui/icons-material/Weekend';
+import WeekendIcon from "@mui/icons-material/Weekend";
 import React from "react";
 import dt from "@/lib/datetime";
 import { Timesheet, WorkType } from "@/lib/models/timesheet.model";
@@ -14,16 +14,18 @@ import { useAppDispatch } from "@/lib/store/state.hook";
 import {
   applyTimesheetThunk,
   updateWeekStatus,
-} from "@/lib/store/userTimesheet.state";
+} from "@/lib/store/timesheet.state";
 import { useConfirm } from "material-ui-confirm";
 import toast from "react-hot-toast";
+import Avatar from "@mui/material/Avatar";
 
 type SheetProps = {
   timesheet: Timesheet[];
   loading?: boolean;
+  username?: string;
 };
 
-export default function Sheet({ timesheet, loading }: SheetProps) {
+export default function Sheet({ timesheet, username, loading }: SheetProps) {
   const appDispatch = useAppDispatch();
   const confirmation = useConfirm();
 
@@ -67,19 +69,27 @@ export default function Sheet({ timesheet, loading }: SheetProps) {
   };
 
   const canApply = timesheet.some(d => dt.isFuture(d.date));
+  const readonly = !!username;
 
   return (
     <div className="grid grid-cols-8 mt-4">
-      <div className="flex self-end justify-center">
-        {/* <Avatar>QP</Avatar> */}
-        <Button
-          variant="contained"
-          className="mb-[5px]"
-          onClick={() => handleRegister()}
-          disabled={loading || !canApply}
-        >
-          APPLY
-        </Button>
+      <div
+        className={`flex justify-center ${
+          readonly ? "items-center" : "self-end"
+        }`}
+      >
+        {readonly ? (
+          <Avatar>QP</Avatar>
+        ) : (
+          <Button
+            variant="contained"
+            className="mb-[5px]"
+            onClick={() => handleRegister()}
+            disabled={loading || !canApply}
+          >
+            APPLY
+          </Button>
+        )}
       </div>
 
       {timesheet.map(d => (
@@ -98,7 +108,7 @@ export default function Sheet({ timesheet, loading }: SheetProps) {
               >
                 {d.workType === WorkType.Office ? "Office" : "Remote"}
               </div>
-              {dt.isFuture(d.date) ? (
+              {dt.isFuture(d.date) && !readonly ? (
                 <ToggleButtonGroup
                   value={d.workType}
                   exclusive
@@ -133,8 +143,8 @@ export default function Sheet({ timesheet, loading }: SheetProps) {
             </div>
           ) : (
             <div className="text-center">
-              <b>Weekend</b>
-              <div>
+              <span>Weekend</span>
+              <div className="h-[48px] flex items-center justify-center">
                 <WeekendIcon />
               </div>
             </div>

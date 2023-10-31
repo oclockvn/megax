@@ -8,10 +8,11 @@ import Sheet from "@/components/portal/timesheet/Sheet";
 import SheetNav from "@/components/portal/timesheet/SheetNav";
 import dt from "@/lib/datetime";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { fetchTimesheetThunk } from "@/lib/store/userTimesheet.state";
+import { fetchTimesheetThunk } from "@/lib/store/timesheet.state";
+import SheetWeek from "@/components/portal/timesheet/SheetWeek";
 
 export default function Timesheet() {
-  const { timesheet, current, loading } = useAppSelector(s => s.userTimesheet);
+  const { timesheet, current, loading } = useAppSelector(s => s.timesheet);
   const appDispatch = useAppDispatch();
 
   const week = dt.getWeekDays(current);
@@ -26,25 +27,7 @@ export default function Timesheet() {
 
       <Divider className="my-4" />
 
-      <div className="grid grid-cols-8">
-        <div>{/* empty */}</div>
-
-        {week.map(d => (
-          <div key={d.getTime()} className="flex items-center justify-center">
-            <div className="text-center">
-              <div className={dt.isToday(d) ? "text-blue-500" : ""}>
-                {dt.formatDate(d, "eee")}
-              </div>
-              <Avatar
-                sizes="30"
-                className={dt.isToday(d) ? "bg-blue-500 text-white" : ""}
-              >
-                {dt.formatDate(d, "dd")}
-              </Avatar>
-            </div>
-          </div>
-        ))}
-      </div>
+      <SheetWeek week={week} />
 
       {timesheet.length > 0 && <Sheet timesheet={timesheet} loading={loading} />}
     </div>

@@ -3,20 +3,20 @@ import { Timesheet, WorkType } from "../models/timesheet.model";
 import { applyTimesheet, getTimesheet } from "../apis/user.api";
 import dt from "@/lib/datetime";
 
-export interface UserTimesheetState {
+export interface TimesheetState {
   loading: boolean;
   current: Date;
   timesheet: Timesheet[];
 }
 
-const initialState: UserTimesheetState = {
+const initialState: TimesheetState = {
   loading: false,
   current: new Date(),
   timesheet: [],
 };
 
 export const fetchTimesheetThunk = createAsyncThunk(
-  "user-timesheet/fetch",
+  "timesheet/fetch",
   async (date: Date, thunkApi) => {
     thunkApi.dispatch(setLoading({ loading: true }));
     return await getTimesheet(date);
@@ -24,7 +24,7 @@ export const fetchTimesheetThunk = createAsyncThunk(
 );
 
 export const applyTimesheetThunk = createAsyncThunk(
-  "user-timesheet/apply",
+  "timesheet/apply",
   async (req: { timesheet: Timesheet[] }, thunkApi) => {
     thunkApi.dispatch(setLoading({ loading: true }));
     return await applyTimesheet(
@@ -32,8 +32,8 @@ export const applyTimesheetThunk = createAsyncThunk(
     );
   }
 );
-export const userTimesheetSlice = createSlice({
-  name: "userTimesheet",
+export const timesheetSlice = createSlice({
+  name: "timesheet",
   initialState,
   reducers: {
     setLoading: (
@@ -85,6 +85,6 @@ export const userTimesheetSlice = createSlice({
 });
 
 export const { setLoading, reset, updateWeekStatus, navWeek } =
-  userTimesheetSlice.actions;
+  timesheetSlice.actions;
 
-export default userTimesheetSlice.reducer;
+export default timesheetSlice.reducer;
