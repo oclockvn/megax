@@ -10,6 +10,7 @@ namespace MegaApp.Core.Services;
 
 public interface ITimesheetService
 {
+    Task<TimesheetModel[]> GetLastTimesheetAsync(int userId);
     Task<Result<bool>> ApplyTimesheetAsync(int userId, TimesheetModel[] request);
     Task<TimesheetModel[]> GetTimesheetAsync(int userId, DateTime current);
 }
@@ -105,12 +106,11 @@ internal class TimesheetService : ITimesheetService
 
     public async Task<TimesheetModel[]> GetTimesheetAsync(int userId, DateTime current)
     {
-        var startOfWeek = current.StartOfWeek();
-        var endOfWeek = current.EndOfWeek();
+        var week = ISOWeek.GetWeekOfYear(current);
 
         using var db = UseDb();
         var timesheets = await db.Timesheets
-            .Where(x => x.UserId == userId && startOfWeek.Date <= x.Date && x.Date <= endOfWeek.Date)
+            .Where(x => x.UserId == userId && week == x.Week)
             .Select(x => new TimesheetModel
             {
                 Id = x.Id,
@@ -119,7 +119,10 @@ internal class TimesheetService : ITimesheetService
             })
             .ToArrayAsync();
 
+        var startOfWeek = current.StartOfWeek();
+        var endOfWeek = current.EndOfWeek();
         List<TimesheetModel> result = new();
+
         while (startOfWeek <= endOfWeek)
         {
             var match = timesheets.SingleOrDefault(t => t.Date.IsSameDay(startOfWeek))
@@ -135,5 +138,25 @@ internal class TimesheetService : ITimesheetService
         }
 
         return result.ToArray();
+    }
+
+    public async Task<TimesheetModel[]> GetLastTimesheetAsync(int userId)
+    {
+        using var db = UseDb();
+        // we should get 5 days in a week
+        // but this also should work
+        var timesheet = await db.Timesheets
+            .OrderByDescending(x => x.Week)
+            .Where(x => x.UserId == userId)
+            .Select(x => new TimesheetModel
+            {
+                Id = x.Id,
+                Date = x.Date,
+                WorkType = x.WorkType,
+            })
+            .Take(5)
+            .ToArrayAsync();
+
+        return timesheet;
     }
 }

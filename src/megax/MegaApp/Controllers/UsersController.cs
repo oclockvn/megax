@@ -264,9 +264,21 @@ public class UsersController : ApplicationControllerBase
     [ProducesResponseType(typeof(TimesheetModel[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTimesheet([FromQuery] DateTime current)
     {
-        var timesheet = await timesheetService.GetTimesheetAsync(GetCurrentUserId(), current);
-        // load preference future timesheet
-        // current.Wee
+        var userId = GetCurrentUserId();
+        var timesheet = await timesheetService.GetTimesheetAsync(userId, current);
+        // load preference future timesheet if viewing future timesheet
+        if (current >= DateTime.Today && timesheet.All(d => d.Id == 0))
+        {
+            var lastTimesheet = await timesheetService.GetLastTimesheetAsync(userId);
+            if (lastTimesheet.Length > 0)
+            {
+                foreach (var t in timesheet)
+                {
+                    t.WorkType = lastTimesheet.FirstOrDefault(x => t.Date.IsSameWeekDay(x.Date))?.WorkType ?? t.WorkType;
+                }
+            }
+        }
+
         return Ok(timesheet);
     }
 }

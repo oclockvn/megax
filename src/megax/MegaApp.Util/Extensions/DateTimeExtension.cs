@@ -9,6 +9,11 @@ public static class DateTimeExtension
 
     public static DateTimeOffset ToEndOfDate(this DateTimeOffset now) => now.Date.ToEndOfDate();
 
+    public static bool IsSameWeekDay(this DateTime d1, DateTime d2)
+    {
+        return d1.DayOfWeek == d2.DayOfWeek;
+    }
+
     public static bool IsSameDay(this DateTime d1, DateTime d2)
     {
         return d1.Date == d2.Date;
