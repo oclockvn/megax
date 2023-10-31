@@ -28,6 +28,7 @@ import {
   isFuture,
   isAfter,
   isBefore,
+  isToday,
 } from "date-fns";
 
 const startOfDay = (date: Date): Date => {
@@ -46,8 +47,8 @@ const formatDate = (date: Date, formatter: string): string => {
   return format(date, formatter);
 };
 
-const formatToServer = (date: Date): string => {
-  return formatISO(date);
+const formatToServer = (date: Date, noOffset: boolean = false): string => {
+  return noOffset ? `${format(date, 'yyyy-MM-dd')}T${format(date, 'hh:mm:ss')}` : formatISO(date);
 };
 
 const parseFromServer = (isoDate: string): Date => {
@@ -101,6 +102,25 @@ const getNextWeekDay = (from: Date) => {
   return next;
 };
 
+const getWeekDays = (curr: Date) => {
+  const begin = startOfWeek(curr, {
+    weekStartsOn: 1, // monday
+  });
+  const end = endOfWeek(curr, {
+    weekStartsOn: 1,
+  });
+
+  let week = [];
+  let next = begin;
+
+  while (next.getTime() < end.getTime()) {
+    week.push(next);
+    next = addDays(next, 1);
+  }
+
+  return week;
+};
+
 export default {
   todayAt,
   formatDate,
@@ -133,6 +153,8 @@ export default {
   isFuture,
   isAfter,
   isBefore,
+  isToday,
+  getWeekDays,
 };
 
 // export function handleDates(body: any) {

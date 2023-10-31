@@ -1,21 +1,22 @@
 "use client";
 
-import React from "react";
-
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
+import React, { useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Grid from "@mui/material/Grid";
 
 import { useAppDispatch } from "@/lib/store/state.hook";
-import Grid from "@mui/material/Grid";
 import {
   fetchDeviceTypesThunk,
   reset as resetDevice,
 } from "@/lib/store/devices.state";
-import DeviceInfo from "@/components/admin/devices/DeviceInfo";
 import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
+
+const DeviceInfo  = dynamic(() => import( "@/components/admin/devices/DeviceInfo"));
 
 export default function NewDevicePage() {
   const pathname = usePathname();

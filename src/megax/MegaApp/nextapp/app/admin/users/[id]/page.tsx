@@ -1,22 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import dynamic from "next/dynamic";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { fetchUserDetailThunk } from "@/lib/store/users.state";
 import Grid from "@mui/material/Grid";
-import UserDeviceList from "@/components/admin/users/UserDeviceList";
-import { fetchDevicesThunk } from "@/lib/store/devices.state";
-import UserTabs from "@/components/admin/users/UserTabs";
-import { fetchBanksThunk } from "@/lib/store/banks.state";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
+import { fetchDevicesThunk } from "@/lib/store/devices.state";
+import { fetchBanksThunk } from "@/lib/store/banks.state";
+import { delay } from "@/lib/util";
+
+const UserTabs = dynamic(() => import("@/components/admin/users/UserTabs"), {
+  ssr: false,
+});
+const UserDeviceList = dynamic(
+  () => import("@/components/admin/users/UserDeviceList"),
+  { ssr: false }
+);
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -24,13 +32,19 @@ export default function UserPage({ params }: { params: { id: number } }) {
   const { user } = useAppSelector(s => s.users);
 
   useEffect(() => {
-    appDispatch(fetchUserDetailThunk(params.id));
-    appDispatch(fetchDevicesThunk());
-    appDispatch(fetchBanksThunk({ pageSize: 1000 }));
+    async function load() {
+      appDispatch(fetchUserDetailThunk(params.id));
+      await delay(100);
+      appDispatch(fetchDevicesThunk());
+      await delay(100);
+      appDispatch(fetchBanksThunk({ pageSize: 1000 }));
+    }
 
-    // return () => {
-    //   appDispatch(clearUser());
-    // };
+    load();
+
+    return () => {
+      appDispatch(clearUser());
+    };
   }, [params.id]);
 
   const hasAccount = Number(user?.accountId) > 0;
