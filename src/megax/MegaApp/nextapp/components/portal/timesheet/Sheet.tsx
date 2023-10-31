@@ -8,6 +8,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import WeekendIcon from "@mui/icons-material/Weekend";
 import InfoIcon from "@mui/icons-material/Info";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import React from "react";
 import dt from "@/lib/datetime";
 import { Timesheet, WorkType } from "@/lib/models/timesheet.model";
@@ -79,6 +80,33 @@ export default function Sheet({
   const canApply = timesheet.some(d => dt.isFuture(d.date));
   const readonly = !!username;
 
+  const SheetAction = (d: Timesheet) => {
+    return (
+      <ToggleButtonGroup
+        value={d.workType}
+        exclusive
+        onChange={(_, s) => handleUpdateStatus(d.date, s)}
+        aria-label="Work location"
+        color="primary"
+      >
+        <ToggleButton
+          value={WorkType.Office}
+          aria-label="left aligned"
+          title="Office"
+        >
+          <ApartmentIcon />
+        </ToggleButton>
+        <ToggleButton
+          value={WorkType.Remote}
+          aria-label="centered"
+          title="Working remotely"
+        >
+          <HomeIcon />
+        </ToggleButton>
+      </ToggleButtonGroup>
+    );
+  };
+
   return (
     <div className="grid grid-cols-8 mt-4">
       <div
@@ -115,49 +143,32 @@ export default function Sheet({
           className="flex items-center justify-center"
         >
           {!dt.isWeekend(d.date) ? (
-            <div>
-              <div
-                className={`text-center font-bold ${
-                  d.workType === WorkType.Office
-                    ? " text-blue-500"
-                    : "text-fuchsia-500"
-                }`}
-              >
-                {d.workType === WorkType.Office ? "Office" : "Remote"}
-              </div>
-              {dt.isFuture(d.date) && !readonly ? (
-                <ToggleButtonGroup
-                  value={d.workType}
-                  exclusive
-                  onChange={(_, s) => handleUpdateStatus(d.date, s)}
-                  aria-label="Work location"
-                  color="primary"
+            loading ? (
+              <MoreHorizIcon />
+            ) : (
+              <div>
+                <div
+                  className={`text-center font-bold ${
+                    d.workType === WorkType.Office
+                      ? "text-blue-500"
+                      : "text-fuchsia-500"
+                  }`}
                 >
-                  <ToggleButton
-                    value={WorkType.Office}
-                    aria-label="left aligned"
-                    title="Office"
-                  >
-                    <ApartmentIcon />
-                  </ToggleButton>
-                  <ToggleButton
-                    value={WorkType.Remote}
-                    aria-label="centered"
-                    title="Working remotely"
-                  >
-                    <HomeIcon />
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              ) : (
-                <div className="flex items-center justify-center h-[48px] text-blue-500">
-                  {d.workType === WorkType.Office ? (
-                    <ApartmentIcon />
-                  ) : (
-                    <HomeIcon />
-                  )}
+                  {d.workType === WorkType.Office ? "Office" : "Remote"}
                 </div>
-              )}
-            </div>
+                {dt.isFuture(d.date) && !readonly ? (
+                  <SheetAction {...d} />
+                ) : (
+                  <div className="flex items-center justify-center h-[48px] text-blue-500">
+                    {d.workType === WorkType.Office ? (
+                      <ApartmentIcon />
+                    ) : (
+                      <HomeIcon />
+                    )}
+                  </div>
+                )}
+              </div>
+            )
           ) : (
             <div className="text-center">
               <span>Weekend</span>

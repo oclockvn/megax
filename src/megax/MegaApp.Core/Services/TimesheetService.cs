@@ -33,7 +33,9 @@ internal class TimesheetService : ITimesheetService
             throw new BusinessRuleViolationException("Timesheet must have max 5 days");
         }
 
-        var invalidRequest = request.Any(r => r.Id > 0) && request.Any(r => r.Id == 0);
+        var today = DateTime.Today;
+        // allow submit in the middle of the week but skip the past dates
+        var invalidRequest = request.Any(r => r.Id > 0) && request.Any(r => r.Id == 0 && r.Date >= today);
         if (invalidRequest)
         {
             throw new BusinessRuleViolationException("Do not support insert and update timesheet at the same time");
@@ -51,7 +53,7 @@ internal class TimesheetService : ITimesheetService
         }
 
         var endDate = request.OrderByDescending(x => x.Date).First().Date;
-        if (endDate < DateTime.Today) // past register
+        if (endDate < today) // past register
         {
             throw new BusinessRuleViolationException("Do not support past timesheet");
         }
@@ -67,7 +69,8 @@ internal class TimesheetService : ITimesheetService
         // only allow update or insert at once
         // it means, if any object is updating, the rest are updating
         // otherwise, all date are inserting
-        var isUpdate = request[0].Id > 0;
+        request = request.Where(r => r.Date >= today).ToArray();
+        var isUpdate = request.Any(d => d.Id > 0);
         if (isUpdate)
         {
             await UpdateTimesheetInternalAsync(request, db);
