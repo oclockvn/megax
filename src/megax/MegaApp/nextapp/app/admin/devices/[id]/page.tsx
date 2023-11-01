@@ -16,12 +16,13 @@ import {
 import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 
-const DeviceInfo = dynamic(
-  () => import("@/components/admin/devices/DeviceInfo"),
+const DeviceOwnerTimeline = dynamic(
+  () => import("@/components/admin/devices/DeviceOwnerTimeline"),
   { ssr: false }
 );
-const DeviceOwnerList = dynamic(
-  () => import("@/components/admin/devices/DeviceOwnerList"),
+
+const DeviceInfo = dynamic(
+  () => import("@/components/admin/devices/DeviceInfo"),
   { ssr: false }
 );
 
@@ -64,7 +65,8 @@ export default function DevicePage({ params }: { params: { id: number } }) {
           </Grid>
 
           <Grid item xs={4}>
-            {params.id > 0 && <DeviceOwnerList deviceId={params.id} />}
+            {/* {params.id > 0 && <DeviceOwnerList deviceId={params.id} />} */}
+            {params.id > 0 && <DeviceOwnerTimeline deviceId={params.id} />}
           </Grid>
         </Grid>
       </div>

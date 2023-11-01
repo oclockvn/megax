@@ -9,13 +9,13 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
+import Chip from "@mui/material/Chip";
 import LeaveCard from "@/components/portal/leave/LeaveCard";
 import {
   Leave,
   LeaveStatus,
   LeaveStatusMapping,
 } from "@/lib/models/leave.model";
-import Chip from "@mui/material/Chip";
 import LeaveCardLoading from "@/components/common/skeletons/LeaveCardLoading";
 
 export type LeaveHistoryProps = {
