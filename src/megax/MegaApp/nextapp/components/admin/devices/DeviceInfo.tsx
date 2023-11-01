@@ -18,6 +18,8 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import toast from "react-hot-toast";
 import Alert from "@mui/material/Alert";
 import ClearIcon from "@mui/icons-material/Clear";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import BlockIcon from "@mui/icons-material/Block";
 import { Device } from "@/lib/models/device.model";
 import {
   updateDeviceDetailThunk,
@@ -25,21 +27,32 @@ import {
   clearError,
   addDeviceThunk,
   setLoadingState,
-  deleteDeviceThunk,
+  toggleDeviceThunk,
 } from "@/lib/store/devices.state";
 import { useConfirm } from "material-ui-confirm";
+import Chip from "@mui/material/Chip";
+import {
+  usePopupState,
+  bindTrigger,
+  bindMenu,
+} from "material-ui-popup-state/hooks";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import CheckIcon from "@mui/icons-material/Check";
 
 declare type DeviceInfoProps = {
   device?: Device;
   onAdded?: (id: number) => void;
-  onDeleted?: () => void;
+  // onDeleted?: () => void;
 };
 
 export default function DeviceInfo({
   device,
   onAdded,
-  onDeleted,
-}: DeviceInfoProps) {
+}: // onDeleted,
+DeviceInfoProps) {
   const appDispatch = useAppDispatch();
   const confirm = useConfirm();
   const { loading, loadingState, error, deviceTypes } = useAppSelector(
@@ -98,22 +111,23 @@ export default function DeviceInfo({
     }
   };
 
-  const handleDeleteDevice = async () => {
+  const handleToggleDevice = async (disable: boolean) => {
     const id = Number(device?.id);
-    const result = await appDispatch(deleteDeviceThunk(id)).unwrap();
+    const result = await appDispatch(toggleDeviceThunk(id)).unwrap();
 
     if (result.success) {
-      toast.success("Successfully disabled");
-      onDeleted && onDeleted();
+      toast.success(`Successfully ${disable ? "disabled" : "enabled"}`);
+      // onDeleted && onDeleted();
     }
   };
 
-  const confirmDelete = () => {
+  const confirmAction = (disable: boolean) => {
     confirm({
-      description: "Disable this device?",
+      description: `${disable ? "Disable" : "Enable"} this device?`,
       dialogProps: { maxWidth: "xs" },
     })
-      .then(handleDeleteDevice)
+      .then(() => handleToggleDevice(disable))
+      .then(() => popupState.close())
       .catch(() => {
         /* swallow error */
       });
@@ -129,11 +143,52 @@ export default function DeviceInfo({
     ),
   };
 
+  const popupState = usePopupState({
+    variant: "popover",
+    popupId: "device-menu",
+  });
+
+  const isDisabled = device?.disabled === true;
+
   return (
     <>
       <FormContainer formContext={formContext}>
         <Card>
-          <CardHeader title={<h4>Device detail</h4>} />
+          <CardHeader
+            title={<h4>Device detail</h4>}
+            action={
+              <>
+                {isDisabled && (
+                  <Chip label="Device is disabled" color="warning" />
+                )}
+
+                <IconButton {...bindTrigger(popupState)}>
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  {...bindMenu(popupState)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                  transformOrigin={{ vertical: "top", horizontal: "left" }}
+                >
+                  {isDisabled ? (
+                    <MenuItem onClick={() => confirmAction(false)} className="!bg-green-500 text-white">
+                      <ListItemIcon>
+                        <CheckIcon className="text-white" />
+                      </ListItemIcon>
+                      Enable
+                    </MenuItem>
+                  ) : (
+                    <MenuItem onClick={() => confirmAction(true)}>
+                      <ListItemIcon>
+                        <BlockIcon color="warning" />
+                      </ListItemIcon>
+                      Disable
+                    </MenuItem>
+                  )}
+                </Menu>
+              </>
+            }
+          />
           <CardContent>
             {error && (
               <div className="mb-5">
@@ -242,7 +297,7 @@ export default function DeviceInfo({
                 <Grid item>
                   <Button
                     color="primary"
-                    variant="text"
+                    variant="contained"
                     type="button"
                     onClick={handleSubmit(e => onButtonSubmit(e))}
                     disabled={loading}
@@ -252,30 +307,6 @@ export default function DeviceInfo({
                 </Grid>
                 <Grid item flex={1}>
                   {loading && <div className="ml-4">{loadingState}</div>}
-                </Grid>
-                <Grid item>
-                  {disabled ? (
-                    <Button
-                      color="success"
-                      variant="contained"
-                      type="button"
-                      onClick={confirmDelete}
-                      disabled={loading}
-                    >
-                      Enable
-                    </Button>
-                  ) : (
-                    <Button
-                      color="error"
-                      variant="contained"
-                      type="button"
-                      startIcon={<ClearIcon />}
-                      onClick={confirmDelete}
-                      disabled={loading}
-                    >
-                      Disable
-                    </Button>
-                  )}
                 </Grid>
               </Grid>
             )}

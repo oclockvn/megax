@@ -95,17 +95,17 @@ public class DevicesController : ApplicationControllerBase
     }
 
     /// <summary>
-    /// Delete device by id
+    /// toggle device's status by id
     /// </summary>
     /// <param name="id">The device id</param>
     /// <returns></returns>
-    [HttpDelete("{id}")]
+    [HttpPost("{id}/toggle")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DeleteDevice(int id)
+    public async Task<IActionResult> ToggleDevice(int id)
     {
-        var result = await deviceService.DeleteDeviceAsync(id);
+        var result = await deviceService.ToggleDeviceAsync(id);
         return Ok(result);
     }
 

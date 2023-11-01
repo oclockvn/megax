@@ -24,8 +24,8 @@ export async function addDevice(req: Omit<Device, "id">) {
   return res.data;
 }
 
-export async function deleteDevice(id: number) {
-  const res = await api.delete<Result<Device>>("/api/devices/" + id);
+export async function toggleDevice(id: number) {
+  const res = await api.post<Result<boolean>>(`/api/devices/${id}/toggle`);
   return res.data;
 }
 

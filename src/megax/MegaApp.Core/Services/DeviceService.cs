@@ -14,7 +14,7 @@ public interface IDeviceService
 
     Task<Result<int>> CreateDeviceAsync(DeviceModel.NewDevice user);
     Task<Result<int>> UpdateDeviceAsync(int id, DeviceModel req);
-    Task<Result<bool>> DeleteDeviceAsync(int id);
+    Task<Result<bool>> ToggleDeviceAsync(int id);
     Task<List<DeviceOwnerRecord>> GetDeviceOwnersAsync(int id);
 }
 
@@ -198,7 +198,7 @@ internal class DeviceService : IDeviceService
         return new PagedResult<DeviceModel>(items, filter.Page, total);
     }
 
-    public async Task<Result<bool>> DeleteDeviceAsync(int id)
+    public async Task<Result<bool>> ToggleDeviceAsync(int id)
     {
         using var db = UseDb();
         var device = await db.Devices.Where(d => d.Id == id).FirstOrDefaultAsync();
@@ -214,7 +214,7 @@ internal class DeviceService : IDeviceService
             return Result<bool>.Fail(Result.DEVICE_IS_BEING_USED);
         }
 
-        device.Disabled = true;
+        device.Disabled = !device.Disabled;
         await db.SaveChangesAsync();
 
         return Result<bool>.Ok(true);

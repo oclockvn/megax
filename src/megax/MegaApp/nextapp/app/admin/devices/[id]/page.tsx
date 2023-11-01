@@ -38,9 +38,9 @@ export default function DevicePage({ params }: { params: { id: number } }) {
     appDispatch(fetchSuppliersThunk());
   }, [params.id]);
 
-  const onDeviceDeleted = () => {
-    router.push(pathname + "/..");
-  };
+  // const onDeviceDeleted = () => {
+  //   router.push(pathname + "/..");
+  // };
 
   return (
     <>
@@ -61,7 +61,7 @@ export default function DevicePage({ params }: { params: { id: number } }) {
 
         <Grid container spacing={2} className="p-4">
           <Grid item xs={8}>
-            <DeviceInfo device={currentDevice} onDeleted={onDeviceDeleted} />
+            <DeviceInfo device={currentDevice} />
           </Grid>
 
           <Grid item xs={4}>
