@@ -1,5 +1,9 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+
 import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -12,7 +16,12 @@ import ListItemText from "@mui/material/ListItemText/ListItemText";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import React, { useEffect, useState } from "react";
+import Alert from "@mui/material/Alert";
+import Badge from "@mui/material/Badge";
+import LinearProgress from "@mui/material/LinearProgress";
+import UndoIcon from "@mui/icons-material/Undo";
+import Chip from "@mui/material/Chip";
+
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { Device } from "@/lib/models/device.model";
 import {
@@ -21,17 +30,16 @@ import {
   getUserDevicesThunk,
   returnDeviceThunk,
 } from "@/lib/store/userDevice.state";
-import Alert from "@mui/material/Alert";
 import { toast } from "react-hot-toast";
 import { UserDeviceRecord } from "@/lib/models/user.model";
-import Badge from "@mui/material/Badge";
-import LinearProgress from "@mui/material/LinearProgress";
-import UndoIcon from '@mui/icons-material/Undo';
 import { useConfirm } from "material-ui-confirm";
-import Link from "next/link";
-import DeviceIconSelector from "@/components/admin/devices/DeviceIconSelector";
-import Chip from "@mui/material/Chip";
-import UserDeviceLoading from "@/components/common/skeletons/UserDeviceLoading";
+
+const DeviceIconSelector = dynamic(
+  () => import("@/components/admin/devices/DeviceIconSelector")
+);
+const UserDeviceLoading = dynamic(
+  () => import("@/components/common/skeletons/UserDeviceLoading")
+);
 
 function UserDeviceAdd({
   userId,
@@ -205,8 +213,8 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
 
     return devices?.length ? (
       <List>
-        {devices.map(i => (
-          <React.Fragment key={i.id}>
+        {devices.map((i,idx) => (
+          <React.Fragment key={idx}>
             <DeviceItem {...i} />
             <Divider />
           </React.Fragment>

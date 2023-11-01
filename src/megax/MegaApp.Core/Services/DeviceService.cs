@@ -224,8 +224,9 @@ internal class DeviceService : IDeviceService
     {
         using var db = UseDb();
         var owners = await db.DeviceHistories
+            .OrderByDescending(x => x.Id)
             .Where(d => d.DeviceId == id)
-            .Select(d => new DeviceOwnerRecord(d.UserId, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
+            .Select(d => new DeviceOwnerRecord(d.UserId, d.Id, d.User.FullName, d.User.Email, d.TakenAt, d.ReturnedAt))
             .ToListAsync();
 
         if (owners.Count == 0)

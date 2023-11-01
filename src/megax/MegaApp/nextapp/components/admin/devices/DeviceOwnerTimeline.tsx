@@ -65,7 +65,7 @@ export default function DeviceOwnerTimeline({ deviceId }: DeviceOwnerProps) {
           }}
         >
           {owners.map(owner => (
-            <TimelineItem key={owner.id}>
+            <TimelineItem key={owner.recordId}>
               <TimelineOppositeContent>
                 <div>
                   <Chip
