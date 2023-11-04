@@ -19,13 +19,14 @@ public class TeamsController : ApplicationControllerBase
     /// <summary>
     /// Get all teams
     /// </summary>
+    /// <param name="include">Include members type</param>
     /// <returns></returns>
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(typeof(TeamModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTeams()
+    public async Task<IActionResult> GetTeams([FromQuery] TeamModel.Include? include = null)
     {
-        var teams = await teamService.GetTeamsAsync();
+        var teams = await teamService.GetTeamsAsync(include);
 
         return Ok(teams);
     }

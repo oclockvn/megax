@@ -11,6 +11,12 @@ public class TeamModel
     public bool Disabled { get; set; }
 
     public List<TeamMemberModel> Members { get; set; } = new();
+
+    public enum Include
+    {
+        Leader = 0,
+        Member,
+    }
 }
 
 public record TeamMemberModel

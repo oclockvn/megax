@@ -8,7 +8,7 @@ namespace MegaApp.Core.Services;
 
 public interface ITeamService
 {
-    Task<TeamModel[]> GetTeamsAsync();
+    Task<TeamModel[]> GetTeamsAsync(TeamModel.Include? include = null);
     Task<TeamModel> GetTeamAsync(int id);
     Task<Result<TeamModel>> CreateUpdateTeamAsync(TeamModel request);
     Task<Result<bool>> DeleteTeamAsync(int id);
@@ -107,14 +107,35 @@ internal class TeamService : ITeamService
         return new Result<bool>(true);
     }
 
-    public async Task<TeamModel[]> GetTeamsAsync()
+    public async Task<TeamModel[]> GetTeamsAsync(TeamModel.Include? include = null)
     {
         using var db = UseDb();
-        return await db.Teams.Select(x => new TeamModel
+        var query = db.Teams.AsQueryable();
+
+        if (include.HasValue)
+        {
+            query = include switch
+            {
+                TeamModel.Include.Leader => query.Include(x => x.Members).ThenInclude(m => m.Member).Where(x => x.Members.Any(m => m.Leader)),
+                TeamModel.Include.Member => query.Include(x => x.Members).ThenInclude(m => m.Member),
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        var teams = await query.OrderByDescending(x => x.Id).Take(1000).ToListAsync();
+
+        return teams.Select(x => new TeamModel
         {
             Id = x.Id,
-            Name = x.Name
-        }).ToArrayAsync();
+            Name = x.Name,
+            Members = x.Members.Select(m => new TeamMemberModel
+            {
+                TeamId = m.TeamId,
+                MemberId = m.MemberId,
+                MemberName = m.Member?.FullName,
+                Leader = m.Leader,
+            }).ToList()
+        }).ToArray();
     }
 
     public async Task<TeamModel> GetTeamAsync(int id)

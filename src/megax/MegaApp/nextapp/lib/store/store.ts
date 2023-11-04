@@ -9,6 +9,7 @@ import taskStore from "./tasks.state";
 import projectStore from "./projects.state";
 import leaveStore from "./leave.state";
 import timesheetState from "./timesheet.state";
+import teamStore from './teams.state';
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +22,8 @@ export const store = configureStore({
     tasks: taskStore,
     projects: projectStore,
     leaves: leaveStore,
-    timesheet: timesheetState
+    timesheet: timesheetState,
+    teams: teamStore,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
