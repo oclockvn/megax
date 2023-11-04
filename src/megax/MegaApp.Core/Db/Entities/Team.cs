@@ -27,8 +27,8 @@ public class TeamMember : ICreatedByEntity
     public int TeamId { get; set; }
     public Team Team { get; set; }
 
-    public int UserId { get; set; }
-    public User User { get; set; }
+    public int MemberId { get; set; }
+    public User Member { get; set; }
 
     public bool IsLeader { get; set; }
 
@@ -55,14 +55,14 @@ public class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMember>
     {
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("sysdatetimeoffset()");
         builder.Property(x => x.IsLeader).HasDefaultValueSql("0");
-        builder.HasKey(x => new { x.TeamId, x.UserId });
+        builder.HasKey(x => new { x.TeamId, x.MemberId });
 
         builder.HasOne(x => x.Team)
             .WithMany(t => t.Members)
             .HasForeignKey(x => x.TeamId);
 
-        builder.HasOne(x => x.User)
+        builder.HasOne(x => x.Member)
             .WithMany(u => u.Teams)
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.MemberId);
     }
 }

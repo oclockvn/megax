@@ -9,6 +9,7 @@ namespace MegaApp.Core.Services;
 public interface ITeamService
 {
     Task<TeamModel[]> GetTeamsAsync();
+    Task<TeamModel> GetTeamAsync(int id);
     Task<Result<TeamModel>> CreateUpdateTeamAsync(TeamModel request);
     Task<Result<bool>> DeleteTeamAsync(int id);
     Task<Result<bool>> ToggleActiveTeamAsync(int id);
@@ -44,34 +45,35 @@ internal class TeamService : ITeamService
             };
         }
 
+        // update members
         foreach (var m in team.Members)
         {
-            var match = request.Members?.SingleOrDefault(x => x.UserId == m.UserId);
+            var match = request.Members?.SingleOrDefault(x => x.UserId == m.MemberId);
             if (match is not null)
             {
                 m.IsLeader = match.IsLeader;
             }
         }
 
-        var existingMembers = team.Members.Select(x => x.UserId).ToArray();
-        var requestMembers = request.Members?.Select(x => x.UserId).ToArray() ?? Array.Empty<int>();
-
-        var newMembers = requestMembers.Except(existingMembers).ToArray();
-        var deleteMembers = existingMembers.Except(requestMembers).ToArray();
-
-        if (newMembers.Length > 0)
+        // new members
+        var currMembers = team.Members.Select(x => x.MemberId).ToArray();
+        var newMembers = request.Members?.Where(x => !currMembers.Contains(x.UserId)).Select(x => new TeamMember
         {
-            team.Members.AddRange(request.Members.Where(m => newMembers.Contains(m.UserId)).Select(m => new TeamMember
-            {
-                TeamId = team.Id,
-                UserId = m.UserId,
-                IsLeader = m.IsLeader
-            }));
+            TeamId = team.Id,
+            MemberId = x.UserId,
+            IsLeader = x.IsLeader
+        }).ToArray();
+
+        if (newMembers?.Length > 0)
+        {
+            team.Members.AddRange(newMembers);
         }
 
+        // delete members
+        var deleteMembers = request.Members?.Count > 0 ? currMembers.Except(request.Members.Select(x => x.UserId)).ToArray() : null;
         if (deleteMembers.Length > 0)
         {
-            team.Members.RemoveAll(m => deleteMembers.Contains(m.UserId));
+            team.Members.RemoveAll(m => deleteMembers.Contains(m.MemberId));
         }
 
         await db.SaveChangesAsync();
@@ -80,7 +82,7 @@ internal class TeamService : ITeamService
         {
             Id = team.Id,
             Name = team.Name,
-            Members = team.Members.Select(m => new TeamMemberModel(team.Id, m.UserId, m.IsLeader)).ToList()
+            Members = team.Members.Select(m => new TeamMemberModel(team.Id, m.MemberId, m.IsLeader)).ToList()
         });
     }
 
@@ -99,6 +101,17 @@ internal class TeamService : ITeamService
             Id = x.Id,
             Name = x.Name
         }).ToArrayAsync();
+    }
+
+    public async Task<TeamModel> GetTeamAsync(int id)
+    {
+        using var db = UseDb();
+        return await db.Teams.Where(x => x.Id == id).Select(x => new TeamModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Members = x.Members.Select(m => new TeamMemberModel(m.TeamId, m.MemberId, m.IsLeader)).ToList()
+        }).FirstOrDefaultAsync();
     }
 
     public async Task<Result<bool>> ToggleActiveTeamAsync(int id)
