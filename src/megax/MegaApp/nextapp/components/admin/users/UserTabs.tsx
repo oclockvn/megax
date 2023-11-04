@@ -1,18 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
+
 import { User } from "@/lib/models/user.model";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { useState } from "react";
-import UserInfo from "./UserInfo";
 import Card from "@mui/material/Card";
-import UserContactList from "./UserContactList";
-import UserDocumentList from "./UserDocumentList";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import CustomTabPanel from "@/components/common/CustomTabPanel";
-import UserRoles from "./UserRoles";
+import CircularProgress from "@mui/material/CircularProgress";
+
+const UserInfo = dynamic(() => import("./UserInfo"), { ssr: false, loading: () => <div><CircularProgress /></div> });
+const UserContactList = dynamic(() => import("./UserContactList"), {
+  ssr: false,
+});
+const UserDocumentList = dynamic(() => import("./UserDocumentList"), {
+  ssr: false,
+});
+const CustomTabPanel = dynamic(
+  () => import("@/components/common/CustomTabPanel"),
+  { ssr: false }
+);
+const UserRoles = dynamic(() => import("./UserRoles"), { ssr: false });
 
 declare type UserTabsProps = {
   user: User | undefined;
@@ -63,8 +73,8 @@ export default function UserTabs({ user }: UserTabsProps) {
       label: "Documents",
     },
     {
-      value: 'user-roles',
-      label: 'User roles',
+      value: "user-roles",
+      label: "User roles",
     },
   ];
 

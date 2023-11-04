@@ -15,3 +15,8 @@ html, body {
 body {
   background-color: var(--bg);
 }
+
+.full-bleed {
+  box-shadow: 0 0 0 100vmax var(--tw-shadow-color);
+  clip-path: inset(0 -100vmax);
+}

@@ -1,22 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { usePathname, useRouter } from "next/navigation";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import Grid from "@mui/material/Grid";
 import {
   fetchDeviceDetailThunk,
   fetchDeviceTypesThunk,
 } from "@/lib/store/devices.state";
-import DeviceInfo from "@/components/admin/devices/DeviceInfo";
-import DeviceOwnerList from "@/components/admin/devices/DeviceOwnerList";
 import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
+import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+
+const DeviceOwnerTimeline = dynamic(
+  () => import("@/components/admin/devices/DeviceOwnerTimeline"),
+  { ssr: false }
+);
+
+const DeviceInfo = dynamic(
+  () => import("@/components/admin/devices/DeviceInfo"),
+  { ssr: false }
+);
 
 export default function DevicePage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -30,9 +38,9 @@ export default function DevicePage({ params }: { params: { id: number } }) {
     appDispatch(fetchSuppliersThunk());
   }, [params.id]);
 
-  const onDeviceDeleted = () => {
-    router.push(pathname + "/..");
-  };
+  // const onDeviceDeleted = () => {
+  //   router.push(pathname + "/..");
+  // };
 
   return (
     <>
@@ -53,11 +61,12 @@ export default function DevicePage({ params }: { params: { id: number } }) {
 
         <Grid container spacing={2} className="p-4">
           <Grid item xs={8}>
-            <DeviceInfo device={currentDevice} onDeleted={onDeviceDeleted} />
+            <DeviceInfo device={currentDevice} />
           </Grid>
 
           <Grid item xs={4}>
-            {params.id > 0 && <DeviceOwnerList deviceId={params.id} />}
+            {/* {params.id > 0 && <DeviceOwnerList deviceId={params.id} />} */}
+            {params.id > 0 && <DeviceOwnerTimeline deviceId={params.id} />}
           </Grid>
         </Grid>
       </div>

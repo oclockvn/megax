@@ -14,16 +14,19 @@ public class UsersController : ApplicationControllerBase
     private readonly IUserService userService;
     private readonly IStorageService storageService;
     private readonly IUserRoleService userRoleService;
+    private readonly ITimesheetService timesheetService;
 
     public UsersController(
         IUserService userService,
         IStorageService storageService,
-        IUserRoleService userRoleService
+        IUserRoleService userRoleService,
+        ITimesheetService timesheetService
         )
     {
         this.userService = userService;
         this.storageService = storageService;
         this.userRoleService = userRoleService;
+        this.timesheetService = timesheetService;
     }
 
     /// <summary>
@@ -235,5 +238,49 @@ public class UsersController : ApplicationControllerBase
     {
         var roles = await userRoleService.GetUserRolesAsync(GetCurrentUserId());
         return Ok(roles);
+    }
+
+    /// <summary>
+    /// Apply timesheet for current user
+    /// </summary>
+    /// <param name="request"><see cref="TimesheetRequest" /></param>
+    /// <returns></returns>
+    [HttpPost("timesheet")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ApplyTimesheet(TimesheetRequest request)
+    {
+        var result = await timesheetService.ApplyTimesheetAsync(GetCurrentUserId(), request.Timesheet);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// get timesheet of current user
+    /// </summary>
+    /// <param name="current">The current date of week</param>
+    /// <returns></returns>
+    [HttpGet("timesheet")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(TimesheetModel[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTimesheet([FromQuery] DateTime current)
+    {
+        var userId = GetCurrentUserId();
+        var timesheet = await timesheetService.GetTimesheetAsync(userId, current);
+        var estimated = timesheet.All(d => d.Id == 0);
+
+        // load preference future timesheet if viewing future timesheet
+        if (estimated && current >= DateTime.Today)
+        {
+            var lastTimesheet = await timesheetService.GetLastTimesheetAsync(userId);
+            if (lastTimesheet.Length > 0)
+            {
+                foreach (var t in timesheet)
+                {
+                    t.WorkType = lastTimesheet.FirstOrDefault(x => t.Date.IsSameWeekDay(x.Date))?.WorkType ?? t.WorkType;
+                }
+            }
+        }
+
+        return Ok(new TimesheetViewModel(timesheet, estimated));
     }
 }

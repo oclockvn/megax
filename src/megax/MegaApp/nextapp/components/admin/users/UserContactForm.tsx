@@ -28,7 +28,7 @@ export default function UserContactForm(props: UserContactFormProps) {
     <>
       <div className="p-4 w-[500px]">
         <h4 className="uppercase !text-[1.2rem] font-semibold mb-4">
-          Edit contact
+          {Number(contact?.id) > 0 ? `Viewing ${contact.name}` : "Add contact"}
         </h4>
 
         <FormContainer values={contact} onSuccess={handleSubmit}>
@@ -83,8 +83,13 @@ export default function UserContactForm(props: UserContactFormProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outlined" className="px-6" type="submit" disabled={loading}>
-              {loading ? 'Processing...' : 'Save Changes'}
+            <Button
+              variant="outlined"
+              className="px-6"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Save Changes"}
             </Button>
             <Button
               variant="text"

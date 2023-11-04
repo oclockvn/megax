@@ -1,8 +1,8 @@
 import datetime from "./datetime";
 
 /**
- * delay given milisecond
- * @param time delay milisecond
+ * delay given millisecond
+ * @param time delay millisecond
  * @returns a promise
  */
 export function delay(time: number) {
@@ -18,12 +18,14 @@ export const toFormData = (
 ): FormData => {
   const form = new FormData();
   for (let key in obj) {
-    form.append(key, obj[key]);
+    if (obj[key] != null) {
+      form.append(key, obj[key]);
+    }
   }
 
   if (files?.length) {
     for (let file of files) {
-      form.append('files', file, file.name);
+      form.append("files", file, file.name);
     }
   }
 
@@ -31,15 +33,15 @@ export const toFormData = (
 };
 
 export const normalizeDateTimePayload = (src: Record<string, any>) => {
-  const result: Record<string, any> = {}
+  const result: Record<string, any> = {};
 
   for (let k in src) {
     if (src[k] instanceof Date) {
       result[k] = datetime.formatToServer(src[k]);
     } else {
-      result[k] = src[k]
+      result[k] = src[k];
     }
   }
 
   return result;
-}
+};

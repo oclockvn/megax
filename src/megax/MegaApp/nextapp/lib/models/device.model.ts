@@ -14,6 +14,7 @@ export interface DeviceType {
 
 export interface DeviceOwnerRecord {
   id: number;
+  recordId: number;
   fullName: string;
   email: string;
   takenAt: Date;

@@ -20,12 +20,7 @@ public static class ExceptionHandlingExtension
                 //var exceptionResult = new Result<bool>(errorCode);
 
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    code = "INTERNAL_SERVER_ERROR",
-                    msg = exceptionContext.Error.Message,
-                    success = false,
-                });
+                await context.Response.WriteAsJsonAsync(new ErrorResponseRecord("INTERNAL_SERVER_ERROR", exceptionContext.Error.Message, false));
             });
         });
     }
@@ -45,3 +40,5 @@ public static class ExceptionHandlingExtension
     //    return (StatusCode.Internal_server_error, ex.Message);
     //}
 }
+
+public record ErrorResponseRecord(string Code, string Message, bool Success);
