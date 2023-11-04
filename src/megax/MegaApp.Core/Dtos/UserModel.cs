@@ -1,6 +1,5 @@
 ﻿using MegaApp.Core.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 
 namespace MegaApp.Core.Dtos;
 
@@ -43,27 +42,10 @@ public record UserModel
     public DateTimeOffset ContractStart { get; set; }
     public DateTimeOffset ContractEnd { get; set; }
     public string ContractType { get; set; }// official|contractor|fresher
-    public int? TeamId { get; set; }
 
-    // public Team Team { get; set; }
-
-    // public List<Account> Accounts { get; set; } = new();
     public List<DocumentModel> Documents { get; set; } = new();
     public List<ContactModel> Contacts { get; set; } = new();
     public UserRoleModel[] Roles { get; set; }
-
-    // public DateTimeOffset CreatedAt { get; set; }
-    // public int? CreatedBy { get; set; }
-
-    // public UserModel()
-    // {
-
-    // }
-
-    // public UserModel(Db.Entities.User user, int accountId) : this(user)
-    // {
-    //     AccountId = accountId;
-    // }
 
     public UserModel(Db.Entities.User user)
     {
@@ -103,7 +85,6 @@ public record UserModel
         ContractStart = user.ContractStart;
         ContractEnd = user.ContractEnd;
         ContractType = user.ContractType;
-        // TeamId = user.TeamId;
     }
 
     public class NewUser
