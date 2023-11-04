@@ -128,17 +128,11 @@ internal class TeamService : ITeamService
             }).Take(take).ToArrayAsync();
         }
 
-        var query = include switch
-        {
-            TeamModel.Include.Leader => db.Teams.Where(t => t.Members.Any(m => m.Leader)),
-            _ => db.Teams.AsQueryable(),
-        };
-
-        return await query.Select(x => new TeamModel
+        return await db.Teams.Select(x => new TeamModel
         {
             Id = x.Id,
             Name = x.Name,
-            Members = x.Members.Select(m => new TeamMemberModel
+            Members = x.Members.Where(m => include != TeamModel.Include.Leader || m.Leader).Select(m => new TeamMemberModel
             {
                 TeamId = m.TeamId,
                 MemberId = m.MemberId,

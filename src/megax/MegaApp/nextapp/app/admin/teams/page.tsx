@@ -23,6 +23,8 @@ import AvatarGroup from "@mui/material/AvatarGroup";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
 import CommonSearch from "@/components/grid/CommonSearch";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
 
 export default function TeamPage() {
   const appDispatch = useAppDispatch();
@@ -54,13 +56,21 @@ export default function TeamPage() {
       <div className="mb-4 flex justify-between items-center">
         <CommonSearch keypress handleSearch={handleSearch} />
 
-        <Button variant="contained" size="small">
+        <Button
+          variant="contained"
+          onClick={() => {
+            setFilter(prev => [
+              { id: Date.now(), name: "test", members: [], leaders: [] },
+              ...prev,
+            ]);
+          }}
+        >
           <AddIcon fontSize="inherit" className="me-2" />
-          Add
+          Add Team
         </Button>
       </div>
 
-      <div className="border border-gray-300 rounded-sm">
+      <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -84,10 +94,14 @@ export default function TeamPage() {
                   </Link>
                 </TableCell>
                 <TableCell scope="row" width={200}>
-                  <AvatarGroup className="[justify-content:start]">
+                  <AvatarGroup
+                    className="[justify-content:start]"
+                  >
                     {team.leaders?.map(l => (
                       <Tooltip key={l.memberId} title={l.memberName}>
-                        <Avatar className="w-[32px] h-[32px] text-sm bg-blue-500">
+                        <Avatar
+                          className="w-[32px] h-[32px] text-sm bg-blue-500"
+                        >
                           {l.memberName ? getInitial(l.memberName) : "UNK"}
                         </Avatar>
                       </Tooltip>
@@ -96,14 +110,14 @@ export default function TeamPage() {
                 </TableCell>
                 <TableCell align="right">
                   <IconButton size="small" color="error">
-                    <CloseIcon fontSize="inherit" />
+                    <CloseIcon fontSize="inherit"/>
                   </IconButton>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </div>
+      </TableContainer>
     </div>
   );
 }

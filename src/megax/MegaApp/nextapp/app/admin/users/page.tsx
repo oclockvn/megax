@@ -11,6 +11,8 @@ import { Filter, PageModel } from "@/lib/models/common.model";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LinearProgress from "@mui/material/LinearProgress";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
 
 const CustomPagination = dynamic(
   () => import("@/components/grid/CustomPagination")
@@ -96,33 +98,35 @@ export default function UserListPage() {
   }, [filter]);
 
   return (
-    <div className="p-4">
+    <div className="container mx-auto p-4">
       <div className="mb-4">
         <CommonSearch handleSearch={onSearch} />
       </div>
 
-      <DataGrid
-        rows={pagedUsers.items}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 100 },
-          },
-        }}
-        pagination
-        slots={{
-          pagination: CustomPagination,
-          loadingOverlay: LinearProgress,
-        }}
-        rowCount={pagedUsers.total}
-        paginationMode="server"
-        paginationModel={pagingModel}
-        onPaginationModelChange={onPaging}
-        pageSizeOptions={[100]}
-        sortingMode="server"
-        onSortModelChange={onSorting}
-        loading={loading}
-      />
+      <TableContainer component={Paper}>
+        <DataGrid
+          rows={pagedUsers.items}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 100 },
+            },
+          }}
+          pagination
+          slots={{
+            pagination: CustomPagination,
+            loadingOverlay: LinearProgress,
+          }}
+          rowCount={pagedUsers.total}
+          paginationMode="server"
+          paginationModel={pagingModel}
+          onPaginationModelChange={onPaging}
+          pageSizeOptions={[100]}
+          sortingMode="server"
+          onSortModelChange={onSorting}
+          loading={loading}
+        />
+      </TableContainer>
     </div>
   );
 }

@@ -98,6 +98,7 @@ public class TeamsController : ApplicationControllerBase
             return BadRequest(ModelState);
         }
 
+        request.Id = 0;
         var result = await teamService.CreateUpdateTeamAsync(request);
 
         return Ok(result);

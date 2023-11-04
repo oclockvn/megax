@@ -19,6 +19,8 @@ import { Filter, PageModel } from "@/lib/models/common.model";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import dateLib from "@/lib/datetime";
 import { formatMoney } from "@/lib/formatter";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
 
 const CustomPagination = dynamic(
   () => import("@/components/grid/CustomPagination"),
@@ -48,6 +50,7 @@ export default function DeviceListPage() {
       field: "name",
       headerName: "Device name",
       width: 400,
+      flex: 1,
       renderCell: params => (
         <div>
           <Link href={`${pathname}/${params.id}`} className="text-blue-400">
@@ -94,12 +97,12 @@ export default function DeviceListPage() {
       valueFormatter: params =>
         params.value ? dateLib.formatDate(params.value, "dd/MM/yyyy") : "",
     },
-    {
-      field: "supplier",
-      headerName: "Supplier",
-      width: 200,
-      sortable: false,
-    },
+    // {
+    //   field: "supplier",
+    //   headerName: "Supplier",
+    //   width: 200,
+    //   sortable: false,
+    // },
   ];
 
   const onPaging = (ev: PageModel) => {
@@ -146,7 +149,7 @@ export default function DeviceListPage() {
   }, [loadRef.current]);
 
   return (
-    <div className="p-4">
+    <div className="container mx-auto p-4">
       <Grid container className="mb-4" alignItems={"center"}>
         <Grid item xs={6}>
           <CommonSearch handleSearch={onSearch} />
@@ -163,28 +166,30 @@ export default function DeviceListPage() {
         </Grid>
       </Grid>
 
-      <DataGrid
-        rows={pagedDevices.items}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 100 },
-          },
-        }}
-        pagination
-        slots={{
-          pagination: CustomPagination,
-          loadingOverlay: LinearProgress,
-        }}
-        rowCount={pagedDevices.total}
-        paginationMode="server"
-        paginationModel={pagingModel}
-        onPaginationModelChange={onPaging}
-        pageSizeOptions={[100]}
-        sortingMode="server"
-        onSortModelChange={onSorting}
-        loading={loading}
-      />
+      <TableContainer component={Paper}>
+        <DataGrid
+          rows={pagedDevices.items}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 100 },
+            },
+          }}
+          pagination
+          slots={{
+            pagination: CustomPagination,
+            loadingOverlay: LinearProgress,
+          }}
+          rowCount={pagedDevices.total}
+          paginationMode="server"
+          paginationModel={pagingModel}
+          onPaginationModelChange={onPaging}
+          pageSizeOptions={[100]}
+          sortingMode="server"
+          onSortModelChange={onSorting}
+          loading={loading}
+        />
+      </TableContainer>
     </div>
   );
 }
