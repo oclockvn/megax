@@ -11,6 +11,8 @@ public class Team : ICreatedByEntity
     [Required, MaxLength(250)]
     public string Name { get; set; } = null!;
 
+    public bool Disabled { get; set; }
+
     public List<TeamMember> Members { get; set; } = new();
 
     public DateTimeOffset CreatedAt { get; set; }
@@ -43,6 +45,7 @@ public class TeamConfiguration : IEntityTypeConfiguration<Team>
     {
         builder.HasIndex(x => x.Name).IsUnique();
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("sysdatetimeoffset()");
+        builder.Property(x => x.Disabled).HasDefaultValueSql("0");
     }
 }
 
@@ -51,6 +54,7 @@ public class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMember>
     public void Configure(EntityTypeBuilder<TeamMember> builder)
     {
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("sysdatetimeoffset()");
+        builder.Property(x => x.IsLeader).HasDefaultValueSql("0");
         builder.HasKey(x => new { x.TeamId, x.UserId });
 
         builder.HasOne(x => x.Team)

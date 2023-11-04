@@ -33,6 +33,7 @@ public static class ServiceCollectionExtension
             .AddScoped<IUserRoleService, UserRoleService>()
             .AddScoped<IPermissionService, PermissionService>()
             .AddScoped<ITimesheetService, TimesheetService>()
+            .AddScoped<ITeamService, TeamService>()
             .AddSettings(configuration)
             ;
     }
