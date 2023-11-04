@@ -26,16 +26,28 @@ internal class TeamService : ITeamService
 
     public async Task<Result<TeamModel>> CreateUpdateTeamAsync(TeamModel request)
     {
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
         using var db = UseDb();
-        var isUpdate = request.Id > 0;
+        var duplicateName = await db.Teams.AnyAsync(t => t.Id != request.Id && t.Name == request.Name);
+        if (duplicateName)
+        {
+            return Result<TeamModel>.Fail(ResultCode.RECORD_DUPLICATED);
+        }
 
         Team team;
-        if (isUpdate)
+        if (request.Id > 0)
         {
             team = await db.Teams
                 .Include(x => x.Members)
                 .FirstOrDefaultAsync(x => x.Id == request.Id)
                  ?? throw new EntityNotFoundException($"No team found by id {request.Id}");
+
+            team.Name = request.Name;
+            team.Disabled = request.Disabled;
         }
         else
         {
@@ -43,12 +55,14 @@ internal class TeamService : ITeamService
             {
                 Name = request.Name,
             };
+
+            db.Teams.Add(team);
         }
 
         // update members
         foreach (var m in team.Members)
         {
-            var match = request.Members?.SingleOrDefault(x => x.UserId == m.MemberId);
+            var match = request.Members?.SingleOrDefault(x => x.MemberId == m.MemberId);
             if (match is not null)
             {
                 m.IsLeader = match.IsLeader;
@@ -57,10 +71,10 @@ internal class TeamService : ITeamService
 
         // new members
         var currMembers = team.Members.Select(x => x.MemberId).ToArray();
-        var newMembers = request.Members?.Where(x => !currMembers.Contains(x.UserId)).Select(x => new TeamMember
+        var newMembers = request.Members?.Where(x => !currMembers.Contains(x.MemberId)).Select(x => new TeamMember
         {
             TeamId = team.Id,
-            MemberId = x.UserId,
+            MemberId = x.MemberId,
             IsLeader = x.IsLeader
         }).ToArray();
 
@@ -70,8 +84,8 @@ internal class TeamService : ITeamService
         }
 
         // delete members
-        var deleteMembers = request.Members?.Count > 0 ? currMembers.Except(request.Members.Select(x => x.UserId)).ToArray() : null;
-        if (deleteMembers.Length > 0)
+        var deleteMembers = request.Members?.Count > 0 ? currMembers.Except(request.Members.Select(x => x.MemberId)).ToArray() : null;
+        if (deleteMembers?.Length > 0)
         {
             team.Members.RemoveAll(m => deleteMembers.Contains(m.MemberId));
         }

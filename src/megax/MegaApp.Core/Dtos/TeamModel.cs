@@ -8,8 +8,27 @@ public class TeamModel
 
     [Required, MaxLength(250)]
     public string Name { get; set; } = null!;
+    public bool Disabled { get; set; }
 
     public List<TeamMemberModel> Members { get; set; } = new();
 }
 
-public record TeamMemberModel(int TeamId, int UserId, bool IsLeader);
+public record TeamMemberModel
+{
+    public int TeamId { get; set; }
+    public int MemberId { get; set; }
+    public string MemberName { get; set; }
+    public bool IsLeader { get; set; }
+
+    public TeamMemberModel()
+    {
+
+    }
+
+    public TeamMemberModel(int teamId, int memberId, bool isLeader)
+    {
+        TeamId = teamId;
+        MemberId = memberId;
+        IsLeader = isLeader;
+    }
+}

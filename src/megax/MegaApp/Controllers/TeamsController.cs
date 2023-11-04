@@ -11,9 +11,9 @@ public class TeamsController : ApplicationControllerBase
 {
     private readonly ITeamService teamService;
 
-    public TeamsController(ITeamService bankService)
+    public TeamsController(ITeamService teamService)
     {
-        this.teamService = bankService;
+        this.teamService = teamService;
     }
 
     /// <summary>
