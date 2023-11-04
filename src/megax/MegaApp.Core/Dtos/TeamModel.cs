@@ -11,6 +11,7 @@ public class TeamModel
     public bool Disabled { get; set; }
 
     public List<TeamMemberModel> Members { get; set; } = new();
+    public TeamMemberModel[] Leaders => Members?.Where(m => m.Leader).ToArray();
 
     public enum Include
     {
