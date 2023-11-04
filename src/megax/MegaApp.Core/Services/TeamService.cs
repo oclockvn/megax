@@ -65,7 +65,7 @@ internal class TeamService : ITeamService
             var match = request.Members?.SingleOrDefault(x => x.MemberId == m.MemberId);
             if (match is not null)
             {
-                m.IsLeader = match.IsLeader;
+                m.Leader = match.Leader;
             }
         }
 
@@ -75,7 +75,7 @@ internal class TeamService : ITeamService
         {
             TeamId = team.Id,
             MemberId = x.MemberId,
-            IsLeader = x.IsLeader
+            Leader = x.Leader
         }).ToArray();
 
         if (newMembers?.Length > 0)
@@ -96,7 +96,7 @@ internal class TeamService : ITeamService
         {
             Id = team.Id,
             Name = team.Name,
-            Members = team.Members.Select(m => new TeamMemberModel(team.Id, m.MemberId, m.IsLeader)).ToList()
+            Members = team.Members.Select(m => new TeamMemberModel(team.Id, m.MemberId, m.Leader)).ToList()
         });
     }
 
@@ -124,7 +124,7 @@ internal class TeamService : ITeamService
         {
             Id = x.Id,
             Name = x.Name,
-            Members = x.Members.Select(m => new TeamMemberModel(m.TeamId, m.MemberId, m.IsLeader)).ToList()
+            Members = x.Members.Select(m => new TeamMemberModel(m.TeamId, m.MemberId, m.Leader)).ToList()
         }).FirstOrDefaultAsync();
     }
 

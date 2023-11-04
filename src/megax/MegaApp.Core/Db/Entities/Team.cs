@@ -30,7 +30,7 @@ public class TeamMember : ICreatedByEntity
     public int MemberId { get; set; }
     public User Member { get; set; }
 
-    public bool IsLeader { get; set; }
+    public bool Leader { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
@@ -54,7 +54,7 @@ public class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMember>
     public void Configure(EntityTypeBuilder<TeamMember> builder)
     {
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("sysdatetimeoffset()");
-        builder.Property(x => x.IsLeader).HasDefaultValueSql("0");
+        builder.Property(x => x.Leader).HasDefaultValueSql("0");
         builder.HasKey(x => new { x.TeamId, x.MemberId });
 
         builder.HasOne(x => x.Team)

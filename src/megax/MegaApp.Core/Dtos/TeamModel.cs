@@ -18,17 +18,17 @@ public record TeamMemberModel
     public int TeamId { get; set; }
     public int MemberId { get; set; }
     public string MemberName { get; set; }
-    public bool IsLeader { get; set; }
+    public bool Leader { get; set; }
 
     public TeamMemberModel()
     {
 
     }
 
-    public TeamMemberModel(int teamId, int memberId, bool isLeader)
+    public TeamMemberModel(int teamId, int memberId, bool leader)
     {
         TeamId = teamId;
         MemberId = memberId;
-        IsLeader = isLeader;
+        Leader = leader;
     }
 }
