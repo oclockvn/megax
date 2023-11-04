@@ -25,6 +25,7 @@ namespace MegaApp.Core.Db
         public DbSet<Bank> Banks { get; set; }
         public DbSet<UserDocument> UserDocuments { get; set; }
         public DbSet<Team> Teams { get; set; }
+        public DbSet<TeamMember> TeamMembers { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Entities.File> Files { get; set; }
         public DbSet<FileReference> FileReferences { get; set; }
@@ -36,6 +37,8 @@ namespace MegaApp.Core.Db
 
         public DbSet<Leave> Leaves { get; set; }
         public DbSet<LeaveDate> LeaveDates { get; set; }
+
+        public DbSet<Timesheet> Timesheets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +52,7 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new DeviceHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new BankConfiguration());
             modelBuilder.ApplyConfiguration(new TeamConfiguration());
+            // modelBuilder.ApplyConfiguration(new TeamMemberConfiguration());
             modelBuilder.ApplyConfiguration(new FileConfiguration());
             modelBuilder.ApplyConfiguration(new FileReferenceConfiguration());
             modelBuilder.ApplyConfiguration(new TaskConfiguration());
@@ -57,6 +61,7 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new LeaveConfiguration());
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new TimesheetConfiguration());
         }
 
         public void SetCurrentUser(int userId, string userName)

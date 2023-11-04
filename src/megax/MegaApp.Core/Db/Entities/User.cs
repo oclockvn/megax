@@ -107,20 +107,19 @@ public class User : ICreatedByEntity
     [MaxLength(255)]
     public string ContractType { get; set; } = null!;// official|contractor|fresher
 
-    public int? TeamId { get; set; } = null!;
-    public Team Team { get; set; } = null!;
-
     public DateTimeOffset CreatedAt { get; set; }
     public int? CreatedBy { get; set; }
     [MaxLength(255)]
     public string CreatedName { get; set; }
 
+    public List<TeamMember> Teams { get; set; } = new();
     public List<Account> Accounts { get; set; } = new();
     public List<UserDocument> Documents { get; set; } = new();
     public List<Contact> Contacts { get; set; } = new();
     public List<TodoTask> Tasks { get; set; } = new();
     public List<Leave> Leaves { get; set; } = new();
     public List<UserRole> Roles { get; set; } = new();
+    public List<Timesheet> Timesheets { get; set; } = new();
 }
 
 public static class UserQueryExtension
@@ -154,9 +153,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(x => x.Bank)
             .WithMany()
             .HasForeignKey(x => x.BankId);
-
-        builder.HasOne(x => x.Team)
-            .WithMany(t => t.Members)
-            .HasForeignKey(x => x.TeamId);
     }
 }

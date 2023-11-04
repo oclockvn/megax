@@ -103,7 +103,7 @@ public record UserModel
         ContractStart = user.ContractStart;
         ContractEnd = user.ContractEnd;
         ContractType = user.ContractType;
-        TeamId = user.TeamId;
+        // TeamId = user.TeamId;
     }
 
     public class NewUser
