@@ -9,13 +9,13 @@ export async function getTeams(include?: TeamQueryInclude) {
 }
 
 export async function getTeam(id: number) {
-  const res = await api.get<Team>("api/team/" + id);
+  const res = await api.get<Team>("api/teams/" + id);
   return res.data;
 }
 
 export async function createTeam(team: Team) {
   try {
-    const res = await api.post<Result<Team>>("api/team", { team });
+    const res = await api.post<Result<Team>>("api/teams", { team });
     return res.data;
   } catch (err) {
     return {
@@ -27,7 +27,7 @@ export async function createTeam(team: Team) {
 
 export async function updateTeam(team: Team) {
   try {
-    const res = await api.post<Result<Team>>(`api/team/${team.id}`, { team });
+    const res = await api.post<Result<Team>>(`api/teams/${team.id}`, { team });
     return res.data;
   } catch (err) {
     return {

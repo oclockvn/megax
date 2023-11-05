@@ -10,6 +10,7 @@
 
 html, body {
   font-family: var(--font-qs);
+  scroll-behavior: smooth;
 }
 
 body {
