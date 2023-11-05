@@ -2,37 +2,41 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import ClearIcon from "@mui/icons-material/Clear";
-import { useState } from "react";
-const debounce = require("lodash/debounce");
+import { useCallback, useState } from "react";
+const throttle = require("lodash/throttle");
 
 export default function CommonSearch({
   handleSearch,
   keypress,
+  placeholder,
+  label,
 }: {
   handleSearch: (keyword: string) => void;
   keypress?: boolean;
+  placeholder?: string;
+  label?: string;
 }) {
   const [value, setValue] = useState("");
 
-  let onSearch = (
+  const handleInternal = !keypress ? handleSearch : useCallback(
+    throttle((q: string) => handleSearch(q), 200), []
+  )
+
+  const onSearch = (
     ev: React.KeyboardEvent & React.ChangeEvent<HTMLInputElement>
   ) => {
     if (!!keypress || ev.key === "Enter") {
-      handleSearch(value?.trim());
+      handleInternal(value?.trim());
     }
   };
 
-  if (!!keypress) {
-    onSearch = debounce(onSearch, 250);
-  }
-
   return (
     <TextField
-      label="Search"
+      label={label || "Search"}
       variant="outlined"
       value={value}
       onChange={e => setValue(e.target.value)}
-      placeholder="Type search term and enter to search"
+      placeholder={placeholder || "Type search term and enter to search"}
       className="min-w-[400px]"
       onKeyUp={onSearch}
       InputProps={{

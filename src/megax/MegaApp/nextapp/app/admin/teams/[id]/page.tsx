@@ -31,7 +31,8 @@ import Checkbox from "@mui/material/Checkbox";
 import CheckIcon from "@mui/icons-material/Check";
 import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import RemoveIcon from '@mui/icons-material/Remove';
+import RemoveIcon from "@mui/icons-material/Remove";
+import UserSelector from "@/components/common/UserSelector";
 
 export default function TeamDetailPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
@@ -69,6 +70,10 @@ export default function TeamDetailPage({ params }: { params: { id: number } }) {
                 required
                 label="Team name"
               />
+
+              <div className="mt-4">
+                <UserSelector />
+              </div>
 
               <List
                 className="border border-gray-200 rounded mt-4"
