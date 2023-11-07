@@ -45,7 +45,14 @@ export default function UserListPage() {
       ),
     },
     { field: "title", headerName: "Title", width: 200 },
-    { field: "email", headerName: "Email", width: 300 },
+    {
+      field: "email",
+      headerName: "Email",
+      width: 300,
+      renderCell: params => (
+        <a href={`mailto:${params.value}`}>{params.value}</a>
+      ),
+    },
     {
       field: "dob",
       headerName: "Dob",

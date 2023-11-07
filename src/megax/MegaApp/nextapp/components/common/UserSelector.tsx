@@ -12,10 +12,11 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchUserList } from "@/lib/apis/user.api";
 import Fuse from "fuse.js";
 import { User } from "@/lib/models/user.model";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 export default function UserSelector() {
   const [users, setUsers] = useState<User[]>([]);
-  const [rand, setRand] = useState(0)
+  const [rand, setRand] = useState(0);
   const [keyword, setKeyword] = useState("");
 
   const { isLoading, data: source } = useQuery({
@@ -27,7 +28,7 @@ export default function UserSelector() {
         sortBy: "id",
         sortDir: "desc",
       }),
-      select: data => data?.items || []
+    select: data => data?.items || [],
   });
 
   const fuse = new Fuse(source || [], {
@@ -41,15 +42,17 @@ export default function UserSelector() {
 
   const handleSearch = (q: string) => {
     if (!q) {
-      setRand(Date.now())
+      setRand(Date.now());
       return;
     }
 
     const result = fuse.search(q);
 
-    if (result.length) { // use local result
+    if (result.length) {
+      // use local result
       setUsers(result.map(r => r.item));
-    } else { // trigger api search
+    } else {
+      // trigger api search
       setKeyword(q);
     }
   };
@@ -59,23 +62,23 @@ export default function UserSelector() {
       <CommonSearch label="Member search" handleSearch={handleSearch} />
       <div>
         <List
-          disablePadding
           dense
           className="my-2 border border-slate-200 rounded max-h-[500px] overflow-auto"
         >
           {users.map((user, index) => (
             <ListItem
               key={user.id}
-              disablePadding
               className={index === 0 ? "" : `border-t border-slate-200`}
             >
-              <ListItemButton role={undefined} dense>
-                <Checkbox edge="start" />
-                <ListItemText>
-                  <div>{user.fullName}</div>
-                  <small>{user.email}</small>
-                </ListItemText>
-              </ListItemButton>
+              <FormControlLabel
+                label={
+                  <ListItemText>
+                    <div>{user.fullName}</div>
+                    <a href={`mailto:${user.email}`}><small>{user.email}</small></a>
+                  </ListItemText>
+                }
+                control={<Checkbox />}
+              />
             </ListItem>
           ))}
         </List>
