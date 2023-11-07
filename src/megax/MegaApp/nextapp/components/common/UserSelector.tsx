@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import CommonSearch from "../grid/CommonSearch";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -14,12 +14,63 @@ import Fuse from "fuse.js";
 import { User } from "@/lib/models/user.model";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
+type UserRecord = Pick<User, "id" | "fullName" | "email"> & {
+  selected?: boolean;
+};
+
+type _State = {
+  users: UserRecord[];
+};
+
+type _Action =
+  | {
+      type: "toggle";
+      payload: number[];
+    }
+  | {
+      type: "set";
+      payload: UserRecord[];
+    };
+
+function userSelectorReducer(state: _State, action: _Action) {
+  const { type, payload } = action;
+  let users = [];
+
+  switch (type) {
+    case "set":
+      users = [...payload];
+      break;
+    case "toggle":
+      users = state.users.map(u => ({
+        ...u,
+        selected: action.payload.includes(u.id || 0) ? !u.selected : u.selected,
+      }));
+      break;
+  }
+
+  return {
+    ...state,
+    users,
+  };
+}
+
 export default function UserSelector() {
-  const [users, setUsers] = useState<User[]>([]);
+  const initState: _State = {
+    users: [],
+  };
+
+  const [{ users }, dispatch] = useReducer(userSelectorReducer, initState);
+
+  // const [users, setUsers] = useState<User[]>([]);
   const [rand, setRand] = useState(0);
   const [keyword, setKeyword] = useState("");
+  const snapshot = useRef(users)
 
-  const { isLoading, data: source } = useQuery({
+  const {
+    status,
+    isLoading,
+    data: source,
+  } = useQuery({
     queryKey: ["users-search", keyword, rand],
     queryFn: () =>
       fetchUserList({
@@ -37,8 +88,16 @@ export default function UserSelector() {
   });
 
   useEffect(() => {
-    setUsers(source || []);
-  }, [source]);
+    if (status === "success") {
+      console.log("api loaded", source);
+      dispatch({ type: "set", payload: source });
+    }
+  }, [source, status]);
+
+  useEffect(() => {
+    console.log("reducer updated", users);
+    snapshot.current = users;
+  }, [users]);
 
   const handleSearch = (q: string) => {
     if (!q) {
@@ -50,12 +109,17 @@ export default function UserSelector() {
 
     if (result.length) {
       // use local result
-      setUsers(result.map(r => r.item));
+      // setUsers(result.map(r => r.item));
+      dispatch({ type: "set", payload: result.map(r => r.item) });
     } else {
       // trigger api search
       setKeyword(q);
     }
   };
+
+  const handleAdd = () => {
+    console.log('latest data', snapshot.current.filter(u => u.selected));
+  }
 
   return (
     <div>
@@ -74,17 +138,24 @@ export default function UserSelector() {
                 label={
                   <ListItemText>
                     <div>{user.fullName}</div>
-                    <a href={`mailto:${user.email}`}><small>{user.email}</small></a>
+                    <small>{user.email}</small>
                   </ListItemText>
                 }
-                control={<Checkbox />}
+                onChange={() =>
+                  dispatch({ type: "toggle", payload: [user.id || 0] })
+                }
+                control={
+                  <Checkbox
+                    checked={user.selected == null ? false : user.selected}
+                  />
+                }
               />
             </ListItem>
           ))}
         </List>
       </div>
 
-      <Button size="small" variant="contained">
+      <Button size="small" variant="contained" onClick={handleAdd}>
         Add
       </Button>
     </div>
