@@ -13,6 +13,8 @@ import { fetchUserList } from "@/lib/apis/user.api";
 import Fuse from "fuse.js";
 import { User } from "@/lib/models/user.model";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Skeleton from "@mui/material/Skeleton";
+import { makeArrOf } from "@/lib/helpers/array";
 
 type UserRecord = Pick<User, "id" | "fullName" | "email"> & {
   selected?: boolean;
@@ -60,11 +62,9 @@ export default function UserSelector() {
   };
 
   const [{ users }, dispatch] = useReducer(userSelectorReducer, initState);
-
-  // const [users, setUsers] = useState<User[]>([]);
   const [rand, setRand] = useState(0);
   const [keyword, setKeyword] = useState("");
-  const snapshot = useRef(users)
+  const snapshot = useRef(users);
 
   const {
     status,
@@ -84,18 +84,21 @@ export default function UserSelector() {
 
   const fuse = new Fuse(source || [], {
     keys: ["fullName", "email"],
-    minMatchCharLength: 2, // ignore single match
+    minMatchCharLength: 3, // ignore single match
+    threshold: 0.4,
+    includeScore: true,
+    includeMatches: true
   });
 
   useEffect(() => {
+    // api effect
     if (status === "success") {
-      console.log("api loaded", source);
       dispatch({ type: "set", payload: source });
     }
   }, [source, status]);
 
   useEffect(() => {
-    console.log("reducer updated", users);
+    // reducer effect
     snapshot.current = users;
   }, [users]);
 
@@ -106,10 +109,9 @@ export default function UserSelector() {
     }
 
     const result = fuse.search(q);
+    console.log(result);
 
     if (result.length) {
-      // use local result
-      // setUsers(result.map(r => r.item));
       dispatch({ type: "set", payload: result.map(r => r.item) });
     } else {
       // trigger api search
@@ -118,41 +120,75 @@ export default function UserSelector() {
   };
 
   const handleAdd = () => {
-    console.log('latest data', snapshot.current.filter(u => u.selected));
-  }
+    console.log(
+      "latest data",
+      snapshot.current.filter(u => u.selected)
+    );
+  };
+
+  const LoadingSkeleton = () => (
+    <div className="flex items-center gap-4 px-4 py-2">
+      <div>
+        <Skeleton variant="rectangular" width={20} height={20} />
+      </div>
+
+      <div>
+        <Skeleton variant="text" width={400} />
+        <Skeleton variant="text" width={200} />
+      </div>
+    </div>
+  );
+
+  const LoadingList = () => {
+    return (
+      <>
+        {makeArrOf(3, i => (
+          <div className="border-b border-slate-200">
+            <LoadingSkeleton key={i} />
+          </div>
+        ))}
+      </>
+    );
+  };
 
   return (
     <div>
       <CommonSearch label="Member search" handleSearch={handleSearch} />
       <div>
-        <List
-          dense
-          className="my-2 border border-slate-200 rounded max-h-[500px] overflow-auto"
-        >
-          {users.map((user, index) => (
-            <ListItem
-              key={user.id}
-              className={index === 0 ? "" : `border-t border-slate-200`}
-            >
-              <FormControlLabel
-                label={
-                  <ListItemText>
-                    <div>{user.fullName}</div>
-                    <small>{user.email}</small>
-                  </ListItemText>
-                }
-                onChange={() =>
-                  dispatch({ type: "toggle", payload: [user.id || 0] })
-                }
-                control={
-                  <Checkbox
-                    checked={user.selected == null ? false : user.selected}
-                  />
-                }
-              />
-            </ListItem>
-          ))}
-        </List>
+        {isLoading ? (
+          <div className="border border-slate-200 rounded my-2">
+            <LoadingList />
+          </div>
+        ) : (
+          <List
+            dense
+            className="my-2 border border-slate-200 rounded max-h-[500px] overflow-auto"
+          >
+            {users.map((user, index) => (
+              <ListItem
+                key={user.id}
+                className={index === 0 ? "" : `border-t border-slate-200`}
+              >
+                <FormControlLabel
+                  label={
+                    <ListItemText>
+                      <div>{user.fullName}</div>
+                      <small>{user.email}</small>
+                    </ListItemText>
+                  }
+                  onChange={() =>
+                    dispatch({ type: "toggle", payload: [user.id || 0] })
+                  }
+                  control={
+                    <Checkbox
+                      checked={user.selected == null ? false : user.selected}
+                    />
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
       </div>
 
       <Button size="small" variant="contained" onClick={handleAdd}>
