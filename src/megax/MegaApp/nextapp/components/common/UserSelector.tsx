@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { memo, useEffect, useReducer, useRef } from "react";
 import CommonSearch from "../grid/CommonSearch";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
@@ -22,6 +21,8 @@ type UserRecord = Pick<User, "id" | "fullName" | "email"> & {
 
 type _State = {
   users: UserRecord[];
+  keyword?: string;
+  rand: number;
 };
 
 type _Action =
@@ -32,11 +33,15 @@ type _Action =
   | {
       type: "set";
       payload: UserRecord[];
+    }
+  | {
+      type: "reload";
+      payload: { keyword: string; rand: number };
     };
 
 function userSelectorReducer(state: _State, action: _Action) {
   const { type, payload } = action;
-  let users = [];
+  let users: UserRecord[] = [];
 
   switch (type) {
     case "set":
@@ -48,6 +53,12 @@ function userSelectorReducer(state: _State, action: _Action) {
         selected: action.payload.includes(u.id || 0) ? !u.selected : u.selected,
       }));
       break;
+    case "reload":
+      return {
+        ...state,
+        keyword: payload.keyword,
+        rand: payload.rand,
+      };
   }
 
   return {
@@ -59,11 +70,14 @@ function userSelectorReducer(state: _State, action: _Action) {
 export default function UserSelector() {
   const initState: _State = {
     users: [],
+    keyword: "",
+    rand: 0,
   };
 
-  const [{ users }, dispatch] = useReducer(userSelectorReducer, initState);
-  const [rand, setRand] = useState(0);
-  const [keyword, setKeyword] = useState("");
+  const [{ users, keyword, rand }, dispatch] = useReducer(
+    userSelectorReducer,
+    initState
+  );
   const snapshot = useRef(users);
 
   const {
@@ -75,7 +89,7 @@ export default function UserSelector() {
     queryFn: () =>
       fetchUserList({
         query: keyword,
-        pageSize: 100,
+        pageSize: 500,
         sortBy: "id",
         sortDir: "desc",
       }),
@@ -84,10 +98,8 @@ export default function UserSelector() {
 
   const fuse = new Fuse(source || [], {
     keys: ["fullName", "email"],
-    minMatchCharLength: 3, // ignore single match
-    threshold: 0.4,
-    includeScore: true,
-    includeMatches: true
+    minMatchCharLength: 2, // ignore single match
+    threshold: 0.5,
   });
 
   useEffect(() => {
@@ -104,18 +116,23 @@ export default function UserSelector() {
 
   const handleSearch = (q: string) => {
     if (!q) {
-      setRand(Date.now());
+      dispatch({
+        type: "reload",
+        payload: {
+          keyword: "",
+          rand: Date.now(),
+        },
+      });
       return;
     }
 
     const result = fuse.search(q);
-    console.log(result);
 
     if (result.length) {
       dispatch({ type: "set", payload: result.map(r => r.item) });
     } else {
       // trigger api search
-      setKeyword(q);
+      dispatch({ type: "reload", payload: { keyword: q, rand: Date.now() } });
     }
   };
 
@@ -139,17 +156,17 @@ export default function UserSelector() {
     </div>
   );
 
-  const LoadingList = () => {
+  const LoadingList = memo(() => {
     return (
       <>
         {makeArrOf(3, i => (
-          <div className="border-b border-slate-200">
-            <LoadingSkeleton key={i} />
+          <div className="border-b border-slate-200" key={i}>
+            <LoadingSkeleton />
           </div>
         ))}
       </>
     );
-  };
+  });
 
   return (
     <div>
@@ -159,6 +176,8 @@ export default function UserSelector() {
           <div className="border border-slate-200 rounded my-2">
             <LoadingList />
           </div>
+        ) : users.length == 0 ? (
+          <div className="py-4">No user found</div>
         ) : (
           <List
             dense
