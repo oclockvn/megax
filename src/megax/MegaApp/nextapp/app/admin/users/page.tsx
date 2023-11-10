@@ -1,10 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { fetchUsersThunk } from "@/lib/store/users.state";
 import datetime from "@/lib/datetime";
 import { Filter, PageModel } from "@/lib/models/common.model";
 
@@ -13,6 +11,8 @@ import { usePathname } from "next/navigation";
 import LinearProgress from "@mui/material/LinearProgress";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserList } from "@/lib/apis/user.api";
 
 const CustomPagination = dynamic(
   () => import("@/components/grid/CustomPagination")
@@ -21,9 +21,6 @@ const CommonSearch = dynamic(() => import("@/components/grid/CommonSearch"));
 
 export default function UserListPage() {
   const pathname = usePathname();
-  const appDispatch = useAppDispatch();
-  const loadRef = useRef(false);
-  const { loading, pagedUsers } = useAppSelector(s => s.users);
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
     pageSize: 100,
@@ -100,9 +97,13 @@ export default function UserListPage() {
     }
   };
 
-  useEffect(() => {
-    appDispatch(fetchUsersThunk(filter));
-  }, [filter]);
+  const { isLoading, data} = useQuery({
+    queryKey: ['users', filter],
+    queryFn: () => fetchUserList(filter),
+  });
+
+  const items = data?.items || []
+  const total = data?.total || 0
 
   return (
     <div className="container mx-auto p-4">
@@ -112,7 +113,7 @@ export default function UserListPage() {
 
       <TableContainer component={Paper}>
         <DataGrid
-          rows={pagedUsers.items}
+          rows={items}
           columns={columns}
           initialState={{
             pagination: {
@@ -124,14 +125,14 @@ export default function UserListPage() {
             pagination: CustomPagination,
             loadingOverlay: LinearProgress,
           }}
-          rowCount={pagedUsers.total}
+          rowCount={total}
           paginationMode="server"
           paginationModel={pagingModel}
           onPaginationModelChange={onPaging}
           pageSizeOptions={[100]}
           sortingMode="server"
           onSortModelChange={onSorting}
-          loading={loading}
+          loading={isLoading}
         />
       </TableContainer>
     </div>
