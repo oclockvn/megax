@@ -69,9 +69,10 @@ function userSelectorReducer(state: _State, action: _Action) {
 
 type UserSelectorProps = {
   onOk: (selected: Pick<User, "id" | "fullName">[]) => void;
+  onCancel: () => void;
 };
 
-export default function UserSelector({ onOk }: UserSelectorProps) {
+export default function UserSelector({ onOk, onCancel }: UserSelectorProps) {
   const initState: _State = {
     users: [],
     keyword: "",
@@ -215,9 +216,15 @@ export default function UserSelector({ onOk }: UserSelectorProps) {
         )}
       </div>
 
-      <Button size="small" variant="contained" onClick={handleAdd}>
-        Add
-      </Button>
+      <div className="mt-4">
+        <Button variant="contained" onClick={handleAdd} className="px-8 me-4">
+          Add
+        </Button>
+
+        <Button variant="text" onClick={() => onCancel()}>
+          Cancel
+        </Button>
+      </div>
     </div>
   );
 }

@@ -17,8 +17,12 @@ import Avatar from "@mui/material/Avatar";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import CheckIcon from "@mui/icons-material/Check";
+import AddIcon from "@mui/icons-material/Add";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import RemoveIcon from "@mui/icons-material/Remove";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
 import UserSelector from "@/components/common/UserSelector";
 import { useMutation } from "@tanstack/react-query";
 import { updateTeam } from "@/lib/apis/team.api";
@@ -27,6 +31,11 @@ import { User } from "@/lib/models/user.model";
 import { uniqBy } from "@/lib/helpers/array";
 import toast from "react-hot-toast";
 import { getInitial } from "@/lib/string.helper";
+import {
+  usePopupState,
+  bindTrigger,
+  bindDialog,
+} from "material-ui-popup-state/hooks";
 
 type TeamDetailState = {
   members: TeamMember[];
@@ -76,7 +85,13 @@ function teamDetailReducer(state: TeamDetailState, action: TeamDetailAction) {
   }
 }
 
-export default function TeamForm({ current, onSuccess }: { current?: Team, onSuccess?: (team: Team) => void }) {
+export default function TeamForm({
+  current,
+  onSuccess,
+}: {
+  current?: Team;
+  onSuccess?: (team: Team) => void;
+}) {
   const initState: TeamDetailState = {
     members: [],
     loading: false,
@@ -85,6 +100,10 @@ export default function TeamForm({ current, onSuccess }: { current?: Team, onSuc
 
   const [state, dispatch] = useReducer(teamDetailReducer, initState);
   const membersRef = useRef<TeamMember[]>([]);
+
+  const popupState = usePopupState({
+    variant: "dialog",
+  });
 
   const saveTeam = useMutation({
     mutationFn: (team: Partial<Team>) => {
@@ -119,6 +138,8 @@ export default function TeamForm({ current, onSuccess }: { current?: Team, onSuc
           ({ memberId: id, memberName: fullName } as TeamMember)
       ),
     });
+
+    popupState.close();
   };
 
   const handleSave = async (team: Team) => {
@@ -138,73 +159,103 @@ export default function TeamForm({ current, onSuccess }: { current?: Team, onSuc
   };
 
   return (
-    <FormContainer formContext={form} onSuccess={handleSave}>
-      <Card className="max-w-[800px] mx-auto">
-        <CardHeader title="Team detail" />
-        <CardContent>
-          <TextFieldElement name="name" fullWidth required label="Team name" />
+    <>
+      <FormContainer formContext={form} onSuccess={handleSave}>
+        <Card className="max-w-[800px] mx-auto">
+          <CardHeader title="Team detail" />
+          <CardContent>
+            <TextFieldElement
+              name="name"
+              fullWidth
+              required
+              label="Team name"
+            />
 
-          <div className="mt-4">
-            <UserSelector onOk={onSelectedMember} />
-          </div>
-
-          <List
-            className="border border-gray-200 rounded mt-4 overflow-hidden"
-            subheader={<ListSubheader>Members</ListSubheader>}
-          >
-            {state.members?.map(mem => (
-              <ListItem
-                key={mem.memberId}
-                className={`border-t border-gray-300${
-                  mem.leader ? " bg-fuchsia-100" : ""
-                }`}
-                secondaryAction={
-                  <div>
-                    <FormControlLabel
-                      label="Leader"
-                      control={
-                        <Checkbox
-                          checked={!!mem.leader}
-                          icon={<RemoveIcon />}
-                          checkedIcon={<CheckIcon />}
-                          onChange={() =>
-                            dispatch({
-                              type: "toggleLeader",
-                              payload: [mem.memberId],
-                            })
-                          }
-                        />
-                      }
-                    />
+            <List
+              className="border border-gray-200 rounded mt-4 overflow-hidden"
+              subheader={
+                <ListSubheader>
+                  <div className="flex items-center justify-between">
+                    <span>Members</span>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      {...bindTrigger(popupState)}
+                    >
+                      Add members
+                    </Button>
                   </div>
-                }
-              >
-                <ListItemIcon>
-                  <Avatar
-                    children={getInitial(mem.memberName!)}
-                    sizes={"32px"}
-                  />
-                </ListItemIcon>
-                <ListItemText children={mem.memberName} />
-              </ListItem>
-            ))}
-          </List>
+                </ListSubheader>
+              }
+            >
+              {state.members?.map(mem => (
+                <ListItem
+                  key={mem.memberId}
+                  className={`border-t border-gray-300${
+                    mem.leader ? " bg-fuchsia-100" : ""
+                  }`}
+                  secondaryAction={
+                    <div>
+                      <FormControlLabel
+                        label="Leader"
+                        control={
+                          <Checkbox
+                            checked={!!mem.leader}
+                            icon={<RemoveIcon />}
+                            checkedIcon={<CheckIcon />}
+                            onChange={() =>
+                              dispatch({
+                                type: "toggleLeader",
+                                payload: [mem.memberId],
+                              })
+                            }
+                          />
+                        }
+                      />
+                    </div>
+                  }
+                >
+                  <ListItemIcon>
+                    <Avatar
+                      children={getInitial(mem.memberName!)}
+                      sizes={"32px"}
+                    />
+                  </ListItemIcon>
+                  <ListItemText children={mem.memberName} />
+                </ListItem>
+              ))}
+            </List>
 
-          {state.error && (
-            <Alert severity="error" children={state.error} className="mt-4" />
-          )}
-        </CardContent>
-        <CardActions className="bg-blue-50">
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            className="px-8"
-          >
-            Save
-          </Button>
-        </CardActions>
-      </Card>
-    </FormContainer>
+            {state.error && (
+              <Alert severity="error" children={state.error} className="mt-4" />
+            )}
+          </CardContent>
+          <CardActions className="bg-blue-50">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              className="px-8"
+            >
+              Save
+            </Button>
+          </CardActions>
+        </Card>
+      </FormContainer>
+
+      <Dialog
+        {...bindDialog(popupState)}
+        aria-labelledby="approval-popup"
+        aria-describedby="approval-popup"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="approval-popup">{"Are you sure?"}</DialogTitle>
+        <DialogContent>
+          <UserSelector onCancel={() => popupState.close()} onOk={onSelectedMember} />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
