@@ -20,6 +20,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import AddIcon from "@mui/icons-material/Add";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import RemoveIcon from "@mui/icons-material/Remove";
+import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -36,6 +37,7 @@ import {
   bindTrigger,
   bindDialog,
 } from "material-ui-popup-state/hooks";
+import IconButton from "@mui/material/IconButton";
 
 type TeamDetailState = {
   members: TeamMember[];
@@ -55,6 +57,10 @@ type TeamDetailAction =
   | {
       type: "addMember";
       payload: TeamMember[];
+    }
+  | {
+      type: "removeMember";
+      payload: number;
     };
 
 function teamDetailReducer(state: TeamDetailState, action: TeamDetailAction) {
@@ -77,6 +83,11 @@ function teamDetailReducer(state: TeamDetailState, action: TeamDetailAction) {
       return {
         ...state,
         members: uniqBy([...payload, ...state.members], "memberId"),
+      };
+    case "removeMember":
+      return {
+        ...state,
+        members: state.members.filter(m => m.memberId !== payload),
       };
     default:
       return {
@@ -172,7 +183,7 @@ export default function TeamForm({
             />
 
             <List
-              className="border border-gray-200 rounded mt-4 overflow-hidden"
+              className={ `border border-gray-200 rounded mt-4 overflow-hidden${!state.members || !state.members.length ? ' !pb-0' : ''}` }
               subheader={
                 <ListSubheader>
                   <div className="flex items-center justify-between">
@@ -213,6 +224,19 @@ export default function TeamForm({
                           />
                         }
                       />
+
+                      <IconButton
+                        color="warning"
+                        size="small"
+                        onClick={() =>
+                          dispatch({
+                            type: "removeMember",
+                            payload: mem.memberId,
+                          })
+                        }
+                      >
+                        <CloseIcon />
+                      </IconButton>
                     </div>
                   }
                 >
@@ -253,7 +277,10 @@ export default function TeamForm({
       >
         <DialogTitle id="approval-popup">{"Are you sure?"}</DialogTitle>
         <DialogContent>
-          <UserSelector onCancel={() => popupState.close()} onOk={onSelectedMember} />
+          <UserSelector
+            onCancel={() => popupState.close()}
+            onOk={onSelectedMember}
+          />
         </DialogContent>
       </Dialog>
     </>
