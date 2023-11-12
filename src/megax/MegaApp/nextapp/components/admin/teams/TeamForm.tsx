@@ -76,7 +76,7 @@ function teamDetailReducer(state: TeamDetailState, action: TeamDetailAction) {
   }
 }
 
-export default function TeamForm({ current }: { current?: Team }) {
+export default function TeamForm({ current, onSuccess }: { current?: Team, onSuccess?: (team: Team) => void }) {
   const initState: TeamDetailState = {
     members: [],
     loading: false,
@@ -128,6 +128,7 @@ export default function TeamForm({ current }: { current?: Team }) {
     });
     if (result.success) {
       toast.success(`Team saved successfully`);
+      onSuccess && onSuccess(result.data);
     } else {
       dispatch({
         type: "set",

@@ -155,14 +155,11 @@ export default function DeviceListPage() {
           <CommonSearch handleSearch={onSearch} />
         </Grid>
         <Grid item xs={6} textAlign={"right"}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            href={`${pathname}/new`}
-          >
-            New Device
-          </Button>
+          <Link href={`${pathname}/new`}>
+            <Button variant="contained" color="primary" startIcon={<AddIcon />}>
+              New Device
+            </Button>
+          </Link>
         </Grid>
       </Grid>
 

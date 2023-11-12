@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchTeamsThunk } from "@/lib/store/teams.state";
@@ -28,6 +29,7 @@ import Paper from "@mui/material/Paper";
 
 export default function TeamPage() {
   const appDispatch = useAppDispatch();
+  const pathname = usePathname()
   const { teams, loading } = useAppSelector(s => s.teams);
   const [filtered, setFilter] = useState<Team[]>([]);
 
@@ -56,18 +58,11 @@ export default function TeamPage() {
       <div className="mb-4 flex justify-between items-center">
         <CommonSearch keypress handleSearch={handleSearch} />
 
-        <Button
-          variant="contained"
-          onClick={() => {
-            setFilter(prev => [
-              { id: Date.now(), name: "test", members: [], leaders: [] },
-              ...prev,
-            ]);
-          }}
-        >
-          <AddIcon fontSize="inherit" className="me-2" />
-          Add Team
-        </Button>
+        <Link href={`${pathname}/new`}>
+          <Button variant="contained" startIcon={<AddIcon />}>
+            Add Team
+          </Button>
+        </Link>
       </div>
 
       <TableContainer component={Paper}>
@@ -94,14 +89,10 @@ export default function TeamPage() {
                   </Link>
                 </TableCell>
                 <TableCell scope="row" width={200}>
-                  <AvatarGroup
-                    className="[justify-content:start]"
-                  >
+                  <AvatarGroup className="[justify-content:start]">
                     {team.leaders?.map(l => (
                       <Tooltip key={l.memberId} title={l.memberName}>
-                        <Avatar
-                          className="w-[32px] h-[32px] text-sm bg-blue-500"
-                        >
+                        <Avatar className="w-[32px] h-[32px] text-sm bg-blue-500">
                           {l.memberName ? getInitial(l.memberName) : "UNK"}
                         </Avatar>
                       </Tooltip>
@@ -110,7 +101,7 @@ export default function TeamPage() {
                 </TableCell>
                 <TableCell align="right">
                   <IconButton size="small" color="error">
-                    <CloseIcon fontSize="inherit"/>
+                    <CloseIcon fontSize="inherit" />
                   </IconButton>
                 </TableCell>
               </TableRow>
