@@ -67,7 +67,11 @@ function userSelectorReducer(state: _State, action: _Action) {
   };
 }
 
-export default function UserSelector() {
+type UserSelectorProps = {
+  onOk: (selected: Pick<User, "id" | "fullName">[]) => void;
+};
+
+export default function UserSelector({ onOk }: UserSelectorProps) {
   const initState: _State = {
     users: [],
     keyword: "",
@@ -137,9 +141,10 @@ export default function UserSelector() {
   };
 
   const handleAdd = () => {
-    console.log(
-      "latest data",
-      snapshot.current.filter(u => u.selected)
+    onOk(
+      snapshot.current
+        .filter(u => u.selected)
+        .map(({ id, fullName }) => ({ id, fullName }))
     );
   };
 

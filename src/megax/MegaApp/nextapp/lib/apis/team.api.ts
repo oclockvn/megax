@@ -27,7 +27,7 @@ export async function createTeam(team: Team) {
 
 export async function updateTeam(team: Team) {
   try {
-    const res = await api.post<Result<Team>>(`api/teams/${team.id}`, { team });
+    const res = await api.put<Result<Team>>(`api/teams/${team.id}`, team);
     return res.data;
   } catch (err) {
     return {

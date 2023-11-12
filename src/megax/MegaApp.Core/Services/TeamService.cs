@@ -96,7 +96,7 @@ internal class TeamService : ITeamService
         {
             Id = team.Id,
             Name = team.Name,
-            Members = team.Members.Select(m => new TeamMemberModel(team.Id, m.MemberId, m.Leader)).ToList()
+            Members = team.Members.Select(m => new TeamMemberModel(m.MemberId, m.Leader)).ToList()
         });
     }
 
@@ -120,7 +120,6 @@ internal class TeamService : ITeamService
                 Name = x.Name,
                 Members = x.Members.Select(m => new TeamMemberModel
                 {
-                    TeamId = m.TeamId,
                     MemberId = m.MemberId,
                     // MemberName = m.Member.FullName,
                     Leader = m.Leader
@@ -134,7 +133,6 @@ internal class TeamService : ITeamService
             Name = x.Name,
             Members = x.Members.Where(m => include != TeamModel.Include.Leader || m.Leader).Select(m => new TeamMemberModel
             {
-                TeamId = m.TeamId,
                 MemberId = m.MemberId,
                 MemberName = m.Member.FullName,
                 Leader = m.Leader
@@ -149,7 +147,10 @@ internal class TeamService : ITeamService
         {
             Id = x.Id,
             Name = x.Name,
-            Members = x.Members.Select(m => new TeamMemberModel(m.TeamId, m.MemberId, m.Leader)).ToList()
+            Members = x.Members.Select(m => new TeamMemberModel(m.MemberId, m.Leader)
+            {
+                MemberName = m.Member.FullName,
+            }).ToList()
         }).FirstOrDefaultAsync();
     }
 

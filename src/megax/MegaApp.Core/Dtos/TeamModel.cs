@@ -22,7 +22,6 @@ public class TeamModel
 
 public record TeamMemberModel
 {
-    public int TeamId { get; set; }
     public int MemberId { get; set; }
     public string MemberName { get; set; }
     public bool Leader { get; set; }
@@ -32,9 +31,8 @@ public record TeamMemberModel
 
     }
 
-    public TeamMemberModel(int teamId, int memberId, bool leader)
+    public TeamMemberModel(int memberId, bool leader)
     {
-        TeamId = teamId;
         MemberId = memberId;
         Leader = leader;
     }

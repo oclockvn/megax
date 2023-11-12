@@ -2,7 +2,7 @@ export type Team = {
   id: number;
   name: string;
   members: TeamMember[];
-  leaders: TeamMember[];
+  leaders?: TeamMember[];
 };
 
 export type TeamMember = {
