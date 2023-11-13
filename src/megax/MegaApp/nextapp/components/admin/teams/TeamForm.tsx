@@ -2,6 +2,8 @@
 
 import React, { useEffect, useReducer, useRef } from "react";
 
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -18,6 +20,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import CheckIcon from "@mui/icons-material/Check";
 import AddIcon from "@mui/icons-material/Add";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CloseIcon from "@mui/icons-material/Close";
@@ -36,8 +39,10 @@ import {
   usePopupState,
   bindTrigger,
   bindDialog,
+  bindMenu,
 } from "material-ui-popup-state/hooks";
 import IconButton from "@mui/material/IconButton";
+import { useConfirm } from "material-ui-confirm";
 
 type TeamDetailState = {
   members: TeamMember[];
@@ -116,6 +121,13 @@ export default function TeamForm({
     variant: "dialog",
   });
 
+  const teamActionState = usePopupState({
+    variant: "popover",
+    popupId: "device-menu",
+  });
+
+  const confirm = useConfirm();
+
   const saveTeam = useMutation({
     mutationFn: (team: Partial<Team>) => {
       return updateTeam({
@@ -169,11 +181,34 @@ export default function TeamForm({
     }
   };
 
+  const handleDeleteTeam = (id: number) => {};
+
+  const confirmAction = () => {
+    confirm({
+      description: `Delete this team?`,
+      dialogProps: { maxWidth: "xs" },
+    })
+      .then(() => handleDeleteTeam(current!.id!))
+      .then(() => popupState.close())
+      .catch(() => {
+        /* swallow error */
+      });
+  };
+
   return (
     <>
       <FormContainer formContext={form} onSuccess={handleSave}>
         <Card className="max-w-[800px] mx-auto">
-          <CardHeader title="Team detail" />
+          <CardHeader
+            title="Team detail"
+            action={
+              current?.id ? (
+                <IconButton size="small" {...bindTrigger(teamActionState)}>
+                  <MoreVertIcon />
+                </IconButton>
+              ) : undefined
+            }
+          />
           <CardContent>
             <TextFieldElement
               name="name"
@@ -183,7 +218,9 @@ export default function TeamForm({
             />
 
             <List
-              className={ `border border-gray-200 rounded mt-4 overflow-hidden${!state.members || !state.members.length ? ' !pb-0' : ''}` }
+              className={`border border-gray-200 rounded mt-4 overflow-hidden${
+                !state.members || !state.members.length ? " !pb-0" : ""
+              }`}
               subheader={
                 <ListSubheader>
                   <div className="flex items-center justify-between">
@@ -283,6 +320,19 @@ export default function TeamForm({
           />
         </DialogContent>
       </Dialog>
+
+      <Menu
+        {...bindMenu(teamActionState)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <MenuItem onClick={() => confirmAction()}>
+          <ListItemIcon>
+            <CloseIcon color="warning" />
+          </ListItemIcon>
+          Delete Team
+        </MenuItem>
+      </Menu>
     </>
   );
 }

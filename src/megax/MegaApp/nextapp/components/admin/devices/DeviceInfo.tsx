@@ -162,7 +162,7 @@ DeviceInfoProps) {
                   <Chip label="Device is disabled" color="warning" />
                 )}
 
-                <IconButton {...bindTrigger(popupState)}>
+                <IconButton size="small" {...bindTrigger(popupState)}>
                   <MoreVertIcon />
                 </IconButton>
                 <Menu

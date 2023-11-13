@@ -71,7 +71,6 @@ export default function TeamPage() {
             <TableRow>
               <TableCell width={300}>Team</TableCell>
               <TableCell width={200}>Leaders</TableCell>
-              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -98,11 +97,6 @@ export default function TeamPage() {
                       </Tooltip>
                     ))}
                   </AvatarGroup>
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton size="small" color="error">
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
