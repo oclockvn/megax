@@ -2,7 +2,7 @@
 
 import React, { memo, useEffect, useReducer, useRef } from "react";
 import CommonSearch from "../grid/CommonSearch";
-import List from "@mui/material/List";
+// import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
@@ -15,7 +15,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Skeleton from "@mui/material/Skeleton";
 import { makeArrOf } from "@/lib/helpers/array";
 
-import { FixedSizeList, ListChildComponentProps } from 'react-window';
+import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 type UserRecord = Pick<User, "id" | "fullName" | "email"> & {
   selected?: boolean;
@@ -177,33 +177,28 @@ export default function UserSelector({ onOk, onCancel }: UserSelectorProps) {
   });
 
   function renderRow(props: ListChildComponentProps) {
-    const { index, style } = props
+    const { index, style } = props;
+    const user = users[index];
 
     return (
-      <ListItem style={style}
-
-                className={index === 0 ? "" : `border-t border-slate-200`}
+      <ListItem
+        style={style}
+        className={index === 0 ? "" : `border-t border-slate-200`}
       >
-
-                <FormControlLabel
-                  label={
-                    <ListItemText>
-                      <div>{user.fullName}</div>
-                      <small>{user.email}</small>
-                    </ListItemText>
-                  }
-                  onChange={() =>
-                    dispatch({ type: "toggle", payload: [user.id || 0] })
-                  }
-                  control={
-                    <Checkbox
-                      checked={user.selected == null ? false : user.selected}
-                    />
-                  }
-                />
-
+        <FormControlLabel
+          label={
+            <ListItemText>
+              <div className="[line-height:1]">{user.fullName}</div>
+              <small>{user.email}</small>
+            </ListItemText>
+          }
+          onChange={() => dispatch({ type: "toggle", payload: [user.id || 0] })}
+          control={
+            <Checkbox checked={user.selected == null ? false : user.selected} />
+          }
+        />
       </ListItem>
-    )
+    );
   }
 
   return (
@@ -220,36 +215,13 @@ export default function UserSelector({ onOk, onCancel }: UserSelectorProps) {
           <FixedSizeList<UserRecord>
             className="my-2 border border-slate-200 rounded max-h-[500px] overflow-auto"
             itemCount={users?.length || 0}
-            itemSize={50}
+            itemSize={56}
             overscanCount={5}
             height={500}
-            width={300}
-            itemData={(users satisfies UserRecord[]) || []}
+            width={550}
+            itemKey={(i, u) => u?.id || i}
           >
             {renderRow}
-            {/* {users.map((user, index) => (
-              <ListItem
-                key={user.id}
-                className={index === 0 ? "" : `border-t border-slate-200`}
-              >
-                <FormControlLabel
-                  label={
-                    <ListItemText>
-                      <div>{user.fullName}</div>
-                      <small>{user.email}</small>
-                    </ListItemText>
-                  }
-                  onChange={() =>
-                    dispatch({ type: "toggle", payload: [user.id || 0] })
-                  }
-                  control={
-                    <Checkbox
-                      checked={user.selected == null ? false : user.selected}
-                    />
-                  }
-                />
-              </ListItem>
-            ))} */}
           </FixedSizeList>
         )}
       </div>
