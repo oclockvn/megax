@@ -15,6 +15,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Skeleton from "@mui/material/Skeleton";
 import { makeArrOf } from "@/lib/helpers/array";
 
+import { FixedSizeList, ListChildComponentProps } from 'react-window';
+
 type UserRecord = Pick<User, "id" | "fullName" | "email"> & {
   selected?: boolean;
 };
@@ -174,6 +176,36 @@ export default function UserSelector({ onOk, onCancel }: UserSelectorProps) {
     );
   });
 
+  function renderRow(props: ListChildComponentProps) {
+    const { index, style } = props
+
+    return (
+      <ListItem style={style}
+
+                className={index === 0 ? "" : `border-t border-slate-200`}
+      >
+
+                <FormControlLabel
+                  label={
+                    <ListItemText>
+                      <div>{user.fullName}</div>
+                      <small>{user.email}</small>
+                    </ListItemText>
+                  }
+                  onChange={() =>
+                    dispatch({ type: "toggle", payload: [user.id || 0] })
+                  }
+                  control={
+                    <Checkbox
+                      checked={user.selected == null ? false : user.selected}
+                    />
+                  }
+                />
+
+      </ListItem>
+    )
+  }
+
   return (
     <div>
       <CommonSearch label="Member search" handleSearch={handleSearch} />
@@ -185,11 +217,17 @@ export default function UserSelector({ onOk, onCancel }: UserSelectorProps) {
         ) : users.length == 0 ? (
           <div className="py-4">No user found</div>
         ) : (
-          <List
-            dense
+          <FixedSizeList<UserRecord>
             className="my-2 border border-slate-200 rounded max-h-[500px] overflow-auto"
+            itemCount={users?.length || 0}
+            itemSize={50}
+            overscanCount={5}
+            height={500}
+            width={300}
+            itemData={(users satisfies UserRecord[]) || []}
           >
-            {users.map((user, index) => (
+            {renderRow}
+            {/* {users.map((user, index) => (
               <ListItem
                 key={user.id}
                 className={index === 0 ? "" : `border-t border-slate-200`}
@@ -211,8 +249,8 @@ export default function UserSelector({ onOk, onCancel }: UserSelectorProps) {
                   }
                 />
               </ListItem>
-            ))}
-          </List>
+            ))} */}
+          </FixedSizeList>
         )}
       </div>
 
