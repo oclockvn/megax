@@ -9,7 +9,7 @@ public record DocumentModel
 
     [MaxLength(255)]
     public string DocumentType { get; set; } // CMND|CCCD
-    public DateTimeOffset? IssueDate { get; set; }
+    public DateTimeOffset? IssueDate { get; set; } = null;
 
     [MaxLength(255)]
     public string DocumentNumber { get; set; }

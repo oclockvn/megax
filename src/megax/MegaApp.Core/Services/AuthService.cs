@@ -34,6 +34,7 @@ internal class AuthService : IAuthService
             .SingleOrDefaultAsync();
 
         var correctPassword = !string.IsNullOrWhiteSpace(account?.Password) && Utils.Extensions.EncryptExtension.IsHashedMatches(account.Password, password);
+
         #if DEBUG
         correctPassword = true;
         #endif

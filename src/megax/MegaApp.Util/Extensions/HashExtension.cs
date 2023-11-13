@@ -25,6 +25,18 @@ public static class EncryptExtension
     /// <returns></returns>
     public static bool IsHashedMatches(this string hashed, string raw)
     {
-        return BCrypt.Net.BCrypt.Verify(raw, hashed);
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return false;
+        }
+
+        try
+        {
+            return BCrypt.Net.BCrypt.Verify(raw, hashed);
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

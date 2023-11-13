@@ -66,6 +66,11 @@ function Nav() {
       requiredRoles: ["admin", "hr", "leader"],
     },
     {
+      label: "Teams",
+      href: "/admin/teams",
+      requiredRoles: ["admin", "hr", "leader"],
+    },
+    {
       label: "Timesheet",
       href: "/admin/timesheet",
       requiredRoles: ["admin", "hr", "leader"],

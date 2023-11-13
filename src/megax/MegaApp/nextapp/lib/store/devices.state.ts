@@ -8,7 +8,7 @@ import {
 import { Device, DeviceType } from "../models/device.model";
 import {
   addDevice,
-  deleteDevice,
+  toggleDevice,
   fetchDeviceDetail,
   fetchDeviceList,
   getDeviceTypes,
@@ -73,11 +73,11 @@ export const addDeviceThunk = createAsyncThunk(
   }
 );
 
-export const deleteDeviceThunk = createAsyncThunk(
-  "devices/delete-device",
+export const toggleDeviceThunk = createAsyncThunk(
+  "devices/device-toggle",
   async (id: number, thunkApi) => {
     thunkApi.dispatch(devicesSlice.actions.setLoadingState("Processing..."));
-    return await deleteDevice(id);
+    return await toggleDevice(id);
   }
 );
 
@@ -157,14 +157,19 @@ export const devicesSlice = createSlice({
         state.loadingState = undefined;
         state.error = `Something went wrong`;
       })
-      .addCase(deleteDeviceThunk.fulfilled, (state, action) => {
+      .addCase(toggleDeviceThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.loadingState = undefined;
-        state.error = action.payload.success
+        const { success } = action.payload;
+        if (success && state.currentDevice) {
+          state.currentDevice.disabled = !state.currentDevice.disabled;
+        }
+
+        state.error = success
           ? undefined
-          : `Couldn't delete device. Error code: ${action.payload.code}`;
+          : `Something went wrong. Error code: ${action.payload.code}`;
       })
-      .addCase(deleteDeviceThunk.rejected, (state, _) => {
+      .addCase(toggleDeviceThunk.rejected, (state, _) => {
         state.loading = false;
         state.loadingState = undefined;
         state.error = `Something went wrong`;

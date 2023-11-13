@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import dynamic from "next/dynamic";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -11,11 +14,11 @@ import IconButton from "@mui/material/IconButton";
 import Drawer from "@mui/material/Drawer";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+
 import { useConfirm } from "material-ui-confirm";
 import { Contact } from "@/lib/models/contact.model";
-import { useState } from "react";
-import Button from "@mui/material/Button";
-import UserContactForm from "./UserContactForm";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import {
   createUpdateContactThunk,
@@ -23,7 +26,8 @@ import {
   setLoading,
 } from "@/lib/store/users.state";
 import { toast } from "react-hot-toast";
-import Chip from "@mui/material/Chip";
+
+const UserContactForm = dynamic(() => import("./UserContactForm"));
 
 export default function UserContactList() {
   const confirmation = useConfirm();

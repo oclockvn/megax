@@ -53,7 +53,7 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
     <>
       <div className="p-4 w-[500px]">
         <h4 className="uppercase !text-[1.2rem] font-semibold mb-4">
-          Edit document
+          {Number(document?.id) > 0 ? `Viewing ${document.documentType} ${document.documentNumber}` : 'Edit document'}
         </h4>
 
         <FormContainer values={document} onSuccess={handleSubmit}>

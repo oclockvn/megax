@@ -29,6 +29,7 @@
     "date-fns": "^2.30.0",
     "eslint-config-next": "^14.0.0",
     "file-saver": "^2.0.5",
+    "fuse.js": "^7.0.0",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "material-ui-confirm": "^3.0.9",
@@ -41,15 +42,19 @@
     "react-hook-form": "^7.46.2",
     "react-hook-form-mui": "^6.5.2",
     "react-hot-toast": "^2.4.1",
+    "react-magic-motion": "^1.1.1",
     "react-redux": "^8.1.2",
     "react-timeago": "^7.2.0",
+    "react-window": "^1.8.9",
     "tailwindcss": "3.3.3",
     "typescript": "5.2.2",
     "yup": "^1.2.0"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.5",
+    "@types/lodash": "^4.14.201",
     "@types/react-timeago": "^4.1.4",
+    "@types/react-window": "^1.8.8",
     "eslint": "8.52.0"
   }
 }
