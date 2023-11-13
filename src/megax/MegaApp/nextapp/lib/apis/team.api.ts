@@ -36,3 +36,15 @@ export async function updateTeam(team: Team) {
     } as Result<Team>;
   }
 }
+
+export async function deleteTeam(id: number) {
+  try {
+    const res = await api.delete<Result<boolean>>(`api/teams/${id}`);
+    return res.data;
+  } catch (err) {
+    return {
+      code: extractErrors(err),
+      success: false,
+    } as Result<Team>;
+  }
+}

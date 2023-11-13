@@ -1,8 +1,8 @@
 "use client";
 
-import React, {  } from "react";
+import React from "react";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -13,6 +13,7 @@ import TeamForm from "@/components/admin/teams/TeamForm";
 
 export default function TeamDetailPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     // isLoading,
     // status,
@@ -21,6 +22,10 @@ export default function TeamDetailPage({ params }: { params: { id: number } }) {
     queryKey: ["get-team", params.id],
     queryFn: () => getTeam(params.id),
   });
+
+  const onDeleted = () => {
+    router.push(pathname + "/..");
+  };
 
   return (
     <>
@@ -39,7 +44,7 @@ export default function TeamDetailPage({ params }: { params: { id: number } }) {
       </div>
 
       <div className="container mx-auto py-4">
-        <TeamForm current={current} />
+        <TeamForm current={current} onDeleted={onDeleted} />
       </div>
     </>
   );

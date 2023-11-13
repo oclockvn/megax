@@ -103,4 +103,19 @@ public class TeamsController : ApplicationControllerBase
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Delete team
+    /// </summary>
+    /// <param name="id">Team's id</param>
+    /// <returns></returns>
+    [HttpDelete("{id}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await teamService.DeleteTeamAsync(id);
+
+        return Ok(result);
+    }
 }

@@ -29,7 +29,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import UserSelector from "@/components/common/UserSelector";
 import { useMutation } from "@tanstack/react-query";
-import { updateTeam } from "@/lib/apis/team.api";
+import { deleteTeam, updateTeam } from "@/lib/apis/team.api";
 import { Team, TeamMember } from "@/lib/models/team.model";
 import { User } from "@/lib/models/user.model";
 import { uniqBy } from "@/lib/helpers/array";
@@ -104,9 +104,11 @@ function teamDetailReducer(state: TeamDetailState, action: TeamDetailAction) {
 export default function TeamForm({
   current,
   onSuccess,
+  onDeleted,
 }: {
   current?: Team;
   onSuccess?: (team: Team) => void;
+  onDeleted?: () => void;
 }) {
   const initState: TeamDetailState = {
     members: [],
@@ -136,6 +138,10 @@ export default function TeamForm({
         members: team.members || [],
       });
     },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteTeam(id),
   });
 
   useEffect(() => {
@@ -181,7 +187,18 @@ export default function TeamForm({
     }
   };
 
-  const handleDeleteTeam = (id: number) => {};
+  const handleDeleteTeam = async (id: number) => {
+    const res = await deleteMutation.mutateAsync(id);
+    if (res.success) {
+      onDeleted && onDeleted();
+      toast.success(`Team deleted successfully`);
+    } else {
+      dispatch({
+        type: "set",
+        payload: { error: `Could not delete team. Error code: ${res.code}` },
+      });
+    }
+  };
 
   const confirmAction = () => {
     confirm({
