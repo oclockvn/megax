@@ -3,7 +3,6 @@ import weatherStore from "./weather.state";
 import usersStore from "./users.state";
 import devicesStore from "./devices.state";
 import supplierStore from "./suppliers.state";
-import bankStore from "./banks.state";
 import taskStore from "./tasks.state";
 import projectStore from "./projects.state";
 import leaveStore from "./leave.state";
@@ -16,7 +15,6 @@ export const store = configureStore({
     users: usersStore,
     devices: devicesStore,
     suppliers: supplierStore,
-    banks: bankStore,
     tasks: taskStore,
     projects: projectStore,
     leaves: leaveStore,

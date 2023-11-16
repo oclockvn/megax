@@ -24,17 +24,23 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import datetime from "@/lib/datetime";
 import nationalities from "@/lib/constants/nationalities";
+import { useQuery } from "@tanstack/react-query";
+import { fetchBanks } from "@/lib/apis/banks.api";
 
 export default function UserInfo({ user }: { user: User | undefined }) {
   const appDispatch = useAppDispatch();
   const { loading, loadingState, error } = useAppSelector(s => s.users);
-  const {
-    pagedBanks: { items },
-  } = useAppSelector(s => s.banks);
-  const banks = items.map(i => ({
-    id: i.id,
-    label: i.code ? `${i.code} - ${i.name}` : i.name,
-  }));
+
+  const { data: banks } = useQuery({
+    queryKey: ["admin/user/banks"],
+    queryFn: () => fetchBanks({}),
+    select: response =>
+      response?.items?.map(i => ({
+        id: i.id,
+        label: i.code ? `${i.code} - ${i.name}` : i.name,
+      })),
+    staleTime: Infinity, // cache forever
+  });
 
   const handleFormSubmit = async (u: User) => {
     const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
@@ -381,7 +387,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 name="bankId"
                 label="Bank"
                 matchId
-                options={banks}
+                options={banks || []}
                 autocompleteProps={{
                   renderOption(attrs, o) {
                     return (
