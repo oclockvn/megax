@@ -33,22 +33,22 @@ export default function DevicePage({ params }: { params: { id: number } }) {
 
   return (
     <>
-      <div>
-        <div role="presentation" className="bg-blue-200 py-2 px-6">
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link
-              color="inherit"
-              href={`${pathname}/..`}
-              className="text-blue-500 flex items-center"
-            >
-              <ArrowBackIcon className="mr-2" />
-              Devices
-            </Link>
-            <div>{device?.name || "..."}</div>
-          </Breadcrumbs>
-        </div>
+      <div role="presentation" className="bg-blue-200 py-2 px-6">
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link
+            color="inherit"
+            href={`${pathname}/..`}
+            className="text-blue-500 flex items-center"
+          >
+            <ArrowBackIcon className="mr-2" />
+            Devices
+          </Link>
+          <div>{device?.name || "..."}</div>
+        </Breadcrumbs>
+      </div>
 
-        <Grid container spacing={2} className="p-4">
+      <div className="container mx-auto">
+        <Grid container spacing={2} className="py-4">
           <Grid item xs={8}>
             <DeviceInfo device={device} />
           </Grid>
