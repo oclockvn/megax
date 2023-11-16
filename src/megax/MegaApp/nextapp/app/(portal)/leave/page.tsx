@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { fetchLeaveSummaryThunk } from "@/lib/store/leave.state";
 import {
   Leave,
@@ -17,6 +17,8 @@ import {
 } from "@/lib/models/leave.model";
 import { makeArrOf } from "@/lib/helpers/array";
 import dt from "@/lib/datetime";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLeaveSummary } from "@/lib/apis/leave.api";
 
 const LeaveCard = dynamic(() => import("@/components/portal/leave/LeaveCard"), {
   ssr: false,
@@ -33,26 +35,93 @@ const LeaveCardLoading = dynamic(
   { ssr: false }
 );
 
+export type LeavePageState = {
+  items: Leave[];
+  capacity: number;
+  loading: boolean;
+  showDrawer: boolean;
+  leave: Partial<Leave> | null;
+};
+
+type Action = {
+  type: "set";
+  payload: Partial<LeavePageState>;
+};
+
+function leavePageReducer(state: LeavePageState, action: Action) {
+  const { type, payload } = action;
+
+  switch (type) {
+    case "set":
+      return {
+        ...state,
+        ...payload,
+      } as LeavePageState;
+  }
+}
+
 export default function LeavePage() {
-  const appDispatch = useAppDispatch();
-  const { items, capacity, loading } = useAppSelector(s => s.leaves);
-  const [showDrawer, setShowDrawer] = useState(false);
-  const [leave, setLeave] = useState<Partial<Leave> | null>(null);
+  // const appDispatch = useAppDispatch();
+  // const { items, capacity, loading } = useAppSelector(s => s.leaves);
+  // const [showDrawer, setShowDrawer] = useState(false);
+  // const [leave, setLeave] = useState<Partial<Leave> | null>(null);
+
+  // useEffect(() => {
+  //   appDispatch(fetchLeaveSummaryThunk());
+  // }, []);
+
+  const [state, dispatch] = useReducer(leavePageReducer, {
+    capacity: 0,
+    loading: true,
+    items: [],
+    leave: null,
+    showDrawer: false,
+  } as LeavePageState);
+
+  const {
+    isLoading: loading,
+    status,
+    data,
+  } = useQuery({
+    queryKey: ["user/leave"],
+    queryFn: () => fetchLeaveSummary(),
+  });
 
   useEffect(() => {
-    appDispatch(fetchLeaveSummaryThunk());
-  }, []);
+    if (status === "success") {
+      dispatch({
+        type: "set",
+        payload: {
+          items: data?.leaves || [],
+          capacity: data?.capacity || 0,
+        },
+      });
+    }
+  }, [status, data]);
 
   const handleCloseDrawer = () => {
-    setShowDrawer(false);
-    // appDispatch(setLoading({ loading: false }));
+    // setShowDrawer(false);
+    dispatch({
+      type: "set",
+      payload: { showDrawer: false },
+    });
   };
 
   const handleOpenLeave = (leave: Partial<Leave>) => {
-    setLeave(leave);
-    setShowDrawer(true);
-    // appDispatch(setLoading({ loading: false }));
+    // setLeave(leave);
+    // setShowDrawer(true);
+    dispatch({
+      type: "set",
+      payload: {
+        leave,
+        showDrawer: true,
+      },
+    });
   };
+
+  // const items = state.items || []
+  // const capacity = state.capacity
+  const { items, capacity, leave, showDrawer } = state
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = loading
