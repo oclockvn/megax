@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import weatherStore from "./weather.state";
 import usersStore from "./users.state";
-import devicesStore from "./devices.state";
 import supplierStore from "./suppliers.state";
 import taskStore from "./tasks.state";
 import projectStore from "./projects.state";
@@ -13,7 +12,6 @@ export const store = configureStore({
   reducer: {
     weather: weatherStore,
     users: usersStore,
-    devices: devicesStore,
     suppliers: supplierStore,
     tasks: taskStore,
     projects: projectStore,
