@@ -5,17 +5,13 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { fetchTeamsThunk } from "@/lib/store/teams.state";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import Avatar from "@mui/material/Avatar";
 
 import { Team, TeamQueryInclude } from "@/lib/models/team.model";
@@ -26,16 +22,17 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CommonSearch from "@/components/grid/CommonSearch";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
+import { useQuery } from "@tanstack/react-query";
+import { getTeams } from "@/lib/apis/team.api";
 
 export default function TeamPage() {
-  const appDispatch = useAppDispatch();
-  const pathname = usePathname()
-  const { teams, loading } = useAppSelector(s => s.teams);
-  const [filtered, setFilter] = useState<Team[]>([]);
+  const pathname = usePathname();
+  const [filtered, setFilter] = useState<Team[] | undefined>([]);
 
-  useEffect(() => {
-    appDispatch(fetchTeamsThunk({ include: TeamQueryInclude.Leader }));
-  }, [appDispatch]);
+  const { isLoading: loading, data: teams } = useQuery({
+    queryKey: ["admin/teams"],
+    queryFn: () => getTeams(TeamQueryInclude.Leader),
+  });
 
   useEffect(() => {
     setFilter(teams);
@@ -50,7 +47,7 @@ export default function TeamPage() {
   }
 
   const handleSearch = (q: string) => {
-    setFilter(teams.filter(t => t.name.includes(q)));
+    setFilter(teams?.filter(t => t.name.includes(q)));
   };
 
   return (
@@ -74,7 +71,7 @@ export default function TeamPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filtered.map(team => (
+            {filtered?.map(team => (
               <TableRow
                 key={team.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}

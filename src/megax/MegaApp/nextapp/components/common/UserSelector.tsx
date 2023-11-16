@@ -16,58 +16,10 @@ import Skeleton from "@mui/material/Skeleton";
 import { makeArrOf } from "@/lib/helpers/array";
 
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-
-type UserRecord = Pick<User, "id" | "fullName" | "email"> & {
-  selected?: boolean;
-};
-
-type _State = {
-  users: UserRecord[];
-  keyword?: string;
-  rand: number;
-};
-
-type _Action =
-  | {
-      type: "toggle";
-      payload: number[];
-    }
-  | {
-      type: "set";
-      payload: UserRecord[];
-    }
-  | {
-      type: "reload";
-      payload: { keyword: string; rand: number };
-    };
-
-function userSelectorReducer(state: _State, action: _Action) {
-  const { type, payload } = action;
-  let users: UserRecord[] = [];
-
-  switch (type) {
-    case "set":
-      users = [...payload];
-      break;
-    case "toggle":
-      users = state.users.map(u => ({
-        ...u,
-        selected: action.payload.includes(u.id || 0) ? !u.selected : u.selected,
-      }));
-      break;
-    case "reload":
-      return {
-        ...state,
-        keyword: payload.keyword,
-        rand: payload.rand,
-      };
-  }
-
-  return {
-    ...state,
-    users,
-  };
-}
+import userSelectorReducer, {
+  UserRecord,
+  UserSelectorState,
+} from "@/lib/states/userSelector.state";
 
 type UserSelectorProps = {
   onOk: (selected: Pick<User, "id" | "fullName">[]) => void;
@@ -75,7 +27,7 @@ type UserSelectorProps = {
 };
 
 export default function UserSelector({ onOk, onCancel }: UserSelectorProps) {
-  const initState: _State = {
+  const initState: UserSelectorState = {
     users: [],
     keyword: "",
     rand: 0,
