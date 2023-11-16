@@ -44,14 +44,6 @@ export const fetchLeavesThunk = createAsyncThunk(
   }
 );
 
-export const fetchRequestingLeavesThunk = createAsyncThunk(
-  "leaves/requesting",
-  async (filter: Partial<Filter> | undefined, thunkApi) => {
-    thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
-    return await fetchRequestingLeaves();
-  }
-);
-
 export const fetchLeaveSummaryThunk = createAsyncThunk(
   "leaves/summary",
   async (filter: Partial<Filter> | undefined, thunkApi) => {
@@ -113,10 +105,6 @@ export const leaveSlice = createSlice({
       })
       .addCase(fetchLeavesThunk.fulfilled, (state, action) => {
         state.items = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchRequestingLeavesThunk.fulfilled, (state, action) => {
-        state.requesting = action.payload;
         state.loading = false;
       })
       .addCase(fetchLeavesThunk.pending, (state, action) => {

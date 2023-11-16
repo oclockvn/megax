@@ -48,6 +48,7 @@ import hasAccess from "@/hooks/accessControl";
 
 export type LeaveCardProps = {
   leave: Leave;
+  onResponded?: (leave: Pick<Leave, "id" | "status">) => void;
 };
 
 const timeDic = {
@@ -56,7 +57,7 @@ const timeDic = {
   [LeaveTime.PM]: "PM",
 };
 
-export default function LeaveCard({ leave }: LeaveCardProps) {
+export default function LeaveCard({ leave, onResponded }: LeaveCardProps) {
   const appDispatch = useAppDispatch();
   const confirmation = useConfirm();
   const commentRef = useRef<HTMLInputElement>(null);
@@ -80,6 +81,8 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           .then(res => {
             if (res.success) {
               toast.success(`Leave is cancelled successfully`);
+              onResponded &&
+                onResponded({ id: leave.id, status: leave.status });
               return;
             }
 
@@ -110,6 +113,7 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
           );
 
           popupState.close();
+          onResponded && onResponded({ id: leave.id, status: res.data });
         } else {
           toast.error(`Could not handle leave action. Error code: ${res.code}`);
         }
