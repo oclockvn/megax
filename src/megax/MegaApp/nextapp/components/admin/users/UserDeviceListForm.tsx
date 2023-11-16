@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -19,29 +19,69 @@ type UserDeviceAddProps = {
   onCancel: () => void;
 };
 
-export default function UserDeviceAdd({
+type UserDeviceFormState = {
+  device: Device | null;
+  error: string | null;
+};
+
+type Action = {
+  type: "set";
+  payload: Partial<UserDeviceFormState>;
+};
+
+function reducer(state: UserDeviceFormState, action: Action) {
+  const { type, payload } = action;
+
+  switch (type) {
+    case "set":
+      return {
+        ...state,
+        ...payload,
+      } as UserDeviceFormState;
+  }
+}
+
+export default function UserDeviceListForm({
   userId,
   devices,
   onAdded,
   onCancel,
 }: UserDeviceAddProps) {
-  const [value, setValue] = useState<Device | null>(null);
-  let [error, setError] = useState<string | undefined>();
+  const [state, dispatch] = useReducer(reducer, {
+    device: null,
+    error: null,
+  });
 
   const assignDeviceMutation = useMutation({
     mutationFn: (deviceId: number) => assignDevice(userId, deviceId),
   });
 
   const handleAssignDevice = async () => {
-    const result = await assignDeviceMutation.mutateAsync(Number(value?.id));
+    const result = await assignDeviceMutation.mutateAsync(
+      Number(state.device?.id)
+    );
 
     if (result.success && result?.data) {
       onAdded(result.data);
-      setError(undefined);
+      dispatch({
+        type: "set",
+        payload: {
+          device: null,
+          error: null,
+        },
+      });
     } else {
-      setError(`Could not add device. Error code: ${result.code}`);
+      dispatch({
+        type: "set",
+        payload: {
+          error: `Could not add device. Error code: ${result.code}`,
+        },
+      });
     }
   };
+
+  const error = state.error;
+  const device = state.device;
 
   return (
     <div className="p-4 bg-slate-100">
@@ -50,7 +90,7 @@ export default function UserDeviceAdd({
           <Alert
             severity="error"
             className="border-red-500 border-solid border"
-            onClose={() => setError(undefined)}
+            onClose={() => dispatch({ type: "set", payload: { error: null } })}
           >
             {error}
           </Alert>
@@ -59,8 +99,8 @@ export default function UserDeviceAdd({
 
       <div>
         <Autocomplete
-          value={value}
-          onChange={(_, d) => setValue(d)}
+          value={device}
+          onChange={(_, d) => dispatch({ type: "set", payload: { device: d } })}
           autoComplete
           options={devices || []}
           renderInput={params => <TextField {...params} label="Device" />}
@@ -82,7 +122,12 @@ export default function UserDeviceAdd({
         >
           Cancel
         </Button>
-        <Button type="button" variant="contained" onClick={handleAssignDevice}>
+        <Button
+          disabled={!device || !device.id}
+          type="button"
+          variant="contained"
+          onClick={handleAssignDevice}
+        >
           Add
         </Button>
       </div>
