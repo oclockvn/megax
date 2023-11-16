@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,28 +9,11 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Grid from "@mui/material/Grid";
 
-import { useAppDispatch } from "@/lib/store/state.hook";
-import {
-  fetchDeviceTypesThunk,
-  reset as resetDevice,
-} from "@/lib/store/devices.state";
-import { fetchSuppliersThunk } from "@/lib/store/suppliers.state";
-
 const DeviceInfo  = dynamic(() => import( "@/components/admin/devices/DeviceInfo"));
 
 export default function NewDevicePage() {
   const pathname = usePathname();
   const router = useRouter();
-  const appDispatch = useAppDispatch();
-
-  useEffect(() => {
-    appDispatch(fetchDeviceTypesThunk());
-    appDispatch(fetchSuppliersThunk());
-
-    return () => {
-      appDispatch(resetDevice());
-    };
-  }, [appDispatch]);
 
   const redirectToPage = (id: number) => {
     router.push(`${pathname}/../${id}`);

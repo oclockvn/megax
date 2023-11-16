@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,13 +14,13 @@ import LinearProgress from "@mui/material/LinearProgress";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckIcon from "@mui/icons-material/Check";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { Filter, PageModel } from "@/lib/models/common.model";
-import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import dateLib from "@/lib/datetime";
 import { formatMoney } from "@/lib/formatter";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDeviceList } from "@/lib/apis/devices.api";
 
 const CustomPagination = dynamic(
   () => import("@/components/grid/CustomPagination"),
@@ -33,17 +33,21 @@ const CommonSearch = dynamic(() => import("@/components/grid/CommonSearch"), {
 
 export default function DeviceListPage() {
   const pathname = usePathname();
-  const appDispatch = useAppDispatch();
-  const { loading, pagedDevices } = useAppSelector(s => s.devices);
+
   const [filter, setFilter] = useState<Partial<Filter>>({
     page: 0,
     pageSize: 100,
   });
+
   const pagingModel = {
     page: filter.page || 0,
     pageSize: filter.pageSize || 100,
   };
-  const loadRef = useRef(false);
+
+  const { isLoading: loading, data: pagedDevices } = useQuery({
+    queryKey: ["admin/devices", filter],
+    queryFn: () => fetchDeviceList(filter),
+  });
 
   const columns: GridColDef[] = [
     {
@@ -136,18 +140,6 @@ export default function DeviceListPage() {
     }
   };
 
-  useEffect(() => {
-    appDispatch(fetchDevicesThunk(filter));
-  }, [filter]);
-
-  // for initial load
-  useEffect(() => {
-    if (!loadRef.current) {
-      loadRef.current = true;
-      onPaging(new PageModel());
-    }
-  }, [loadRef.current]);
-
   return (
     <div className="container mx-auto p-4">
       <Grid container className="mb-4" alignItems={"center"}>
@@ -165,7 +157,7 @@ export default function DeviceListPage() {
 
       <TableContainer component={Paper}>
         <DataGrid
-          rows={pagedDevices.items}
+          rows={pagedDevices?.items || []}
           columns={columns}
           initialState={{
             pagination: {
@@ -177,7 +169,7 @@ export default function DeviceListPage() {
             pagination: CustomPagination,
             loadingOverlay: LinearProgress,
           }}
-          rowCount={pagedDevices.total}
+          rowCount={pagedDevices?.total || 0}
           paginationMode="server"
           paginationModel={pagingModel}
           onPaginationModelChange={onPaging}
