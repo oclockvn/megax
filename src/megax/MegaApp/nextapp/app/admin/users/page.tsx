@@ -98,7 +98,7 @@ export default function UserListPage() {
   };
 
   const { isLoading, data} = useQuery({
-    queryKey: ['users', filter],
+    queryKey: ['admin/users', filter],
     queryFn: () => fetchUserList(filter),
   });
 

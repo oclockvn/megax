@@ -8,10 +8,8 @@ import CardHeader from "@mui/material/CardHeader";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
-import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
+import React from "react";
 import { DeviceOwnerRecord } from "@/lib/models/device.model";
-import { getOwnersThunk } from "@/lib/store/userDevice.state";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 import Link from "next/link";
@@ -19,20 +17,18 @@ import Grid from "@mui/material/Grid";
 import dateLib from "@/lib/datetime";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import RedoIcon from "@mui/icons-material/Redo";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDeviceOwners } from "@/lib/apis/devices.api";
 
 declare type DeviceOwnerProps = {
   deviceId: number;
 };
 
 export default function DeviceOwnerList({ deviceId }: DeviceOwnerProps) {
-  const appDispatch = useAppDispatch();
-  const { owners, loading } = useAppSelector(s => s.userDevice);
-
-  useEffect(() => {
-    if (deviceId > 0) {
-      appDispatch(getOwnersThunk(deviceId));
-    }
-  }, [deviceId]);
+  const { status, data: owners } = useQuery({
+    queryKey: ['admin/device-owners', deviceId],
+    queryFn: () => fetchDeviceOwners(deviceId)
+  })
 
   const OwnerItem = (d: DeviceOwnerRecord) => (
     <ListItem>
@@ -78,7 +74,7 @@ export default function DeviceOwnerList({ deviceId }: DeviceOwnerProps) {
       <Card>
         <CardHeader title={<h4>Owners</h4>} />
         <CardContent className="px-0">
-          {loading && <LinearProgress />}
+          {status === 'pending' && <LinearProgress />}
           {owners?.length ? (
             <List>
               {owners.map(i => (

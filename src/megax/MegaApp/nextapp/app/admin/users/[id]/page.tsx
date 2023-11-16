@@ -17,6 +17,13 @@ import { clearUser, fetchUserDetailThunk } from "@/lib/store/users.state";
 import { fetchDevicesThunk } from "@/lib/store/devices.state";
 import { fetchBanksThunk } from "@/lib/store/banks.state";
 import { delay } from "@/lib/util";
+import { useQueries } from "@tanstack/react-query";
+import { fetchUserDetail } from "@/lib/apis/user.api";
+import { fetchDeviceList } from "@/lib/apis/devices.api";
+import { PagedResult } from "@/lib/models/common.model";
+import { Device } from "@/lib/models/device.model";
+import { fetchBanks } from "@/lib/apis/banks.api";
+import { Bank } from "@/lib/models/bank.model";
 
 const UserTabs = dynamic(() => import("@/components/admin/users/UserTabs"), {
   ssr: false,
@@ -28,25 +35,41 @@ const UserDeviceList = dynamic(
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
-  const appDispatch = useAppDispatch();
-  const { user } = useAppSelector(s => s.users);
+  // const appDispatch = useAppDispatch();
+  // const { user } = useAppSelector(s => s.users);
 
-  useEffect(() => {
-    async function load() {
-      appDispatch(fetchUserDetailThunk(params.id));
-      await delay(100);
-      appDispatch(fetchDevicesThunk());
-      await delay(100);
-      appDispatch(fetchBanksThunk({ pageSize: 1000 }));
-    }
+  // useEffect(() => {
+  //   async function load() {
+  //     appDispatch(fetchUserDetailThunk(params.id));
+  //     await delay(100);
+  //     appDispatch(fetchDevicesThunk());
+  //     await delay(100);
+  //     appDispatch(fetchBanksThunk({ pageSize: 1000 }));
+  //   }
 
-    load();
+  //   load();
 
-    return () => {
-      appDispatch(clearUser());
-    };
-  }, [params.id]);
+  //   return () => {
+  //     appDispatch(clearUser());
+  //   };
+  // }, [params.id]);
 
+  const [userResponse,devicesResponse,banksResponse] = useQueries({
+    queries: [{
+      queryKey: ['admin/user/', params.id],
+      queryFn: () => fetchUserDetail(params.id)
+    }, {
+      queryKey: ['admin/devices'],
+      queryFn: () => fetchDeviceList({}),
+      select: (paged: PagedResult<Device>) => paged.items,
+    }, {
+      queryKey: ['admin/banks'],
+      queryFn: () => fetchBanks({}),
+      select: (paged: PagedResult<Bank>) => paged.items,
+    }]
+  })
+
+  const { data: user } = userResponse
   const hasAccount = Number(user?.accountId) > 0;
 
   return (
@@ -90,7 +113,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
           </Grid>
 
           <Grid item xs={6} sm={6} md={3}>
-            <UserDeviceList userId={user?.id || 0} />
+            <UserDeviceList devices={devicesResponse.data} userId={user?.id || 0} />
           </Grid>
         </Grid>
       </div>

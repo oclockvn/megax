@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 
 import Timeline from "@mui/lab/Timeline";
@@ -18,24 +18,20 @@ import LinearProgress from "@mui/material/LinearProgress";
 import RedoIcon from "@mui/icons-material/Redo";
 import AddIcon from "@mui/icons-material/Add";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { DeviceOwnerRecord } from "@/lib/models/device.model";
-import { getOwnersThunk } from "@/lib/store/userDevice.state";
 import dateLib from "@/lib/datetime";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDeviceOwners } from "@/lib/apis/devices.api";
 
 declare type DeviceOwnerProps = {
   deviceId: number;
 };
 
 export default function DeviceOwnerTimeline({ deviceId }: DeviceOwnerProps) {
-  const appDispatch = useAppDispatch();
-  const { owners, loading } = useAppSelector(s => s.userDevice);
-
-  useEffect(() => {
-    if (deviceId > 0) {
-      appDispatch(getOwnersThunk(deviceId));
-    }
-  }, [deviceId]);
+  const { status, data: owners } = useQuery({
+    queryKey: ["admin/device-owners", deviceId],
+    queryFn: () => fetchDeviceOwners(deviceId),
+  });
 
   const OwnerItem = (d: DeviceOwnerRecord) => (
     <div>
@@ -55,7 +51,7 @@ export default function DeviceOwnerTimeline({ deviceId }: DeviceOwnerProps) {
   return (
     <>
       <h3 className="font-bold text-xl ps-[70px]">History</h3>
-      {loading && <LinearProgress />}
+      {status === "pending" && <LinearProgress />}
       {owners?.length ? (
         <Timeline
           sx={{
