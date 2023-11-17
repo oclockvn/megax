@@ -1,24 +1,15 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import Divider from "@mui/material/Divider";
 
 import dt from "@/lib/datetime";
 import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { fetchTimesheetThunk } from "@/lib/store/timesheet.state";
 
-const Sheet = dynamic(() => import("@/components/portal/timesheet/Sheet"), {
-  ssr: false,
-});
-const SheetNav = dynamic(
-  () => import("@/components/portal/timesheet/SheetNav"),
-  { ssr: false }
-);
-const SheetWeek = dynamic(
-  () => import("@/components/portal/timesheet/SheetWeek"),
-  { ssr: false }
-);
+import Sheet  from "@/components/portal/timesheet/Sheet";
+import SheetNav from "@/components/portal/timesheet/SheetNav";
+import SheetWeek from "@/components/portal/timesheet/SheetWeek";
 
 export default function Timesheet() {
   const { timesheet, current, loading, estimated } = useAppSelector(s => s.timesheet);
