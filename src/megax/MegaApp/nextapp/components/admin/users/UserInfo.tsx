@@ -26,8 +26,11 @@ import datetime from "@/lib/datetime";
 import nationalities from "@/lib/constants/nationalities";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBanks } from "@/lib/apis/banks.api";
+import { useContext } from "react";
+import { UserContext } from "@/components/contexts/UserContext";
 
-export default function UserInfo({ user }: { user: User | undefined }) {
+export default function UserInfo() {
+  const { user } = useContext(UserContext)
   const appDispatch = useAppDispatch();
   const { loading, loadingState, error } = useAppSelector(s => s.users);
 
@@ -209,7 +212,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                   className="w-full"
                   name="dob"
                   required
-                  label="Birthdate"
+                  label="Birthday"
                 />
               </Grid>
               <Grid item xs={12} md={8}>

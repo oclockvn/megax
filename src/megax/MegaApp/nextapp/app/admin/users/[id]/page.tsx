@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -17,6 +17,8 @@ import { fetchUserDetail } from "@/lib/apis/user.api";
 import { fetchDeviceList } from "@/lib/apis/devices.api";
 import { PagedResult } from "@/lib/models/common.model";
 import { Device } from "@/lib/models/device.model";
+import { UserContext } from "@/components/contexts/UserContext";
+import { User } from "@/lib/models/user.model";
 
 const UserTabs = dynamic(() => import("@/components/admin/users/UserTabs"), {
   ssr: false,
@@ -28,6 +30,7 @@ const UserDeviceList = dynamic(
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const pathname = usePathname();
+  const [user, setUser] = useState<User | undefined>();
 
   const [userResponse, devicesResponse] = useQueries({
     queries: [
@@ -39,12 +42,27 @@ export default function UserPage({ params }: { params: { id: number } }) {
         queryKey: ["admin/devices"],
         queryFn: () => fetchDeviceList({}),
         select: (paged: PagedResult<Device>) => paged.items,
-        staleTime: 10 * 60 * 1000 // 10 min
-      }
+        staleTime: 10 * 60 * 1000, // 10 min
+      },
     ],
   });
 
-  const { data: user } = userResponse;
+  useEffect(() => {
+    if (userResponse.status === "success") {
+      setUser(userResponse.data);
+    }
+  }, [userResponse.status, userResponse.data]);
+
+  const updateUser = (u: Partial<User>) => {
+    setUser(
+      prev =>
+        ({
+          ...prev,
+          ...u,
+        } as User)
+    );
+  };
+
   const hasAccount = Number(user?.accountId) > 0;
 
   return (
@@ -80,7 +98,10 @@ export default function UserPage({ params }: { params: { id: number } }) {
                 This user doesn't have login account yet!
               </Alert>
             )}
-            <UserTabs user={user} />
+
+            <UserContext.Provider value={{ user, updateUser }}>
+              <UserTabs />
+            </UserContext.Provider>
           </Grid>
 
           <Grid item xs={4} md={3}>
