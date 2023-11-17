@@ -2,7 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import usersStore from "./users.state";
 import taskStore from "./tasks.state";
 import projectStore from "./projects.state";
-import leaveStore from "./leave.state";
 import timesheetState from "./timesheet.state";
 
 export const store = configureStore({
@@ -10,7 +9,6 @@ export const store = configureStore({
     users: usersStore,
     tasks: taskStore,
     projects: projectStore,
-    leaves: leaveStore,
     timesheet: timesheetState,
   },
   middleware: getDefaultMiddleware =>

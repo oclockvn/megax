@@ -62,7 +62,7 @@ internal class LeaveService : ILeaveService
             return Result<LeaveStatus>.Fail($"Leave was updated to {leave.Status}");
         }
 
-        leave.Status = LeaveStatus.Approved;
+        leave.Status = status;
         leave.Comment = comment;
         leave.ResponseAt = DateTimeOffset.Now;
         leave.ResponseBy = currentUser.Id;

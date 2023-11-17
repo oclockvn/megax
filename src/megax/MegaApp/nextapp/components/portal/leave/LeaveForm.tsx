@@ -17,7 +17,6 @@ import {
 } from "@/lib/models/leave.model";
 import LeaveDatePicker from "./LeaveDatePicker";
 import { useAppDispatch } from "@/lib/store/state.hook";
-import { submitLeaveThunk } from "@/lib/store/leave.state";
 import { useEffect, useReducer, useRef, useState } from "react";
 import Alert from "@mui/material/Alert";
 import toast from "react-hot-toast";
