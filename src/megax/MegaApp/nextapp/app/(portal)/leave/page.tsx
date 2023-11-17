@@ -17,6 +17,7 @@ import {
   useTakenPaid,
 } from "@/hooks/leave.hook";
 import leavePageReducer, { LeavePageState } from "@/lib/states/leave.state";
+import Image from "next/image";
 
 const LeaveCard = dynamic(() => import("@/components/portal/leave/LeaveCard"), {
   ssr: false,
@@ -32,6 +33,8 @@ const LeaveCardLoading = dynamic(
   () => import("@/components/common/skeletons/LeaveCardLoading"),
   { ssr: false }
 );
+
+import LeaveImage from "@/public/images/leave-party.png";
 
 export default function LeavePage() {
   const [state, dispatch] = useReducer(leavePageReducer, {
@@ -161,6 +164,14 @@ export default function LeavePage() {
                   Request Leave
                 </Button>
               </div>
+
+              <Image
+                src={LeaveImage}
+                alt="Leave party"
+                width={250}
+                height={250}
+                className="mx-auto"
+              />
             </div>
           )}
         </Grid>
