@@ -108,41 +108,60 @@ export default function LeavePage() {
 
   return (
     <div className="p-4 md:px-0 container mx-auto">
-      <Grid
-        container
-        spacing={2}
-        alignItems={"center"}
-        className="sticky top-0 z-30"
-      >
-        <Grid item xs={12} sm={4}>
-          <Button
-            variant="contained"
-            color="secondary"
-            size="large"
-            fullWidth
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenLeave({ type: LeaveType.Annual })}
-          >
-            Request Leave
-          </Button>
+      {queueItems.length > 0 && (
+        <Grid
+          container
+          spacing={2}
+          alignItems={"center"}
+          className="sticky top-0 z-30"
+        >
+          <Grid item xs={12} sm={4}>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              fullWidth
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenLeave({ type: LeaveType.Annual })}
+            >
+              Request Leave
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <div className="flex items-center justify-between mt-4 mb-2 font-bold">
-            <h3 className="text-lg">Your Requests</h3>
-          </div>
+          {queueItems.length > 0 && (
+            <div className="flex items-center justify-between mt-4 mb-2 font-bold">
+              <h3 className="text-lg">Your Requests</h3>
+            </div>
+          )}
+
           {loading ? (
-            <>
-              <LeaveCardLoading count={2} />
-            </>
-          ) : (
+            <LeaveCardLoading count={2} />
+          ) : queueItems.length > 0 ? (
             queueItems.map((i, index) => (
               <div key={i.id} className={index === 0 ? "" : "mt-4"}>
                 <LeaveCard leave={i} onResponded={onResponded} />
               </div>
             ))
+          ) : (
+            <div className="mt-8">
+              Screw work, wanna hangout? Request a leave now!
+              <div className="mt-4">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  fullWidth
+                  startIcon={<AddIcon />}
+                  onClick={() => handleOpenLeave({ type: LeaveType.Annual })}
+                >
+                  Request Leave
+                </Button>
+              </div>
+            </div>
           )}
         </Grid>
 
