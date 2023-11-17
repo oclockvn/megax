@@ -43,10 +43,19 @@ export type LeavePageState = {
   leave: Partial<Leave> | null;
 };
 
-type Action = {
-  type: "set";
-  payload: Partial<LeavePageState>;
-};
+type Action =
+  | {
+      type: "set";
+      payload: Partial<LeavePageState>;
+    }
+  | {
+      type: "submitted";
+      payload: Leave;
+    }
+  | {
+      type: "cancel";
+      payload: number;
+    };
 
 function leavePageReducer(state: LeavePageState, action: Action) {
   const { type, payload } = action;
@@ -56,6 +65,17 @@ function leavePageReducer(state: LeavePageState, action: Action) {
       return {
         ...state,
         ...payload,
+      } as LeavePageState;
+    case "submitted":
+      return {
+        ...state,
+        items: [payload, ...state.items],
+        showDrawer: false,
+      } as LeavePageState;
+    case "cancel":
+      return {
+        ...state,
+        items: state.items.filter(i => i.id !== payload),
       } as LeavePageState;
   }
 }
@@ -99,12 +119,34 @@ export default function LeavePage() {
     }
   }, [status, data]);
 
+  // useEffect(() => {
+
+  // }, [])
+
+  const onSubmitted = (leave: Leave) => {
+    dispatch({
+      type: "submitted",
+      payload: leave,
+    });
+  };
+
   const handleCloseDrawer = () => {
     // setShowDrawer(false);
     dispatch({
       type: "set",
       payload: { showDrawer: false },
     });
+  };
+
+  const onResponded = (leave: Pick<Leave, "id" | "status">) => {
+    switch (leave.status) {
+      case LeaveStatus.Cancelled:
+        dispatch({
+          type: "cancel",
+          payload: leave.id,
+        });
+        break;
+    }
   };
 
   const handleOpenLeave = (leave: Partial<Leave>) => {
@@ -121,7 +163,7 @@ export default function LeavePage() {
 
   // const items = state.items || []
   // const capacity = state.capacity
-  const { items, capacity, leave, showDrawer } = state
+  const { items, capacity, leave, showDrawer } = state;
 
   const queueItems = items.filter(x => x.status === LeaveStatus.New);
   const pastItems = loading
@@ -180,9 +222,6 @@ export default function LeavePage() {
         <Grid item xs={12} sm={4}>
           <div className="flex items-center justify-between mt-4 mb-2 font-bold">
             <h3 className="text-lg">Your Requests</h3>
-            {/* <div>
-              (Taken {taken}/{capacity} total days)
-            </div> */}
           </div>
           {loading ? (
             <>
@@ -191,7 +230,7 @@ export default function LeavePage() {
           ) : (
             queueItems.map((i, index) => (
               <div key={i.id} className={index === 0 ? "" : "mt-4"}>
-                <LeaveCard leave={i} />
+                <LeaveCard leave={i} onResponded={onResponded} />
               </div>
             ))
           )}
@@ -215,6 +254,7 @@ export default function LeavePage() {
             leave={leave!}
             loading={loading}
             handleClose={handleCloseDrawer}
+            onAdded={onSubmitted}
             requestedDates={requestedDates}
           />
         )}
