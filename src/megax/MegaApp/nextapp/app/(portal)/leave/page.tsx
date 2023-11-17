@@ -5,20 +5,18 @@ import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Drawer from "@mui/material/Drawer";
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { useEffect, useReducer, useState } from "react";
-import { fetchLeaveSummaryThunk } from "@/lib/store/leave.state";
-import {
-  Leave,
-  LeaveDate,
-  LeaveStatus,
-  LeaveTime,
-  LeaveType,
-} from "@/lib/models/leave.model";
-import { makeArrOf } from "@/lib/helpers/array";
-import dt from "@/lib/datetime";
+import { useEffect, useReducer } from "react";
+import { Leave, LeaveStatus, LeaveType } from "@/lib/models/leave.model";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLeaveSummary } from "@/lib/apis/leave.api";
+import {
+  usePast,
+  useQueue,
+  useRequestedDates,
+  useTakenAnnual,
+  useTakenPaid,
+} from "@/hooks/leave.hook";
+import leavePageReducer, { LeavePageState } from "@/lib/states/leave.state";
 
 const LeaveCard = dynamic(() => import("@/components/portal/leave/LeaveCard"), {
   ssr: false,
@@ -35,61 +33,7 @@ const LeaveCardLoading = dynamic(
   { ssr: false }
 );
 
-export type LeavePageState = {
-  items: Leave[];
-  capacity: number;
-  loading: boolean;
-  showDrawer: boolean;
-  leave: Partial<Leave> | null;
-};
-
-type Action =
-  | {
-      type: "set";
-      payload: Partial<LeavePageState>;
-    }
-  | {
-      type: "submitted";
-      payload: Leave;
-    }
-  | {
-      type: "cancel";
-      payload: number;
-    };
-
-function leavePageReducer(state: LeavePageState, action: Action) {
-  const { type, payload } = action;
-
-  switch (type) {
-    case "set":
-      return {
-        ...state,
-        ...payload,
-      } as LeavePageState;
-    case "submitted":
-      return {
-        ...state,
-        items: [payload, ...state.items],
-        showDrawer: false,
-      } as LeavePageState;
-    case "cancel":
-      return {
-        ...state,
-        items: state.items.filter(i => i.id !== payload),
-      } as LeavePageState;
-  }
-}
-
 export default function LeavePage() {
-  // const appDispatch = useAppDispatch();
-  // const { items, capacity, loading } = useAppSelector(s => s.leaves);
-  // const [showDrawer, setShowDrawer] = useState(false);
-  // const [leave, setLeave] = useState<Partial<Leave> | null>(null);
-
-  // useEffect(() => {
-  //   appDispatch(fetchLeaveSummaryThunk());
-  // }, []);
-
   const [state, dispatch] = useReducer(leavePageReducer, {
     capacity: 0,
     loading: true,
@@ -119,10 +63,6 @@ export default function LeavePage() {
     }
   }, [status, data]);
 
-  // useEffect(() => {
-
-  // }, [])
-
   const onSubmitted = (leave: Leave) => {
     dispatch({
       type: "submitted",
@@ -131,7 +71,6 @@ export default function LeavePage() {
   };
 
   const handleCloseDrawer = () => {
-    // setShowDrawer(false);
     dispatch({
       type: "set",
       payload: { showDrawer: false },
@@ -150,8 +89,6 @@ export default function LeavePage() {
   };
 
   const handleOpenLeave = (leave: Partial<Leave>) => {
-    // setLeave(leave);
-    // setShowDrawer(true);
     dispatch({
       type: "set",
       payload: {
@@ -161,40 +98,13 @@ export default function LeavePage() {
     });
   };
 
-  // const items = state.items || []
-  // const capacity = state.capacity
   const { items, capacity, leave, showDrawer } = state;
 
-  const queueItems = items.filter(x => x.status === LeaveStatus.New);
-  const pastItems = loading
-    ? makeArrOf(5, i => ({ id: i, status: LeaveStatus.New } as Leave))
-    : items.filter(x => x.status !== LeaveStatus.New);
-
-  const takenAnnual =
-    items
-      .filter(l => l.type === LeaveType.Annual)
-      .reduce(
-        (prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates],
-        []
-      )
-      .filter(d => dt.isPast(d.date))
-      .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) /
-    2;
-
-  const takenPaid =
-    items
-      .filter(l => l.type === LeaveType.Paid)
-      .reduce(
-        (prev: LeaveDate[], { leaveDates }) => [...prev, ...leaveDates],
-        []
-      )
-      .filter(d => dt.isPast(d.date))
-      .reduce((prev, curr) => prev + (curr.time === LeaveTime.All ? 2 : 1), 0) /
-    2;
-  const requestedDates = items.reduce(
-    (prev: Date[], { leaveDates }) => [...prev, ...leaveDates.map(d => d.date)],
-    []
-  );
+  const queueItems = useQueue(items);
+  const pastItems = usePast(items);
+  const takenAnnual = useTakenAnnual(items);
+  const takenPaid = useTakenPaid(items);
+  const requestedDates = useRequestedDates(items);
 
   return (
     <div className="p-4 md:px-0 container mx-auto">
