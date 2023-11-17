@@ -35,6 +35,7 @@ const LeaveCardLoading = dynamic(
 );
 
 import LeaveImage from "@/public/images/leave-party.png";
+import { MagicMotion } from "react-magic-motion";
 
 export default function LeavePage() {
   const [state, dispatch] = useReducer(leavePageReducer, {
@@ -144,11 +145,15 @@ export default function LeavePage() {
           {loading ? (
             <LeaveCardLoading count={2} />
           ) : queueItems.length > 0 ? (
-            queueItems.map((i, index) => (
-              <div key={i.id} className={index === 0 ? "" : "mt-4"}>
-                <LeaveCard leave={i} onResponded={onResponded} />
+            <MagicMotion>
+              <div>
+                {queueItems.map((i, index) => (
+                  <div key={i.id} className={index === 0 ? "" : "mt-4"}>
+                    <LeaveCard key="exclude" leave={i} onResponded={onResponded} />
+                  </div>
+                ))}
               </div>
-            ))
+            </MagicMotion>
           ) : (
             <div className="mt-8">
               Screw work, wanna hangout? Request a leave now!
@@ -164,7 +169,6 @@ export default function LeavePage() {
                   Request Leave
                 </Button>
               </div>
-
               <Image
                 src={LeaveImage}
                 alt="Leave party"

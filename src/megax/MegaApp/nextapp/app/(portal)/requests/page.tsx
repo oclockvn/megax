@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchRequestingLeaves } from "@/lib/apis/leave.api";
 import { Leave } from "@/lib/models/leave.model";
 import { useEffect, useState } from "react";
+import { MagicMotion } from "react-magic-motion";
 
 export default function RequestPage() {
   const [items, setItems] = useState<Leave[]>([]);
@@ -45,12 +46,17 @@ export default function RequestPage() {
             {loading ? (
               <LeaveCardLoading count={3} />
             ) : (
-              Number(items.length) > 0 &&
-              items.map(l => (
-                <div key={l.id} className="mt-4">
-                  <LeaveCard leave={l} onResponded={onResponded} />
-                </div>
-              ))
+              Number(items.length) > 0 && (
+                <MagicMotion>
+                  <div>
+                    {items.map(l => (
+                      <div key={l.id} className="mt-4">
+                        <LeaveCard key="exclude" leave={l} onResponded={onResponded} />
+                      </div>
+                    ))}
+                  </div>
+                </MagicMotion>
+              )
             )}
           </Grid>
         </Grid>
