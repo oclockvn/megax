@@ -92,14 +92,10 @@ internal class LeaveService : ILeaveService
             return Result<LeaveStatus>.Fail(Result.LEAVE_WAS_PASSED);
         }
 
-        if (leave.Status == LeaveStatus.Approved)
+        leave.Status = LeaveStatus.Cancelled;
+        if (leave.Status != LeaveStatus.Approved)
         {
-            // return Result<int>.Fail(Result.LEAVE_WAS_APPROVED);
-            leave.Status = LeaveStatus.Cancelled;
-        }
-        else // no need to keep it if it's not approved yet
-        {
-            db.Leaves.Remove(leave);
+            db.Leaves.Remove(leave); // no need to keep it if it's not approved yet
         }
 
         await db.SaveChangesAsync();

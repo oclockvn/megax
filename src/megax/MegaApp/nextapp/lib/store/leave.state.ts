@@ -1,5 +1,4 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Filter } from "../models/common.model";
 import {
   Leave,
   LeaveAction,
@@ -10,10 +9,6 @@ import {
 } from "../models/leave.model";
 import {
   approveLeave,
-  cancelLeave,
-  fetchLeaveSummary,
-  fetchLeaves,
-  fetchRequestingLeaves,
   handleAction,
   submitLeave,
 } from "../apis/leave.api";
@@ -36,33 +31,10 @@ const initialState: LeaveState = {
   loading: false,
 };
 
-export const fetchLeavesThunk = createAsyncThunk(
-  "leaves/fetch",
-  async (filter: Partial<Filter> | undefined, thunkApi) => {
-    thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
-    return await fetchLeaves();
-  }
-);
-
-export const fetchLeaveSummaryThunk = createAsyncThunk(
-  "leaves/summary",
-  async (filter: Partial<Filter> | undefined, thunkApi) => {
-    thunkApi.dispatch(leaveSlice.actions.setLoadingState("Loading..."));
-    return await fetchLeaveSummary();
-  }
-);
-
 export const submitLeaveThunk = createAsyncThunk(
   "leaves/submit",
   async (request: Partial<LeaveRequest>, _thunkApi) => {
     return await submitLeave(request);
-  }
-);
-
-export const cancelLeaveThunk = createAsyncThunk(
-  "leaves/cancel",
-  async (id: number, _thunkApi) => {
-    return await cancelLeave(id);
   }
 );
 
@@ -96,20 +68,6 @@ export const leaveSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(fetchLeaveSummaryThunk.fulfilled, (state, action) => {
-        const { leaves, capacity, approvedDates } = action.payload;
-        state.items = leaves;
-        state.approvedDates = approvedDates;
-        state.capacity = capacity;
-        state.loading = false;
-      })
-      .addCase(fetchLeavesThunk.fulfilled, (state, action) => {
-        state.items = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchLeavesThunk.pending, (state, action) => {
-        state.loading = true;
-      })
       .addCase(submitLeaveThunk.fulfilled, (state, action) => {
         const { data, success, code } = action.payload;
         if (success) {
@@ -154,21 +112,6 @@ export const leaveSlice = createSlice({
 
           leave!.status = LeaveStatus.Approved;
 
-          state.requesting = state.requesting.filter(x => x.id !== id);
-        }
-      })
-      .addCase(cancelLeaveThunk.fulfilled, (state, action) => {
-        const { success, data } = action.payload;
-        if (!success) {
-          return;
-        }
-
-        const id = action.meta.arg;
-        if (data === LeaveStatus.Cancelled) {
-          const leave = state.items.find(x => x.id === id);
-          leave!.status = data;
-        } else {
-          state.items = state.items.filter(x => x.id !== id);
           state.requesting = state.requesting.filter(x => x.id !== id);
         }
       });

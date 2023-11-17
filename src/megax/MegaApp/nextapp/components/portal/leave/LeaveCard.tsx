@@ -28,7 +28,6 @@ import { getInitial } from "@/lib/string.helper";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { useConfirm } from "material-ui-confirm";
 import {
-  cancelLeaveThunk,
   handleLeaveActionThunk,
 } from "@/lib/store/leave.state";
 import toast from "react-hot-toast";
@@ -45,6 +44,8 @@ import TextField from "@mui/material/TextField";
 import { useRef } from "react";
 import UserAvatar from "@/components/common/UserAvatar";
 import hasAccess from "@/hooks/accessControl";
+import { useMutation } from "@tanstack/react-query";
+import { cancelLeave } from "@/lib/apis/leave.api";
 
 export type LeaveCardProps = {
   leave: Leave;
@@ -67,6 +68,21 @@ export default function LeaveCard({ leave, onResponded }: LeaveCardProps) {
     variant: "dialog",
   });
 
+  const cancelHandler = useMutation({
+    mutationKey: ["leave/cancel", leave?.id],
+    mutationFn: () => cancelLeave(leave.id),
+    onSuccess: response => {
+      if (response.success) {
+        toast.success(`Leave is cancelled successfully`);
+        onResponded && onResponded({ id: leave.id, status: response.data });
+      } else {
+        toast.error(
+          `Could not cancel leave request. Error code: ${response.code}`
+        );
+      }
+    },
+  });
+
   const handleCancel = () => {
     confirmation({
       title: "Are you sure? No regret?",
@@ -74,26 +90,7 @@ export default function LeaveCard({ leave, onResponded }: LeaveCardProps) {
       dialogProps: {
         maxWidth: "xs",
       },
-    })
-      .then(() => {
-        appDispatch(cancelLeaveThunk(leave.id))
-          .unwrap()
-          .then(res => {
-            if (res.success) {
-              toast.success(`Leave is cancelled successfully`);
-              onResponded &&
-                onResponded({ id: leave.id, status: leave.status });
-              return;
-            }
-
-            toast.error(
-              `Could not cancel leave request. Error code: ${res.code}`
-            );
-          });
-      })
-      .catch(() => {
-        /*ignore*/
-      });
+    }).then(() => cancelHandler.mutate());
   };
 
   const handleAction = (actionType: LeaveAction) => {
