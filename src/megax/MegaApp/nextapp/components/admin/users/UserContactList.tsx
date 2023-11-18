@@ -64,8 +64,8 @@ export default function UserContactList() {
     onSuccess: ({ data: success }, contactId: number) => {
       if (success) {
         toast.success(`Contact was deleted successfully`);
-        updateUser({
-          contacts: user.contacts?.filter(c => c.id !== contactId) || [],
+        updateUser?.({
+          contacts: user?.contacts?.filter(c => c.id !== contactId) || [],
         });
       } else {
         toast.error(`Something went wrong but I'm too lazy to check`);
@@ -122,7 +122,7 @@ export default function UserContactList() {
       handleCloseDrawer();
 
       const isUpdate = Number(contact.id) > 0;
-      let contacts = user.contacts || [];
+      let contacts = user?.contacts || [];
 
       if (isUpdate) {
         contacts =
@@ -140,7 +140,7 @@ export default function UserContactList() {
         contacts = [data, ...contacts];
       }
 
-      updateUser({
+      updateUser?.({
         contacts,
       });
     },

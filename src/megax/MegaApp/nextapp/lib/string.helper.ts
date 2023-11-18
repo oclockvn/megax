@@ -55,3 +55,7 @@ export const getInitial = (s: string) => {
   const last = arr.at(-1);
   return last ? last[0] + arr[0][0] : arr[0][0];
 };
+
+export const equals = (x: string, y: string, insensitive = true) => {
+  return insensitive ? x?.toLowerCase() === y?.toLowerCase() : x === y;
+};

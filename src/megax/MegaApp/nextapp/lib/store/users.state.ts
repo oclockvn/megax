@@ -1,24 +1,17 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { User } from "../models/user.model";
 import {
-  fetchUserDetail,
-  fetchUserList,
   updateUserDetail,
-  createUpdateContact,
-  deleteContact,
   creteUpdateDocument,
   deleteDocument,
 } from "../apis/user.api";
 import {
   EmptyPaged,
-  Filter,
   PagedResult,
   Result,
 } from "../models/common.model";
-import { Contact } from "../models/contact.model";
 import { Document as UserDocument } from "../models/document.model";
 import { updateUserRoles } from "../apis/userRole.api";
-import StateProvider from "./state.provider";
 
 export interface UsersState {
   pagedUsers: PagedResult<User>;
@@ -33,24 +26,6 @@ const initialState: UsersState = {
   loading: false,
 };
 
-export const fetchUsersThunk = createAsyncThunk(
-  "users/fetch",
-  async (filter: Partial<Filter>, thunkApi) => {
-    thunkApi.dispatch(userSlice.actions.setLoading({ loading: true }));
-    return await fetchUserList(filter);
-  }
-);
-
-export const fetchUserDetailThunk = createAsyncThunk(
-  "users/fetch-detail",
-  async (id: number, thunkApi) => {
-    thunkApi.dispatch(
-      userSlice.actions.setLoading({ loading: true, msg: "Loading..." })
-    );
-    return await fetchUserDetail(id);
-  }
-);
-
 export const updateUserDetailThunk = createAsyncThunk(
   "users/update",
   async (user: User, thunkApi) => {
@@ -63,53 +38,6 @@ export const updateUserDetailThunk = createAsyncThunk(
       return Promise.resolve<Result<User>>({
         code: "Failed",
         data: user,
-        success: false,
-      });
-    }
-  }
-);
-
-export const createUpdateContactThunk = createAsyncThunk(
-  "users/create-update-contact",
-  async (req: { id: number; contact: Partial<Contact | null> }, thunkApi) => {
-    thunkApi.dispatch(
-      userSlice.actions.setLoading({ loading: true, msg: "Saving changes..." })
-    );
-    try {
-      const result = await createUpdateContact(req.id, req.contact);
-      if (result.success) {
-        thunkApi.dispatch(userSlice.actions.updateContacts(result.data));
-      }
-
-      return result;
-    } catch {
-      thunkApi.dispatch(userSlice.actions.setLoading({ loading: false }));
-      return Promise.resolve<Result<Contact | null>>({
-        code: "Failed",
-        data: null,
-        success: false,
-      });
-    }
-  }
-);
-
-export const deleteContactThunk = createAsyncThunk(
-  "users/delete-contact",
-  async (req: { id: number; contactId: number }, thunkApi) => {
-    thunkApi.dispatch(
-      userSlice.actions.setLoading({ loading: true, msg: "Deleting..." })
-    );
-    try {
-      const result = await deleteContact(req.id, req.contactId);
-      if (result.success) {
-        thunkApi.dispatch(userSlice.actions.deleteContacts(req.contactId));
-      }
-
-      return result;
-    } catch {
-      return Promise.resolve<Result<boolean>>({
-        code: "Failed",
-        data: false,
         success: false,
       });
     }
@@ -196,39 +124,6 @@ export const userSlice = createSlice({
       state.error = undefined;
     },
     reset: _ => initialState,
-    updateContacts: (state, action: PayloadAction<Contact>) => {
-      if (!state.user) {
-        return;
-      }
-
-      const { payload: contact } = action;
-      const updating = state.user.contacts?.some(c => c.id === contact.id);
-      if (updating) {
-        state.user.contacts =
-          state.user.contacts?.map(c =>
-            c.id === contact.id
-              ? { ...c, ...contact }
-              : {
-                  ...c,
-                  isPrimaryContact: contact.isPrimaryContact
-                    ? false
-                    : c.isPrimaryContact,
-                }
-          ) || [];
-      } else {
-        state.user.contacts = [contact, ...(state.user.contacts || [])];
-      }
-    },
-    deleteContacts: (state, action: PayloadAction<number>) => {
-      if (!state.user) {
-        return;
-      }
-
-      const { payload: contactId } = action;
-      state.user.contacts = (state.user.contacts || []).filter(
-        c => c.id !== contactId
-      );
-    },
     updateDocuments: (state, action: PayloadAction<UserDocument>) => {
       if (!state.user) {
         return;
@@ -258,20 +153,6 @@ export const userSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(fetchUsersThunk.fulfilled, (state, action) => {
-        state.pagedUsers = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchUsersThunk.pending, (state, action) => {
-        state.loading = true;
-      })
-      .addCase(fetchUserDetailThunk.fulfilled, (state, action) => {
-        state.user = { ...action.payload };
-        state.loading = false;
-      })
-      .addCase(fetchUserDetailThunk.pending, (state, action) => {
-        state.loading = true;
-      })
       .addCase(updateUserDetailThunk.fulfilled, (state, action) => {
         state.loading = false;
         if (action.payload.success) {
