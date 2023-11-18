@@ -69,7 +69,10 @@ export default function UserDocumentList() {
     appDispatch(setLoading({ loading: false }));
   };
 
-  const handleSave = (document: Partial<UserDocument | null>, files?: File[]) => {
+  const handleSave = (
+    document: Partial<UserDocument | null>,
+    files?: File[]
+  ) => {
     const resp = appDispatch(
       createUpdateDocumentThunk({ id: user?.id || 0, document, files })
     ).unwrap();
@@ -84,6 +87,33 @@ export default function UserDocumentList() {
       }
     });
   };
+
+  const RenderRow = (document: UserDocument) => (
+    <TableRow
+      key={document.id}
+      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+    >
+      <TableCell scope="row">
+        <Button variant="text" onClick={() => handleOpenDocument(document)}>
+          {document.documentNumber}
+        </Button>
+      </TableCell>
+      <TableCell>{document.documentType}</TableCell>
+      <TableCell>
+        {document.issueDate &&
+          datetime.formatDate(document.issueDate, "dd/MM/yyyy")}
+      </TableCell>
+      <TableCell align="right">
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => handleDeleteDocument(document)}
+        >
+          <CloseIcon fontSize="inherit" />
+        </IconButton>
+      </TableCell>
+    </TableRow>
+  );
 
   return (
     <>
@@ -108,33 +138,7 @@ export default function UserDocumentList() {
           </TableHead>
           <TableBody>
             {documents.map(document => (
-              <TableRow
-                key={document.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell scope="row">
-                  <Button
-                    variant="text"
-                    onClick={() => handleOpenDocument(document)}
-                  >
-                    {document.documentNumber}
-                  </Button>
-                </TableCell>
-                <TableCell>{document.documentType}</TableCell>
-                <TableCell>
-                  {document.issueDate &&
-                    datetime.formatDate(document.issueDate, "dd/MM/yyyy")}
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => handleDeleteDocument(document)}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+              <RenderRow key={document.id} {...document} />
             ))}
           </TableBody>
         </Table>
