@@ -4,7 +4,7 @@ import {
   fetchUserDetail,
   fetchUserList,
   updateUserDetail,
-  creteUpdateContact,
+  createUpdateContact,
   deleteContact,
   creteUpdateDocument,
   deleteDocument,
@@ -76,7 +76,7 @@ export const createUpdateContactThunk = createAsyncThunk(
       userSlice.actions.setLoading({ loading: true, msg: "Saving changes..." })
     );
     try {
-      const result = await creteUpdateContact(req.id, req.contact);
+      const result = await createUpdateContact(req.id, req.contact);
       if (result.success) {
         thunkApi.dispatch(userSlice.actions.updateContacts(result.data));
       }

@@ -75,7 +75,7 @@ export async function returnDevice(id: number, deviceId: number) {
   }
 }
 
-export async function creteUpdateContact(
+export async function createUpdateContact(
   id: number,
   req: Partial<Contact | null>
 ) {
