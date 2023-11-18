@@ -14,21 +14,11 @@ import {
   TextFieldElement,
   useForm,
 } from "react-hook-form-mui";
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import toast from "react-hot-toast";
 import Alert from "@mui/material/Alert";
-import ClearIcon from "@mui/icons-material/Clear";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import BlockIcon from "@mui/icons-material/Block";
 import { Device } from "@/lib/models/device.model";
-import {
-  updateDeviceDetailThunk,
-  reset as resetDevice,
-  clearError,
-  addDeviceThunk,
-  setLoadingState,
-  toggleDeviceThunk,
-} from "@/lib/store/devices.state";
 import { useConfirm } from "material-ui-confirm";
 import Chip from "@mui/material/Chip";
 import {
@@ -41,28 +31,61 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import CheckIcon from "@mui/icons-material/Check";
+import {
+  addDevice,
+  getDeviceTypes,
+  toggleDevice,
+  updateDevice,
+} from "@/lib/apis/devices.api";
+import { fetchSupplierList } from "@/lib/apis/suppliers.api";
+import { useMutation, useQueries } from "@tanstack/react-query";
+import { PagedResult } from "@/lib/models/common.model";
+import { Supplier } from "@/lib/models/supplier.model";
+import { useReducer } from "react";
+import deviceInfoReducer, {
+  DeviceInfoState,
+} from "@/lib/states/deviceInfo.state";
 
 declare type DeviceInfoProps = {
   device?: Device;
   onAdded?: (id: number) => void;
-  // onDeleted?: () => void;
 };
 
-export default function DeviceInfo({
-  device,
-  onAdded,
-}: // onDeleted,
-DeviceInfoProps) {
-  const appDispatch = useAppDispatch();
+export default function DeviceInfo({ device, onAdded }: DeviceInfoProps) {
   const confirm = useConfirm();
-  const { loading, loadingState, error, deviceTypes } = useAppSelector(
-    s => s.devices
-  );
-  const { pagedSuppliers } = useAppSelector(s => s.suppliers);
+
+  const [state, dispatch] = useReducer(deviceInfoReducer, {
+    error: null,
+    loadingState: null,
+  } as DeviceInfoState);
+
+  const [
+    { data: deviceTypes, isLoading: deviceTypeLoading },
+    { data: suppliers, isLoading: suppliersLoading },
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ["admin/device/types"],
+        queryFn: () => getDeviceTypes(),
+        staleTime: 1000 * 60 * 60 * 24, // 1 day
+      },
+      {
+        queryKey: ["admin/suppliers"],
+        queryFn: () => fetchSupplierList({}),
+        staleTime: 1000 * 60 * 60 * 24, // 1 day
+        select: (response: PagedResult<Supplier>) => response.items,
+      },
+    ],
+  });
+
+  const loading = deviceTypeLoading || suppliersLoading;
   const isUpdate = Number(device?.id) > 0;
 
   const handleClearError = () => {
-    appDispatch(clearError());
+    dispatch({
+      type: "set",
+      payload: { error: null },
+    });
   };
 
   const deviceTypeOptions =
@@ -72,7 +95,7 @@ DeviceInfoProps) {
     })) || [];
 
   const supplierOptions =
-    pagedSuppliers?.items?.map(x => ({
+    suppliers?.map(x => ({
       key: x.id,
       id: x.id,
       label: x.name + (x.website ? " - " + x.website : ""),
@@ -82,42 +105,65 @@ DeviceInfoProps) {
     values: device,
   });
 
-  const disabled = device?.disabled === true;
+  // const disabled = device?.disabled === true;
+  const updateHandler = useMutation({
+    mutationKey: ["admin/device/update", device?.id],
+    mutationFn: (req: Device) => updateDevice(req),
+    onSuccess: res =>
+      res.success && toast.success(`Device updated successfully`),
+  });
+
+  const addHandler = useMutation({
+    mutationKey: ["admin/device/add"],
+    mutationFn: (req: Omit<Device, "id">) => addDevice(req),
+    onSuccess: res => res.success && toast.success(`Device added successfully`),
+  });
 
   const onButtonSubmit = async (req: Device, redirect: boolean = false) => {
     let id = 0;
     if (isUpdate) {
-      const result = await appDispatch(updateDeviceDetailThunk(req)).unwrap();
-      if (result.success) {
-        toast.success("Device updated successfully");
-        id = result.data.id;
-      }
+      await updateHandler.mutateAsync(req);
     } else {
-      const result = await appDispatch(addDeviceThunk(req)).unwrap();
+      const result = await addHandler.mutateAsync(req);
       if (result.success) {
-        toast.success("Device added successfully");
         id = result.data.id;
 
         if (!redirect) {
           formContext.reset();
-          appDispatch(resetDevice());
+        } else if (!!onAdded) {
+          onAdded(id);
         }
-      }
-    }
 
-    if (redirect && !!onAdded) {
-      appDispatch(setLoadingState("Redirecting..."));
-      onAdded(id);
+        dispatch({
+          type: "set",
+          payload: {
+            device: null,
+            error: null,
+            loadingState: redirect ? "Redirecting..." : null,
+          },
+        });
+      }
     }
   };
 
-  const handleToggleDevice = async (disable: boolean) => {
-    const id = Number(device?.id);
-    const result = await appDispatch(toggleDeviceThunk(id)).unwrap();
+  const toggleHandler = useMutation({
+    mutationKey: ["admin/device/toggle", device?.id],
+    mutationFn: (id: number) => toggleDevice(id),
+  });
 
+  const handleToggleDevice = async (disable: boolean) => {
+    const result = await toggleHandler.mutateAsync(Number(device?.id));
+
+    const status = disable ? "disable" : "enable";
     if (result.success) {
-      toast.success(`Successfully ${disable ? "disabled" : "enabled"}`);
-      // onDeleted && onDeleted();
+      toast.success(`Successfully ${status}d`);
+    } else {
+      dispatch({
+        type: "set",
+        payload: {
+          error: `Could not ${status} device. Error code: ${result.code}`,
+        },
+      });
     }
   };
 
@@ -127,10 +173,7 @@ DeviceInfoProps) {
       dialogProps: { maxWidth: "xs" },
     })
       .then(() => handleToggleDevice(disable))
-      .then(() => popupState.close())
-      .catch(() => {
-        /* swallow error */
-      });
+      .then(() => popupState.close());
   };
 
   const { handleSubmit } = formContext;
@@ -149,6 +192,7 @@ DeviceInfoProps) {
   });
 
   const isDisabled = device?.disabled === true;
+  const error = state.error;
 
   return (
     <>
@@ -171,7 +215,10 @@ DeviceInfoProps) {
                   transformOrigin={{ vertical: "top", horizontal: "left" }}
                 >
                   {isDisabled ? (
-                    <MenuItem onClick={() => confirmAction(false)} className="!bg-green-500 text-white">
+                    <MenuItem
+                      onClick={() => confirmAction(false)}
+                      className="!bg-green-500 text-white"
+                    >
                       <ListItemIcon>
                         <CheckIcon className="text-white" />
                       </ListItemIcon>
@@ -306,7 +353,9 @@ DeviceInfoProps) {
                   </Button>
                 </Grid>
                 <Grid item flex={1}>
-                  {loading && <div className="ml-4">{loadingState}</div>}
+                  {state.loadingState && (
+                    <div className="ml-4">{state.loadingState}</div>
+                  )}
                 </Grid>
               </Grid>
             )}
@@ -330,7 +379,9 @@ DeviceInfoProps) {
                   Save and Redirect
                 </Button>
 
-                {loading && <div className="ml-4">{loadingState}</div>}
+                {state.loadingState && (
+                  <div className="ml-4">{state.loadingState}</div>
+                )}
               </>
             )}
           </CardActions>

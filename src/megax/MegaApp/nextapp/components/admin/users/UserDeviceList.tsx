@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 
 import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import List from "@mui/material/List";
@@ -14,25 +13,19 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
 import Button from "@mui/material/Button";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 import Badge from "@mui/material/Badge";
 import LinearProgress from "@mui/material/LinearProgress";
 import UndoIcon from "@mui/icons-material/Undo";
 import Chip from "@mui/material/Chip";
 
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
 import { Device } from "@/lib/models/device.model";
-import {
-  assignDeviceThunk,
-  clearError,
-  getUserDevicesThunk,
-  returnDeviceThunk,
-} from "@/lib/store/userDevice.state";
 import { toast } from "react-hot-toast";
 import { UserDeviceRecord } from "@/lib/models/user.model";
 import { useConfirm } from "material-ui-confirm";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getDevices, returnDevice } from "@/lib/apis/user.api";
+import UserDeviceListForm from "./UserDeviceListForm";
 
 const DeviceIconSelector = dynamic(
   () => import("@/components/admin/devices/DeviceIconSelector")
@@ -41,116 +34,63 @@ const UserDeviceLoading = dynamic(
   () => import("@/components/common/skeletons/UserDeviceLoading")
 );
 
-function UserDeviceAdd({
-  userId,
-  onCancel,
-}: {
-  userId: number;
-  onCancel: () => void;
-}) {
-  const appDispatch = useAppDispatch();
-  const { pagedDevices } = useAppSelector(s => s.devices);
-  const { error } = useAppSelector(s => s.userDevice);
-  const [value, setValue] = useState<Device | null>(null);
-
-  const handleAssignDevice = async () => {
-    const result = await appDispatch(
-      assignDeviceThunk({ userId, deviceId: Number(value?.id) })
-    ).unwrap();
-
-    if (result?.data) {
-      toast.success("Successfully assign");
-    }
-  };
-
-  const handleCloseError = () => {
-    appDispatch(clearError());
-  };
-
-  return (
-    <div className="p-4 bg-slate-100">
-      {error && (
-        <div className="mb-5">
-          <Alert
-            severity="error"
-            className="border-red-500 border-solid border"
-            onClose={handleCloseError}
-          >
-            {error}
-          </Alert>
-        </div>
-      )}
-
-      <div>
-        <Autocomplete
-          value={value}
-          onChange={(_, d) => setValue(d)}
-          autoComplete
-          options={pagedDevices.items}
-          renderInput={params => <TextField {...params} label="Device" />}
-          renderOption={(attrs, o) => (
-            <li {...attrs} key={o.id}>
-              {o.name} - {o.serialNumber ? o.serialNumber : "N/A"}
-            </li>
-          )}
-          getOptionLabel={o => `${o.name} - ${o.serialNumber}`}
-        />
-      </div>
-
-      <div className="mt-2 flex gap-2">
-        <Button
-          variant="text"
-          className="flex-1"
-          type="button"
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        <Button type="button" variant="contained" onClick={handleAssignDevice}>
-          Add
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-declare type UserDeviceListProps = {
+type UserDeviceListProps = {
+  devices?: Device[];
   userId: number;
 };
 
-export default function UserDeviceList({ userId }: UserDeviceListProps) {
+export default function UserDeviceList({
+  userId,
+  devices,
+}: UserDeviceListProps) {
   const [isAddVisible, setAddVisible] = useState(false);
-  const appDispatch = useAppDispatch();
+  const [items, setItems] = useState<UserDeviceRecord[]>([]);
   const confirm = useConfirm();
-  const { devices, loading } = useAppSelector(s => s.userDevice);
 
   const toggleAddDeviceVisibility = () => {
     setAddVisible(!isAddVisible);
   };
 
+  const returnDeviceMutation = useMutation({
+    mutationFn: (deviceId: number) => returnDevice(userId, deviceId),
+  });
+
   const handleReturn = async (deviceId: number) => {
-    const result = await appDispatch(
-      returnDeviceThunk({ userId, deviceId })
-    ).unwrap();
-    result?.data === true && toast.success(`Successfully returned`);
+    const result = await returnDeviceMutation.mutateAsync(deviceId);
+    if (result?.data) {
+      toast.success(`Successfully returned`);
+      setItems(prev =>
+        prev.map(d => ({
+          ...d,
+          returnedAt: d.id === deviceId ? new Date() : d.returnedAt,
+        }))
+      );
+    }
   };
 
   const confirmReturn = (deviceId: number) => {
     confirm({
       description: "Return this device?",
       dialogProps: { maxWidth: "xs" },
-    })
-      .then(() => handleReturn(deviceId))
-      .catch(() => {
-        /*ignore*/
-      });
+    }).then(() => handleReturn(deviceId));
   };
 
+  const { status, data } = useQuery({
+    queryKey: ["admin/user-devices", userId],
+    queryFn: () => getDevices(userId),
+    enabled: userId > 0,
+  });
+
   useEffect(() => {
-    if (userId > 0) {
-      appDispatch(getUserDevicesThunk(userId));
+    if (status === "success") {
+      setItems(data || []);
     }
-  }, [userId]);
+  }, [status, data]);
+
+  const onAdded = (d: UserDeviceRecord) => {
+    setItems(prev => [d, ...prev]);
+    toast.success(`${d.name} is given successfully`);
+  };
 
   const DeviceItem = (d: UserDeviceRecord) => (
     <ListItem
@@ -197,7 +137,7 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
     </ListItem>
   );
 
-  const activeDeviceCount = devices?.filter(d => d.returnedAt == null)?.length;
+  const activeDeviceCount = items?.filter(d => d.returnedAt == null)?.length;
 
   const Header = () => (
     <div className="flex items-center">
@@ -207,13 +147,13 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
   );
 
   const Body = () => {
-    if (loading) {
+    if (status === "pending") {
       return <UserDeviceLoading count={3} />;
     }
 
     return devices?.length ? (
       <List>
-        {devices.map((i,idx) => (
+        {items?.map((i, idx) => (
           <React.Fragment key={idx}>
             <DeviceItem {...i} />
             <Divider />
@@ -245,17 +185,18 @@ export default function UserDeviceList({ userId }: UserDeviceListProps) {
           }
         />
         <CardContent className="px-0">
-          {loading && <LinearProgress />}
+          {status === "pending" && <LinearProgress />}
           {isAddVisible && (
-            <UserDeviceAdd
+            <UserDeviceListForm
               userId={userId}
+              devices={devices}
+              onAdded={onAdded}
               onCancel={toggleAddDeviceVisibility}
             />
           )}
 
           <Body />
         </CardContent>
-        <CardActions></CardActions>
       </Card>
     </>
   );

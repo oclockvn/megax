@@ -15,6 +15,7 @@ import CardHeader from "@mui/material/CardHeader";
 import {
   Leave,
   LeaveAction,
+  LeaveActionRequest,
   LeaveStatus,
   LeaveTime,
   LeaveType,
@@ -27,10 +28,6 @@ import TimeAgo from "react-timeago";
 import { getInitial } from "@/lib/string.helper";
 import { useAppDispatch } from "@/lib/store/state.hook";
 import { useConfirm } from "material-ui-confirm";
-import {
-  cancelLeaveThunk,
-  handleLeaveActionThunk,
-} from "@/lib/store/leave.state";
 import toast from "react-hot-toast";
 import {
   usePopupState,
@@ -45,9 +42,12 @@ import TextField from "@mui/material/TextField";
 import { useRef } from "react";
 import UserAvatar from "@/components/common/UserAvatar";
 import hasAccess from "@/hooks/accessControl";
+import { useMutation } from "@tanstack/react-query";
+import { cancelLeave, handleLeaveAction } from "@/lib/apis/leave.api";
 
 export type LeaveCardProps = {
   leave: Leave;
+  onResponded?: (leave: Pick<Leave, "id" | "status">) => void;
 };
 
 const timeDic = {
@@ -56,7 +56,7 @@ const timeDic = {
   [LeaveTime.PM]: "PM",
 };
 
-export default function LeaveCard({ leave }: LeaveCardProps) {
+export default function LeaveCard({ leave, onResponded }: LeaveCardProps) {
   const appDispatch = useAppDispatch();
   const confirmation = useConfirm();
   const commentRef = useRef<HTMLInputElement>(null);
@@ -66,6 +66,21 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
     variant: "dialog",
   });
 
+  const cancelHandler = useMutation({
+    mutationKey: ["leave/cancel", leave?.id],
+    mutationFn: () => cancelLeave(leave.id),
+    onSuccess: response => {
+      if (response.success) {
+        toast.success(`Leave is cancelled successfully`);
+        onResponded && onResponded({ id: leave.id, status: response.data });
+      } else {
+        toast.error(
+          `Could not cancel leave request. Error code: ${response.code}`
+        );
+      }
+    },
+  });
+
   const handleCancel = () => {
     confirmation({
       title: "Are you sure? No regret?",
@@ -73,47 +88,37 @@ export default function LeaveCard({ leave }: LeaveCardProps) {
       dialogProps: {
         maxWidth: "xs",
       },
-    })
-      .then(() => {
-        appDispatch(cancelLeaveThunk(leave.id))
-          .unwrap()
-          .then(res => {
-            if (res.success) {
-              toast.success(`Leave is cancelled successfully`);
-              return;
-            }
-
-            toast.error(
-              `Could not cancel leave request. Error code: ${res.code}`
-            );
-          });
-      })
-      .catch(() => {
-        /*ignore*/
-      });
+    }).then(() => cancelHandler.mutate());
   };
 
-  const handleAction = (actionType: LeaveAction) => {
-    appDispatch(
-      handleLeaveActionThunk({
-        id: leave.id,
-        request: { action: actionType, comment: commentRef?.current?.value },
-      })
-    )
-      .unwrap()
-      .then(res => {
-        if (res.success) {
-          toast.success(
-            `Leave is ${
-              actionType == LeaveAction.Approve ? "approved" : "rejected"
-            } successfully`
-          );
+  const actionHandler = useMutation({
+    mutationKey: ["leave/action", leave?.id],
+    mutationFn: (req: LeaveActionRequest) => handleLeaveAction(leave.id, req),
+    onSuccess: response => {
+      if (response.success) {
+        popupState.close();
+        onResponded && onResponded({ id: leave.id, status: response.data });
+      } else {
+        toast.error(
+          `Could not handle leave action. Error code: ${response.code}`
+        );
+      }
+    },
+  });
 
-          popupState.close();
-        } else {
-          toast.error(`Could not handle leave action. Error code: ${res.code}`);
-        }
-      });
+  const handleAction = async (actionType: LeaveAction) => {
+    const result = await actionHandler.mutateAsync({
+      action: actionType,
+      comment: commentRef?.current?.value,
+    });
+
+    if (result.success) {
+      toast.success(
+        `Leave is ${
+          actionType == LeaveAction.Approve ? "approved" : "rejected"
+        } successfully`
+      );
+    }
   };
 
   const LeaveItem = ({

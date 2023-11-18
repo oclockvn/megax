@@ -32,7 +32,6 @@ import { useMutation } from "@tanstack/react-query";
 import { deleteTeam, updateTeam } from "@/lib/apis/team.api";
 import { Team, TeamMember } from "@/lib/models/team.model";
 import { User } from "@/lib/models/user.model";
-import { uniqBy } from "@/lib/helpers/array";
 import toast from "react-hot-toast";
 import { getInitial } from "@/lib/string.helper";
 import {
@@ -43,63 +42,7 @@ import {
 } from "material-ui-popup-state/hooks";
 import IconButton from "@mui/material/IconButton";
 import { useConfirm } from "material-ui-confirm";
-
-type TeamDetailState = {
-  members: TeamMember[];
-  loading?: boolean;
-  error?: string;
-};
-
-type TeamDetailAction =
-  | {
-      type: "set";
-      payload: Partial<TeamDetailState>;
-    }
-  | {
-      type: "toggleLeader";
-      payload: number[];
-    }
-  | {
-      type: "addMember";
-      payload: TeamMember[];
-    }
-  | {
-      type: "removeMember";
-      payload: number;
-    };
-
-function teamDetailReducer(state: TeamDetailState, action: TeamDetailAction) {
-  const { type, payload } = action;
-  switch (type) {
-    case "set":
-      return {
-        ...state,
-        ...payload,
-      };
-    case "toggleLeader":
-      return {
-        ...state,
-        members: state.members.map(m => ({
-          ...m,
-          leader: payload.includes(m.memberId) ? !m.leader : m.leader,
-        })),
-      };
-    case "addMember":
-      return {
-        ...state,
-        members: uniqBy([...payload, ...state.members], "memberId"),
-      };
-    case "removeMember":
-      return {
-        ...state,
-        members: state.members.filter(m => m.memberId !== payload),
-      };
-    default:
-      return {
-        ...state,
-      };
-  }
-}
+import teamDetailReducer, { TeamDetailState } from "@/lib/states/team.state";
 
 export default function TeamForm({
   current,
@@ -130,7 +73,7 @@ export default function TeamForm({
 
   const confirm = useConfirm();
 
-  const saveTeam = useMutation({
+  const saveHandler = useMutation({
     mutationFn: (team: Partial<Team>) => {
       return updateTeam({
         id: current?.id || 0,
@@ -140,7 +83,7 @@ export default function TeamForm({
     },
   });
 
-  const deleteMutation = useMutation({
+  const deleteHandler = useMutation({
     mutationFn: (id: number) => deleteTeam(id),
   });
 
@@ -172,7 +115,7 @@ export default function TeamForm({
   };
 
   const handleSave = async (team: Team) => {
-    const result = await saveTeam.mutateAsync({
+    const result = await saveHandler.mutateAsync({
       ...team,
       members: membersRef.current,
     });
@@ -188,7 +131,7 @@ export default function TeamForm({
   };
 
   const handleDeleteTeam = async (id: number) => {
-    const res = await deleteMutation.mutateAsync(id);
+    const res = await deleteHandler.mutateAsync(id);
     if (res.success) {
       onDeleted && onDeleted();
       toast.success(`Team deleted successfully`);

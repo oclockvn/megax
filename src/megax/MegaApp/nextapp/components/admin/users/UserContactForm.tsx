@@ -50,7 +50,7 @@ export default function UserContactForm(props: UserContactFormProps) {
             <Grid container spacing={2}>
               <Grid item md={6}>
                 <DatePickerElement
-                  label="Birthdate"
+                  label="Birthday"
                   name="dob"
                   format="dd/MM/yyyy"
                   maxDate={new Date()}

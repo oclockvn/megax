@@ -24,14 +24,10 @@ const CustomTabPanel = dynamic(
 );
 const UserRoles = dynamic(() => import("./UserRoles"), { ssr: false });
 
-declare type UserTabsProps = {
-  user: User | undefined;
-};
-
 // keep this value outside of the component
 let _handled = false;
 
-export default function UserTabs({ user }: UserTabsProps) {
+export default function UserTabs() {
   const [value, setValue] = useState("details");
   const router = useRouter();
   const path = usePathname();
@@ -98,7 +94,7 @@ export default function UserTabs({ user }: UserTabsProps) {
       </Card>
 
       <CustomTabPanel value={"details"} curr={value}>
-        <UserInfo user={user} />
+        <UserInfo />
       </CustomTabPanel>
       <CustomTabPanel value={"contacts"} curr={value}>
         <UserContactList />

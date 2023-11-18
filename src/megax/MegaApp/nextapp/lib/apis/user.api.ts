@@ -75,7 +75,7 @@ export async function returnDevice(id: number, deviceId: number) {
   }
 }
 
-export async function creteUpdateContact(
+export async function createUpdateContact(
   id: number,
   req: Partial<Contact | null>
 ) {
@@ -90,7 +90,7 @@ export async function deleteContact(id: number, contactId: number) {
   return res.data;
 }
 
-export async function creteUpdateDocument(
+export async function createUpdateDocument(
   id: number,
   req: Partial<UserDocument | null>,
   files?: File[]

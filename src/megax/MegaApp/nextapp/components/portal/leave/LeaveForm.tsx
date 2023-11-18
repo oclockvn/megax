@@ -12,52 +12,117 @@ import CategoryIcon from "@mui/icons-material/Category";
 import {
   Leave,
   LeaveDate,
+  LeaveRequest,
   LeaveType,
 } from "@/lib/models/leave.model";
 import LeaveDatePicker from "./LeaveDatePicker";
 import { useAppDispatch } from "@/lib/store/state.hook";
-import { submitLeaveThunk } from "@/lib/store/leave.state";
-import { useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import Alert from "@mui/material/Alert";
 import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { submitLeave } from "@/lib/apis/leave.api";
 
 type LeaveFormProps = {
   leave: Partial<Leave>;
-  handleClose: () => void;
   loading?: boolean;
   requestedDates?: Date[];
+  handleClose: () => void;
+  onAdded: (leave: Leave) => void;
 };
 
-let leaveDates: LeaveDate[] = [];
+type LeaveFormState = {
+  dates: LeaveDate[],
+  error: string | null,
+  loading: boolean,
+}
+
+type Action = {
+  type: 'set',
+  payload: Partial<LeaveFormState>
+}
+
+function leaveFormReducer(state: LeaveFormState, action: Action) {
+  const { type, payload } = action;
+  switch (type) {
+    case 'set':
+      return {
+        ...state,
+        ...payload,
+      } as LeaveFormState;
+  }
+}
+
+// let leaveDates: LeaveDate[] = [];
 
 export default function LeaveForm(props: LeaveFormProps) {
   const appDispatch = useAppDispatch();
   const { leave, handleClose } = props;
-  const [error, setError] = useState<string | undefined>();
-  const [loading, setLoading] = useState(false);
+  const datesRef = useRef<LeaveDate[]>([])
+  // const [error, setError] = useState<string | undefined>();
+  // const [loading, setLoading] = useState(false);
+
+  const [state,dispatch] = useReducer(leaveFormReducer, {
+    dates: [],
+    error: null,
+    loading: false,
+  } as LeaveFormState)
+
+  const submitHandler = useMutation({
+    mutationKey: ['user/leave/request'],
+    mutationFn: (req: Partial<LeaveRequest>) => submitLeave(req),
+    onSuccess: response => {
+      if (response.success) {
+        toast.success(`Requested successfully`)
+
+        props.onAdded && props.onAdded(response.data)
+      }
+    }
+  })
+
+  useEffect(() => {
+    datesRef.current = state.dates;
+  }, [state.dates])
 
   const handleSubmit = async (request: Partial<Leave>) => {
-    setLoading(true);
+    // setLoading(true);
+    dispatch({
+      type: 'set',
+      payload: {error: null, loading: true}
+    })
 
     const payload = {
       ...request,
-      leaveDates,
+      leaveDates: datesRef.current,
     };
 
-    const result = await appDispatch(submitLeaveThunk(payload)).unwrap();
-    setLoading(false);
-    if (result?.success) {
-      toast.success(`Requested successfully`);
-      handleClose();
-    }
+    const result = await submitHandler.mutateAsync(payload);// appDispatch(submitLeaveThunk(payload)).unwrap();
+    dispatch({
+      type: 'set',
+      payload: {
+        loading: false,
+        error: result.success ? undefined : `Request failed. Error code: ${result.code}`
+      }
+    })
+    // setLoading(false);
+    // if (result?.success) {
+      // toast.success(`Requested successfully`);
+      // handleClose();
+    // }
 
-    setError(
-      result.success ? undefined : `Request failed. Error code: ${result.code}`
-    );
+    // setError(
+    //   result.success ? undefined : `Request failed. Error code: ${result.code}`
+    // );
   };
 
   const dateChange = (items: LeaveDate[]) => {
-    leaveDates = items;
+    // leaveDates = items;
+    dispatch({
+      type: 'set',
+      payload: {
+        dates: items,
+      }
+    })
   };
 
   const leaveTypes = Object.keys(LeaveType)
@@ -129,9 +194,9 @@ export default function LeaveForm(props: LeaveFormProps) {
             />
           </div>
 
-          {!!error && (
+          {!!state.error && (
             <Alert variant="standard" color="error" className="mb-4">
-              {error}
+              {state.error}
             </Alert>
           )}
 
@@ -140,15 +205,15 @@ export default function LeaveForm(props: LeaveFormProps) {
               variant="contained"
               className="px-6"
               type="submit"
-              disabled={loading}
+              disabled={state.loading}
             >
-              {loading ? "Processing..." : "Save Changes"}
+              {state.loading ? "Processing..." : "Save Changes"}
             </Button>
             <Button
               variant="text"
               className="px-6"
               onClick={() => handleClose()}
-              disabled={loading}
+              disabled={state.loading}
             >
               Close
             </Button>

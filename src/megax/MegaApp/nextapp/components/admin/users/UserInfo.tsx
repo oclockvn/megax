@@ -16,39 +16,68 @@ import {
   useForm,
   AutocompleteElement,
 } from "react-hook-form-mui";
-import { useAppDispatch, useAppSelector } from "@/lib/store/state.hook";
-import { clearError, updateUserDetailThunk } from "@/lib/store/users.state";
 import Alert from "@mui/material/Alert";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import datetime from "@/lib/datetime";
 import nationalities from "@/lib/constants/nationalities";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchBanks } from "@/lib/apis/banks.api";
+import { useContext, useReducer } from "react";
+import { UserContext } from "@/components/contexts/UserContext";
+import { updateUserDetail } from "@/lib/apis/user.api";
+import { equals } from "@/lib/string.helper";
+import userInfoReducer, { UserInfoState } from "@/lib/states/userInfo.state";
 
-export default function UserInfo({ user }: { user: User | undefined }) {
-  const appDispatch = useAppDispatch();
-  const { loading, loadingState, error } = useAppSelector(s => s.users);
-  const {
-    pagedBanks: { items },
-  } = useAppSelector(s => s.banks);
-  const banks = items.map(i => ({
-    id: i.id,
-    label: i.code ? `${i.code} - ${i.name}` : i.name,
-  }));
+export default function UserInfo() {
+  const { user, updateUser } = useContext(UserContext);
+  const [state, dispatch] = useReducer(userInfoReducer, {
+    loading: false,
+    loadingState: null,
+    error: null,
+  } as UserInfoState);
+
+  const { data: banks } = useQuery({
+    queryKey: ["admin/user/banks"],
+    queryFn: () => fetchBanks({}),
+    select: response =>
+      response?.items?.map(i => ({
+        id: i.id,
+        label: i.code ? `${i.code} - ${i.name}` : i.name,
+      })),
+    staleTime: Infinity, // cache forever
+  });
+
+  const updateHandler = useMutation({
+    mutationFn: (user: User) => updateUserDetail(user),
+    onMutate: () =>
+      dispatch({
+        type: "patch",
+        payload: { loading: true, loadingState: "Saving..." },
+      }),
+    onSuccess: response => {
+      if (response.success) {
+        toast.success("User updated successfully");
+        handleClearError();
+        updateUser?.({
+          ...response.data,
+        });
+      } else {
+        toast.error("Something went wrong. Check details and retry.");
+      }
+    },
+  });
 
   const handleFormSubmit = async (u: User) => {
-    const result = await appDispatch(updateUserDetailThunk(u)).unwrap();
-    result.success
-      ? toast.success("User updated successfully")
-      : toast.error("Something went wrong. Check details and retry.");
-
-    if (result.success) {
-      handleClearError();
-    }
+    await updateHandler.mutateAsync(u);
   };
 
   const handleClearError = () => {
-    appDispatch(clearError());
+    dispatch({
+      type: "patch",
+      payload: { error: null, loading: false, loadingState: null },
+    });
   };
 
   const contractTypes = ["Official", "Contractor", "Fresher"].map(x => ({
@@ -84,6 +113,8 @@ export default function UserInfo({ user }: { user: User | undefined }) {
     resolver: yupResolver(userSchema),
     values: user,
   });
+
+  const { error, loading, loadingState } = state;
 
   return (
     <>
@@ -184,6 +215,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                   label="Nationality"
                   options={nationalities}
                   autocompleteProps={{
+                    isOptionEqualToValue: (o, v) => equals(o + "", v + ""),
                     renderOption(attrs, o) {
                       return (
                         <li {...attrs} key={o}>
@@ -203,7 +235,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                   className="w-full"
                   name="dob"
                   required
-                  label="Birthdate"
+                  label="Birthday"
                 />
               </Grid>
               <Grid item xs={12} md={8}>
@@ -381,7 +413,7 @@ export default function UserInfo({ user }: { user: User | undefined }) {
                 name="bankId"
                 label="Bank"
                 matchId
-                options={banks}
+                options={banks || []}
                 autocompleteProps={{
                   renderOption(attrs, o) {
                     return (

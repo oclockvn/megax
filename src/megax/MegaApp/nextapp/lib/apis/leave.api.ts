@@ -38,7 +38,7 @@ export async function approveLeave(id: number) {
   return res.data;
 }
 
-export async function handleAction(id: number, request: LeaveActionRequest) {
+export async function handleLeaveAction(id: number, request: LeaveActionRequest) {
   return api
     .post<Result<LeaveStatus>>(`api/leaves/${id}/action`, request)
     .then(res => res.data)

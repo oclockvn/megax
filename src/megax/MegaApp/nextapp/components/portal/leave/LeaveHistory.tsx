@@ -34,7 +34,7 @@ export default function LeaveHistory({ items, loading }: LeaveHistoryProps) {
           },
         }}
       >
-        {items.map(leave => (
+        {items.map((leave, index) => (
           <TimelineItem key={leave.id}>
             <TimelineOppositeContent>
               <Chip
@@ -55,7 +55,7 @@ export default function LeaveHistory({ items, loading }: LeaveHistoryProps) {
                     : "bg-green-500"
                 }
               />
-              <TimelineConnector />
+              {(index < items.length - 1) && <TimelineConnector /> }
             </TimelineSeparator>
             <TimelineContent>
               {loading ? <LeaveCardLoading /> : <LeaveCard leave={leave} />}
