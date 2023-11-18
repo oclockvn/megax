@@ -11,24 +11,82 @@ import { Document as UserDocument } from "@/lib/models/document.model";
 import Grid from "@mui/material/Grid";
 import DropzoneWrapper from "@/components/form/DropzoneWrapper";
 import FileList from "@/components/common/FileList";
+import { useReducer, useRef } from "react";
+import { createUpdateDocument } from "@/lib/apis/user.api";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import Alert from "@mui/material/Alert";
 
 type UserDocumentFormProps = {
+  userId: number;
   document: Partial<UserDocument>;
-  handleSave: (contact: Partial<UserDocument>, files?: File[]) => void;
-  handleClose: () => void;
-  loading?: boolean;
+  handleClose: (document?: Partial<UserDocument>) => void;
 };
 
-export default function UserDocumentForm(props: UserDocumentFormProps) {
-  const { document, handleSave, handleClose, loading } = props;
-  let _selectedFiles: File[] = [];
+type UserDocumentFormState = {
+  loading: boolean;
+  error?: string;
+};
 
-  const handleSubmit = (contact: Partial<UserDocument>) => {
-    handleSave(contact, _selectedFiles);
+type Action = {
+  type: "patch";
+  payload: Partial<UserDocumentFormState>;
+};
+
+function userDocumentFormReducer(state: UserDocumentFormState, action: Action) {
+  switch (action.type) {
+    case "patch":
+      return {
+        ...state,
+        ...action.payload,
+      } as UserDocumentFormState;
+  }
+}
+
+export default function UserDocumentForm(props: UserDocumentFormProps) {
+  const { document, handleClose, userId } = props;
+  const [state, dispatch] = useReducer(userDocumentFormReducer, {
+    loading: false,
+    error: undefined,
+  } as UserDocumentFormState);
+
+  const { loading, error } = state;
+  const filesRef = useRef<File[]>([]);
+
+  const saveHandler = useMutation({
+    mutationFn: ({
+      document,
+      files,
+    }: {
+      document: Partial<UserDocument>;
+      files?: File[];
+    }) => createUpdateDocument(userId, document, files),
+    onMutate: () =>
+      dispatch({ type: "patch", payload: { loading: true, error: undefined } }),
+    onSuccess: result => {
+      result.success
+        ? toast.success("Document saved successfully")
+        : toast.error("Something went wrong");
+
+      handleClose(result.data);
+    },
+    onError: err => {
+      dispatch({
+        type: "patch",
+        payload: {
+          loading: false,
+          error: err.message,
+        },
+      });
+    },
+  });
+
+  const handleSubmit = async (doc: Partial<UserDocument>) => {
+    await saveHandler.mutateAsync({ document: doc, files: filesRef.current });
   };
 
   const handleFileChanged = (files: File[]) => {
-    _selectedFiles = [...files];
+    filesRef.current = [...files];
   };
 
   const documentTypes = [
@@ -53,7 +111,9 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
     <>
       <div className="p-4 w-[500px]">
         <h4 className="uppercase !text-[1.2rem] font-semibold mb-4">
-          {Number(document?.id) > 0 ? `Viewing ${document.documentType} ${document.documentNumber}` : 'Edit document'}
+          {Number(document?.id) > 0
+            ? `Viewing ${document.documentType} ${document.documentNumber}`
+            : "Edit document"}
         </h4>
 
         <FormContainer values={document} onSuccess={handleSubmit}>
@@ -108,6 +168,12 @@ export default function UserDocumentForm(props: UserDocumentFormProps) {
           <div className="mb-4">
             <DropzoneWrapper fileSelected={handleFileChanged} />
           </div>
+
+          {error && (
+            <Alert severity="error" className="mb-4">
+              {error}
+            </Alert>
+          )}
 
           <div className="flex items-center gap-2">
             <Button
