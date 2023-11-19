@@ -32,6 +32,7 @@ public class SysEventConfiguration : IEntityTypeConfiguration<SysEvent>
         builder.HasOne(x => x.EventType)
             .WithMany(x => x.Events)
             .HasForeignKey(x => x.EventTypeId);
+        builder.Property(x => x.CreatedName).IsRequired(false);
     }
 }
 
