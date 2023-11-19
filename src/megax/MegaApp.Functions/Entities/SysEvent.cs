@@ -7,7 +7,7 @@ public class SysEvent
 {
     public int Id { get; set; }
 
-    public int TypeId { get; set; }
+    public int EventTypeId { get; set; }
     public SysEventType EventType { get; set; }
 
     public string Payload { get; set; }

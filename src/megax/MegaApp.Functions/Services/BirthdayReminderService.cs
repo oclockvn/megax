@@ -1,5 +1,6 @@
 ﻿using MegaApp.Functions.Entities;
 using Microsoft.EntityFrameworkCore;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,9 +28,30 @@ namespace MegaApp.Functions.Services
         public async Task RemindBirthdayAsync()
         {
             using var db = dbContextFactory.CreateDbContext();
-            Debug.WriteLine("Scanning");
+            var now = DateTime.Now;
+            var maxDay = 3;
 
-            await Task.CompletedTask;
+            var upcomingBirthdayUsers = await db.Users
+                .Where(u => u.Dob.HasValue && u.Dob.Value.Month >= now.Month && u.Dob.Value.Date.DayOfYear - now.DayOfYear <= maxDay && u.Dob.Value.Date.DayOfYear - now.DayOfYear >= 0)
+                .Select(x => x.Id)
+                .ToArrayAsync();
+
+            if (upcomingBirthdayUsers.Length == 0)
+            {
+                return;
+            }
+
+            var batches = upcomingBirthdayUsers.Batch(50);
+            foreach (var batch in batches)
+            {
+                db.Events.AddRange(batch.Select(u => new SysEvent
+                {
+                    EventTypeId = 0,
+                    Payload = "",
+                }));
+
+                await db.SaveChangesAsync();
+            }
         }
     }
 }
