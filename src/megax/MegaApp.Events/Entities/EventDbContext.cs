@@ -11,6 +11,13 @@ public class EventDbContext : DbContext
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new SysEventConfiguration());
+        modelBuilder.ApplyConfiguration(new SysEventTypeConfiguration());
+    }
+
     public DbSet<SysEvent> Events { get; set; }
     public DbSet<SysEventType> EventTypes { get; set; }
 

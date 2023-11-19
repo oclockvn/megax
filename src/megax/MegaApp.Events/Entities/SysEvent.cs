@@ -26,7 +26,7 @@ public class SysEventConfiguration : IEntityTypeConfiguration<SysEvent>
 {
     public void Configure(EntityTypeBuilder<SysEvent> builder)
     {
-        builder.ToTable("SysEvents", "events");
+        builder.ToTable("SysEvents", "event");
         builder.Property(x => x.Published).HasDefaultValueSql("0");
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("sysdatetimeoffset()");
         builder.HasOne(x => x.EventType)
