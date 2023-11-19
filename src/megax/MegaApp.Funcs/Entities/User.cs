@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MegaApp.Functions.Entities;
+﻿namespace MegaApp.Funcs.Entities;
 
 public class User
 {

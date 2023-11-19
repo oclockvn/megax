@@ -39,8 +39,6 @@ namespace MegaApp.Core.Db
         public DbSet<LeaveDate> LeaveDates { get; set; }
 
         public DbSet<Timesheet> Timesheets { get; set; }
-        public DbSet<SysEvent> Events { get; set; }
-        public DbSet<SysEventType> EventTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,8 +62,6 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new TimesheetConfiguration());
-            modelBuilder.ApplyConfiguration(new SysEventConfiguration());
-            modelBuilder.ApplyConfiguration(new SysEventTypeConfiguration());
         }
 
         public void SetCurrentUser(int userId, string userName)

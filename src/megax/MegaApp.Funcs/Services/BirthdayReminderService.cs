@@ -1,15 +1,9 @@
-﻿using MegaApp.Functions.Entities;
+﻿using MegaApp.Events;
+using MegaApp.Funcs.Entities;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MegaApp.Functions.Services
+namespace MegaApp.Funcs.Services
 {
     public interface IBirthdayReminderService
     {
@@ -18,11 +12,13 @@ namespace MegaApp.Functions.Services
 
     internal class BirthdayReminderService : IBirthdayReminderService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> dbContextFactory;
+        private readonly IDbContextFactory<FuncDbContext> dbContextFactory;
+        private readonly IEventProducer eventProducer;
 
-        public BirthdayReminderService(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+        public BirthdayReminderService(IDbContextFactory<FuncDbContext> dbContextFactory, IEventProducer eventProducer)
         {
             this.dbContextFactory = dbContextFactory;
+            this.eventProducer = eventProducer;
         }
 
         public async Task RemindBirthdayAsync()
@@ -44,13 +40,8 @@ namespace MegaApp.Functions.Services
             var batches = upcomingBirthdayUsers.Batch(50);
             foreach (var batch in batches)
             {
-                db.Events.AddRange(batch.Select(u => new SysEvent
-                {
-                    EventTypeId = 0,
-                    Payload = "",
-                }));
-
-                await db.SaveChangesAsync();
+                var events = batch.Select(id => new BirthdayReminderEvent(id)).ToArray();
+                await eventProducer.AddEventsAsync(events);
             }
         }
     }
