@@ -32,6 +32,12 @@ namespace MegaApp.Funcs.Services
                 .Select(x => x.Id)
                 .ToArrayAsync();
 
+            var reminds = await db.BirthdayReminders.Where(r => upcomingBirthdayUsers.Contains(r.UserId) && r.CreatedAt.Year == now.Year)
+                .Select(x => x.UserId)
+                .ToArrayAsync();
+
+            upcomingBirthdayUsers = upcomingBirthdayUsers.Except(reminds).ToArray();
+
             if (upcomingBirthdayUsers.Length == 0)
             {
                 return;
@@ -45,6 +51,9 @@ namespace MegaApp.Funcs.Services
                     UserId = id,
                 }).ToArray();
                 await eventProducer.AddEventsAsync(events);
+
+                db.BirthdayReminders.AddRange(batch.Select(x => new BirthdayReminder { UserId = x }));
+                await db.SaveChangesAsync();
             }
         }
     }

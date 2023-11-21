@@ -14,7 +14,7 @@ namespace MegaApp
                 .AddJsonFile("appsettings.Development.json", optional: true);
 
             var configuration = configurationBuilder.Build();
-            var connectionString = configuration.GetConnectionString("TenantConnection");
+            var connectionString = configuration.GetConnectionString("ApplicationDbConnection");
 
             var dbContextOptionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             dbContextOptionBuilder.UseSqlServer(connectionString);
