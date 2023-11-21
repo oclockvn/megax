@@ -6,7 +6,7 @@ namespace MegaApp.Events;
 
 public interface IEventProducer
 {
-    Task AddEventsAsync(BaseEvent[] events);
+    Task AddEventsAsync<T>(T[] events) where T : BaseEvent, new();
 }
 
 internal class EventProducer : IEventProducer
@@ -18,7 +18,7 @@ internal class EventProducer : IEventProducer
         this.dbContextFactory = dbContextFactory;
     }
 
-    public async Task AddEventsAsync(BaseEvent[] events)
+    public async Task AddEventsAsync<T>(T[] events) where T : BaseEvent, new()
     {
         using var db = dbContextFactory.CreateDbContext();
 

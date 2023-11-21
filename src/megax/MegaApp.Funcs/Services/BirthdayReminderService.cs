@@ -40,7 +40,10 @@ namespace MegaApp.Funcs.Services
             var batches = upcomingBirthdayUsers.Batch(50);
             foreach (var batch in batches)
             {
-                var events = batch.Select(id => new BirthdayReminderEvent(id)).ToArray();
+                var events = batch.Select(id => new BirthdayReminderEvent
+                {
+                    UserId = id,
+                }).ToArray();
                 await eventProducer.AddEventsAsync(events);
             }
         }

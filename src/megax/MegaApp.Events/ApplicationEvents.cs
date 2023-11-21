@@ -3,13 +3,15 @@
 namespace MegaApp.Events
 {
     [DebuggerDisplay("{EventType}")]
-    public abstract record BaseEvent
+    public abstract class BaseEvent
     {
         public abstract string EventType { get; }
     }
 
-    public record BirthdayReminderEvent(int UserId) : BaseEvent
+    [DebuggerDisplay("{UserId}")]
+    public class BirthdayReminderEvent : BaseEvent
     {
         public override string EventType => "mega.user.birthday-reminder";
+        public int UserId { get; set; }
     }
 }
