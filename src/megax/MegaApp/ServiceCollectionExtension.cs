@@ -1,6 +1,7 @@
 using MegaApp.Authorization;
 using MegaApp.Core.Services;
 using MegaApp.Infrastructure.Http;
+using MegaApp.Jobs;
 using MegaApp.Resolvers;
 using MegaApp.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,7 @@ namespace MegaApp
         public static IServiceCollection AddAppSettings(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<JwtConfig>(configuration.GetSection("JwtConfig"));
+            services.Configure<BackgroundJobConfig>(configuration.GetSection("BackgroundJob"));
             return services;
         }
 
@@ -23,6 +25,7 @@ namespace MegaApp
                 .AddScoped<IHttpOriginResolver, HttpOriginResolver>()
                 .AddScoped<IUserResolver, HttpContextUserResolver>()
                 .AddScoped<IAuthorizationHandler, HasAccessHandler>()
+                .AddHostedService<MessageProducerJob>()
                 ;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using MegaApp.Events;
+using MegaApp.Events.Services;
 using MegaApp.Funcs.Entities;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
@@ -13,9 +14,9 @@ namespace MegaApp.Funcs.Services
     internal class BirthdayReminderService : IBirthdayReminderService
     {
         private readonly IDbContextFactory<FuncDbContext> dbContextFactory;
-        private readonly IEventProducer eventProducer;
+        private readonly IEventService eventProducer;
 
-        public BirthdayReminderService(IDbContextFactory<FuncDbContext> dbContextFactory, IEventProducer eventProducer)
+        public BirthdayReminderService(IDbContextFactory<FuncDbContext> dbContextFactory, IEventService eventProducer)
         {
             this.dbContextFactory = dbContextFactory;
             this.eventProducer = eventProducer;

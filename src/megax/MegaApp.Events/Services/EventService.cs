@@ -2,18 +2,18 @@
 using MegaApp.Utils.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace MegaApp.Events;
+namespace MegaApp.Events.Services;
 
-public interface IEventProducer
+public interface IEventService
 {
     Task AddEventsAsync<T>(T[] events) where T : BaseEvent, new();
 }
 
-internal class EventProducer : IEventProducer
+internal class EventService : IEventService
 {
     private readonly IDbContextFactory<EventDbContext> dbContextFactory;
 
-    public EventProducer(IDbContextFactory<EventDbContext> dbContextFactory)
+    public EventService(IDbContextFactory<EventDbContext> dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }

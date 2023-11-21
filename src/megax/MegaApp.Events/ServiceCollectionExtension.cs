@@ -1,4 +1,5 @@
-﻿using MegaApp.Funcs.Entities;
+﻿using MegaApp.Events.Services;
+using MegaApp.Funcs.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +15,8 @@ public static class ServiceCollectionExtension
         });
 
         return services
-            .AddScoped<IEventProducer, EventProducer>()
+            .AddScoped<IEventService, EventService>()
+            .AddScoped<IMessageService, MessageService>()
             ;
     }
 }
