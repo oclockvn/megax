@@ -32,6 +32,7 @@ namespace MegaApp.Funcs.Services
                 .Select(x => x.Id)
                 .ToArrayAsync();
 
+            // todo: handle birthday at first 3 days of the year
             var reminds = await db.BirthdayReminders.Where(r => upcomingBirthdayUsers.Contains(r.UserId) && r.CreatedAt.Year == now.Year)
                 .Select(x => x.UserId)
                 .ToArrayAsync();
