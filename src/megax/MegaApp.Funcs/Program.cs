@@ -18,7 +18,7 @@ var host = new HostBuilder()
         var funcConnectionString = host.Configuration.GetValue<string>("ApplicationDbConnection");
         if (string.IsNullOrWhiteSpace(funcConnectionString))
         {
-            throw new NullReferenceException("No connection string found for event context");
+            throw new NullReferenceException("No connection string found for func context");
         }
 
         services.AddFunctionServices(funcConnectionString);

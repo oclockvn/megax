@@ -6,7 +6,7 @@ namespace MegaApp.Events.Services;
 
 public interface IEventService
 {
-    Task AddEventsAsync<T>(T[] events) where T : BaseEvent, new();
+    Task AddEventsAsync<T>(T[] events) where T : IntegrationEvent, new();
 }
 
 internal class EventService : IEventService
@@ -18,7 +18,7 @@ internal class EventService : IEventService
         this.dbContextFactory = dbContextFactory;
     }
 
-    public async Task AddEventsAsync<T>(T[] events) where T : BaseEvent, new()
+    public async Task AddEventsAsync<T>(T[] events) where T : IntegrationEvent, new()
     {
         using var db = dbContextFactory.CreateDbContext();
 
@@ -27,11 +27,8 @@ internal class EventService : IEventService
 
         foreach (var ev in events)
         {
-            var eventType = eventTypes.SingleOrDefault(e => e.Name == ev.EventType);
-            if (eventType == null)
-            {
-                throw new NullReferenceException($"No event type found for event name {ev.EventType}");
-            }
+            var eventType = eventTypes.SingleOrDefault(e => e.Name == ev.EventType)
+                ?? throw new Exception($"No event type found for event name {ev.EventType}");
 
             db.Events.Add(new SysEvent
             {
