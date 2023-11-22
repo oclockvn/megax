@@ -39,6 +39,7 @@ namespace MegaApp.Core.Db
         public DbSet<LeaveDate> LeaveDates { get; set; }
 
         public DbSet<Timesheet> Timesheets { get; set; }
+        public DbSet<BirthdayReminder> BirthdayReminders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,6 +63,7 @@ namespace MegaApp.Core.Db
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new TimesheetConfiguration());
+            modelBuilder.ApplyConfiguration(new BirthdayReminderConfiguration());
         }
 
         public void SetCurrentUser(int userId, string userName)

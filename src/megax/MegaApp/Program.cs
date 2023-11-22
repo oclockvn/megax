@@ -1,6 +1,7 @@
 using MegaApp;
 using MegaApp.Authorization;
 using MegaApp.Core;
+using MegaApp.Events;
 using MegaApp.Generator;
 using MegaApp.Infrastructure;
 using MegaApp.Middlewares;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbConnection");
+var eventConnectionString = builder.Configuration.GetConnectionString("EventDbConnection");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -27,6 +29,7 @@ builder.Services
 #endif
         ;
     }, builder.Configuration)
+    .AddEventServices(eventConnectionString)
     .AddGeneratorServices()
     .AddInfrastructureServices(builder.Configuration, builder.Environment.ContentRootPath)
     .AddNextJs(builder.Configuration)

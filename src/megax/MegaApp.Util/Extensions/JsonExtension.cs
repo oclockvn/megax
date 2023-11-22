@@ -1,10 +1,13 @@
+using System.Text.Json;
+
 namespace MegaApp.Utils.Extensions;
 
 public static class JsonExtension
 {
+    private static JsonSerializerOptions _jsonOption = new(JsonSerializerDefaults.Web);
     public static string ToJson<T>(this T obj)
     {
-        return System.Text.Json.JsonSerializer.Serialize<T>(obj);
+        return JsonSerializer.Serialize<T>(obj, options: _jsonOption);
     }
 
     public static T? FromJson<T>(this string s)
@@ -14,7 +17,7 @@ public static class JsonExtension
             return default;
         }
 
-        return System.Text.Json.JsonSerializer.Deserialize<T>(s);
+        return JsonSerializer.Deserialize<T>(s, _jsonOption);
     }
 
     public static async Task<T?> FromJsonAsync<T>(this Stream s)
@@ -24,6 +27,6 @@ public static class JsonExtension
             return default;
         }
 
-        return await System.Text.Json.JsonSerializer.DeserializeAsync<T>(s);
+        return await JsonSerializer.DeserializeAsync<T>(s, _jsonOption);
     }
 }

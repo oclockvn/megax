@@ -9,9 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MegaApp.Core", "MegaApp.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MegaApp.Infrastructure", "MegaApp.Infrastructure\MegaApp.Infrastructure.csproj", "{5219FF21-35C0-4671-BABE-2C7B00050AB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MegaApp.Generator", "MegaApp.Generator\MegaApp.Generator.csproj", "{B73C066E-DF5D-48EF-AA4D-6A2D666E259F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MegaApp.Generator", "MegaApp.Generator\MegaApp.Generator.csproj", "{B73C066E-DF5D-48EF-AA4D-6A2D666E259F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MegaApp.Util", "MegaApp.Util\MegaApp.Util.csproj", "{69164017-1CAB-49A1-B3AF-F3B0A2EC00D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MegaApp.Util", "MegaApp.Util\MegaApp.Util.csproj", "{69164017-1CAB-49A1-B3AF-F3B0A2EC00D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MegaApp.Events", "MegaApp.Events\MegaApp.Events.csproj", "{83C230A0-3A86-41BF-A24D-A4837FD78402}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MegaApp.Funcs", "MegaApp.Funcs\MegaApp.Funcs.csproj", "{EE39C419-5E38-4596-8DA0-14C51E371F42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,14 @@ Global
 		{69164017-1CAB-49A1-B3AF-F3B0A2EC00D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69164017-1CAB-49A1-B3AF-F3B0A2EC00D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69164017-1CAB-49A1-B3AF-F3B0A2EC00D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83C230A0-3A86-41BF-A24D-A4837FD78402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83C230A0-3A86-41BF-A24D-A4837FD78402}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83C230A0-3A86-41BF-A24D-A4837FD78402}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83C230A0-3A86-41BF-A24D-A4837FD78402}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE39C419-5E38-4596-8DA0-14C51E371F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE39C419-5E38-4596-8DA0-14C51E371F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE39C419-5E38-4596-8DA0-14C51E371F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE39C419-5E38-4596-8DA0-14C51E371F42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

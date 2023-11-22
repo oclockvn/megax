@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MegaApp.Core\MegaApp.Core.csproj" />
+    <ProjectReference Include="..\MegaApp.Events\MegaApp.Events.csproj" />
     <ProjectReference Include="..\MegaApp.Generator\MegaApp.Generator.csproj" />
     <ProjectReference Include="..\MegaApp.Infrastructure\MegaApp.Infrastructure.csproj" />
   </ItemGroup>
