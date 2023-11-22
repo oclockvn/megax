@@ -48,7 +48,7 @@ namespace MegaApp.Jobs
             {
                 var messageService =
                     scope.ServiceProvider
-                        .GetRequiredService<IMessageService>();
+                        .GetRequiredService<IMessagePublisherService>();
 
                 await messageService.PublishAsync(stoppingToken);
             }

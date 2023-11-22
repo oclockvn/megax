@@ -16,7 +16,7 @@ public static class ServiceCollectionExtension
 
         return services
             .AddScoped<IEventService, EventService>()
-            .AddScoped<IMessageService, MessageService>()
+            .AddScoped<IMessagePublisherService, MessagePublisherService>()
             ;
     }
 }

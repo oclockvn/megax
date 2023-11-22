@@ -4,16 +4,16 @@ using MoreLinq;
 
 namespace MegaApp.Events.Services;
 
-public interface IMessageService
+public interface IMessagePublisherService
 {
     Task PublishAsync(CancellationToken cancellationToken);
 }
 
-internal class MessageService : IMessageService
+internal class MessagePublisherService : IMessagePublisherService
 {
     private readonly IDbContextFactory<EventDbContext> dbContextFactory;
 
-    public MessageService(IDbContextFactory<EventDbContext> dbContextFactory)
+    public MessagePublisherService(IDbContextFactory<EventDbContext> dbContextFactory)
     {
         this.dbContextFactory = dbContextFactory;
     }
