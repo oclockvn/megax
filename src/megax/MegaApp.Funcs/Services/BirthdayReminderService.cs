@@ -26,26 +26,24 @@ namespace MegaApp.Funcs.Services
         {
             using var db = dbContextFactory.CreateDbContext();
             var now = DateTime.Now;
-            var maxDay = 3;
 
-            var upcomingBirthdayUsers = await db.Users
-                .Where(u => u.Dob.HasValue && u.Dob.Value.Month >= now.Month && u.Dob.Value.Date.DayOfYear - now.DayOfYear <= maxDay && u.Dob.Value.Date.DayOfYear - now.DayOfYear >= 0)
+            var todayBirthdayUsers = await db.Users
+                .Where(u => u.Dob.HasValue && u.Dob.Value.Month >= now.Month && u.Dob.Value.Date.DayOfYear == now.DayOfYear)
                 .Select(x => x.Id)
                 .ToArrayAsync();
 
-            // todo: handle birthday at first 3 days of the year
-            var reminds = await db.BirthdayReminders.Where(r => upcomingBirthdayUsers.Contains(r.UserId) && r.CreatedAt.Year == now.Year)
+            var reminds = await db.BirthdayReminders.Where(r => todayBirthdayUsers.Contains(r.UserId) && r.CreatedAt.Year == now.Year)
                 .Select(x => x.UserId)
                 .ToArrayAsync();
 
-            upcomingBirthdayUsers = upcomingBirthdayUsers.Except(reminds).ToArray();
+            todayBirthdayUsers = todayBirthdayUsers.Except(reminds).ToArray();
 
-            if (upcomingBirthdayUsers.Length == 0)
+            if (todayBirthdayUsers.Length == 0)
             {
                 return;
             }
 
-            var batches = upcomingBirthdayUsers.Batch(50);
+            var batches = todayBirthdayUsers.Batch(50);
             foreach (var batch in batches)
             {
                 var events = batch.Select(id => new BirthdayReminderEvent
